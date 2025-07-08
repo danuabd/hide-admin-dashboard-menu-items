@@ -82,7 +82,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	{
 		register_setting(
 			$this->plugin_name . 'option_group',
-			$this->plugin_name . 'option',
+			$this->plugin_name . 'option_name',
 			array($this, 'sanitize_options')
 		);
 	}
