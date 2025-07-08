@@ -74,6 +74,20 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Register settings for this plugin
+	 * 
+	 * @since 1.0.0
+	 */
+	public function register_settings()
+	{
+		register_setting(
+			$this->plugin_name . 'option_group',
+			$this->plugin_name . 'option',
+			array($this, 'sanitize_options')
+		);
+	}
+
+	/**
 	 * Register the settings page for this plugin.
 	 * 
 	 * @since    1.0.0
