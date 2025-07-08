@@ -89,6 +89,11 @@ class Hide_Dashboard_Menu_Items_Admin
 
 	/**
 	 * Sanitize user inputs
+	 * 
+	 * @since 1.0.0
+	 * 
+	 * @param array $input User inputs received via admin form
+	 * @return array Sanitized array of options
 	 */
 	public function sanitize_options($input)
 	{
