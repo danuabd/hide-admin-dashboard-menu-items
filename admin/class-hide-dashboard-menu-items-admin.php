@@ -126,8 +126,12 @@ class Hide_Dashboard_Menu_Items_Admin
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_styles()
+	public function enqueue_styles($hook_suffix)
 	{
+		// load styles only in plugin admin settings page
+		if ($hook_suffix !== $this->settings_page_hook_suffix) {
+			return;
+		}
 
 		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), $this->version, 'all');
 	}
@@ -137,8 +141,12 @@ class Hide_Dashboard_Menu_Items_Admin
 	 *
 	 * @since    1.0.0
 	 */
-	public function enqueue_scripts()
+	public function enqueue_scripts($hook_suffix)
 	{
+		// load script only in plugin admin settings page
+		if ($hook_suffix !== $this->settings_page_hook_suffix) {
+			return;
+		}
 
 		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), $this->version, false);
 	}
