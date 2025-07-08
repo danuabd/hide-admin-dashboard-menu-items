@@ -55,6 +55,25 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Register the admin menu for this plugin (dashboard area).
+	 *
+	 * @since    1.0.0
+	 */
+	public function add_admin_menu()
+	{
+		// Add a new top-level menu item.
+		$this->settings_page_hook_suffix =	add_menu_page(
+			'Configure Hide Menu Items',
+			'Hide Menu Items',
+			'manage_options',
+			'hide-dashboard-menu-items-settings',
+			array($this, 'display_settings_page'),
+			'dashicons-hidden',
+			99
+		);
+	}
+
+	/**
 	 * Register the stylesheets for the admin area.
 	 *
 	 * @since    1.0.0
