@@ -74,6 +74,22 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Register the settings page for this plugin.
+	 * 
+	 * @since    1.0.0
+	 */
+	public function display_settings_page()
+	{
+		// Check if the user has the required capability.
+		if (!current_user_can('manage_options')) {
+			return;
+		}
+
+		// Include the settings page template.
+		include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
+	}
+
+	/**
 	 * Register the stylesheets for the admin area.
 	 *
 	 * @since    1.0.0
