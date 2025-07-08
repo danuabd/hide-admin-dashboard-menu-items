@@ -1,27 +1,15 @@
 <?php
 
 /**
- * The file that defines the core plugin class
- *
- * A class definition that includes attributes and functions used across both the
- * public-facing side of the site and the admin area.
- *
- * @link       https://danukaprasad.com
- * @since      1.0.0
- *
- * @package    Hide_Dashboard_Menu_Items
- * @subpackage Hide_Dashboard_Menu_Items/includes
- */
-
-/**
  * The core plugin class.
  *
- * This is used to define internationalization, admin-specific hooks, and
- * public-facing site hooks.
+ * This is used to define admin-specific hooks and
+ * admin dashboard-facing site hooks.
  *
  * Also maintains the unique identifier of this plugin as well as the current
  * version of the plugin.
  *
+ * @link       https://danukaprasad.com
  * @since      1.0.0
  * @package    Hide_Dashboard_Menu_Items
  * @subpackage Hide_Dashboard_Menu_Items/includes
@@ -62,8 +50,7 @@ class Hide_Dashboard_Menu_Items
 	 * Define the core functionality of the plugin.
 	 *
 	 * Set the plugin name and the plugin version that can be used throughout the plugin.
-	 * Load the dependencies, define the locale, and set the hooks for the admin area and
-	 * the public-facing side of the site.
+	 * Load the dependencies, define the locale, and set the hooks for the admin area
 	 *
 	 * @since    1.0.0
 	 */
@@ -87,7 +74,6 @@ class Hide_Dashboard_Menu_Items
 	 *
 	 * - Hide_Dashboard_Menu_Items_Loader. Orchestrates the hooks of the plugin.
 	 * - Hide_Dashboard_Menu_Items_Admin. Defines all hooks for the admin area.
-	 * - Hide_Dashboard_Menu_Items_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -108,12 +94,6 @@ class Hide_Dashboard_Menu_Items
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-hide-dashboard-menu-items-admin.php';
-
-		/**
-		 * The class responsible for defining all actions that occur in the public-facing
-		 * side of the site.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-hide-dashboard-menu-items-public.php';
 
 		$this->loader = new Hide_Dashboard_Menu_Items_Loader();
 	}

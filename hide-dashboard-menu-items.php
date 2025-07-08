@@ -53,7 +53,7 @@ register_deactivation_hook(__FILE__, 'deactivate_hide_dashboard_menu_items');
 
 /**
  * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
+ * admin-specific hooks.
  */
 require plugin_dir_path(__FILE__) . 'includes/class-hide-dashboard-menu-items.php';
 
