@@ -32,6 +32,15 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $version;
 
 	/**
+	 * The hook suffix for the settings page.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string
+	 */
+	private $settings_page_hook_suffix;
+
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
