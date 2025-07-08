@@ -88,6 +88,19 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Sanitize user inputs
+	 */
+	public function sanitize_options($input)
+	{
+		/**
+		 * To hold sanitized data
+		 */
+		$sanitized_data = array();
+
+		return $sanitized_data;
+	}
+
+	/**
 	 * Register the settings page for this plugin.
 	 * 
 	 * @since    1.0.0
