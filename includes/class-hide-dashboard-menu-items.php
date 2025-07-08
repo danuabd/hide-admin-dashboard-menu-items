@@ -137,6 +137,10 @@ class Hide_Dashboard_Menu_Items
 
 		$plugin_admin = new Hide_Dashboard_Menu_Items_Admin($this->get_plugin_name(), $this->get_version());
 
+		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
+
+		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
+
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 	}
