@@ -86,7 +86,6 @@ class Hide_Dashboard_Menu_Items
 	 * Include the following files that make up the plugin:
 	 *
 	 * - Hide_Dashboard_Menu_Items_Loader. Orchestrates the hooks of the plugin.
-	 * - Hide_Dashboard_Menu_Items_i18n. Defines internationalization functionality.
 	 * - Hide_Dashboard_Menu_Items_Admin. Defines all hooks for the admin area.
 	 * - Hide_Dashboard_Menu_Items_Public. Defines all hooks for the public side of the site.
 	 *
@@ -104,12 +103,6 @@ class Hide_Dashboard_Menu_Items
 		 * core plugin.
 		 */
 		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-hide-dashboard-menu-items-loader.php';
-
-		/**
-		 * The class responsible for defining internationalization functionality
-		 * of the plugin.
-		 */
-		require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-hide-dashboard-menu-items-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
