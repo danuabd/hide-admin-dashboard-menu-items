@@ -51,6 +51,24 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $menu_items_option_name;
 
 	/**
+	 * The slug for the settings page.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $settings_page_slug    The slug for the settings page.
+	 */
+	private $settings_page_slug;
+
+	/**
+	 * The slug for the debug page.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $debug_page_slug    The slug for the debug page.
+	 */
+	private $debug_page_slug;
+
+	/**
 	 * The hook suffix for the settings page.
 	 *
 	 * @since    1.0.0
@@ -58,6 +76,15 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @var      string
 	 */
 	private $settings_page_hook_suffix;
+
+	/**
+	 * The hook suffix for the debug page.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string
+	 */
+	private $debug_page_hook_suffix;
 
 	/**
 	 * Initialize the class and set its properties.
@@ -73,6 +100,8 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->version = $version;
 		$this->settings_option_name = $this->plugin_name . '_settings';
 		$this->menu_items_option_name = $this->plugin_name . '_cached_menu_items';
+		$this->settings_page_slug = $this->plugin_name . '-settings';
+		$this->debug_page_slug = $this->plugin_name . '-debug';
 	}
 
 	/**
