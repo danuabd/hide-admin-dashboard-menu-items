@@ -165,7 +165,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			'Configure Hide Menu Items',
 			'Hide Menu Items',
 			'manage_options',
-			'hide-dashboard-menu-items-settings',
+			$this->settings_page_slug,
 			array($this, 'display_settings_page'),
 			'dashicons-hidden',
 			99
