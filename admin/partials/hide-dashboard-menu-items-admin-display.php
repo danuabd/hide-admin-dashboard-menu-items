@@ -49,4 +49,23 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success'])): ?>
             <?php submit_button('Start First Scan', 'primary', '', false); ?>
         </form>
     </div>
+<?php endif;
+
+// If scan is done, show success message
+if (isset($_GET['hdmi_scan_success'])) {
+    add_settings_error(
+        'hdmi_scan_notice',
+        'hdmi_scan_success',
+        'Admin menu items scanned and cached successfully!',
+        'success'
+    );
+}
+
+settings_errors('hdmi_scan_notice');
+
+// Only show the rest of the form if scan is done
+if (get_option('hdmi_scan_completed')): ?>
+
+    <!-- <form method="post" action="options.php"></form> -->
+
 <?php endif; ?>
