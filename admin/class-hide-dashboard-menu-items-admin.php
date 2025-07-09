@@ -31,6 +31,25 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	private $version;
 
+
+	/**
+	 * The name of the option where settings are stored.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $settings_option_name    The name of the option where settings are stored.
+	 */
+	private $settings_option_name;
+
+	/**
+	 * The name of the option where menu items are cached.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $menu_items_option_name    The name of the option where menu items are cached.
+	 */
+	private $menu_items_option_name;
+
 	/**
 	 * The hook suffix for the settings page.
 	 *
@@ -52,6 +71,8 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+		$this->settings_option_name = $this->plugin_name . '_settings';
+		$this->menu_items_option_name = $this->plugin_name . '_cached_menu_items';
 	}
 
 	/**
@@ -71,7 +92,7 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		// Perform scan and cache
 		$menu_items = $this->get_registered_top_level_admin_menu_items();
-		update_option('hdmi_cached_menu_items', $menu_items);
+		update_option($this->menu_items_option_name, $menu_items);
 		update_option('hdmi_scan_completed', 1);
 
 		// Redirect back with success param
@@ -93,7 +114,7 @@ class Hide_Dashboard_Menu_Items_Admin
 		}
 
 		// Only run once
-		if (get_option('hdmi_scan_completed')) {
+		if (get_option($this->menu_items_option_name)) {
 			return;
 		}
 
@@ -131,7 +152,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	{
 		register_setting(
 			$this->plugin_name . '_group',
-			$this->plugin_name . '_settings',
+			$this->settings_option_name,
 			array($this, 'sanitize_settings_options')
 		);
 	}
