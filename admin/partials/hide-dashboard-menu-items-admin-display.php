@@ -19,7 +19,10 @@ $scan_done = get_option('hdmi_scan_completed');
 if (!$scan_done && !isset($_GET['hdmi_scan_success'])): ?>
     <style>
         #hdmi-scan-overlay {
-            position: fixed;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
             inset: 0;
             background: rgba(255, 255, 255, 0.95);
             z-index: 9999;
@@ -33,7 +36,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success'])): ?>
         #hdmi-scan-overlay button {
             margin-top: 1rem;
             padding: 0.6rem 1.2rem;
-            font-size: 16px;
+            font-size: 20px;
             background-color: #0073aa;
             color: white;
             border: none;
@@ -43,10 +46,13 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success'])): ?>
     </style>
 
     <div id="hdmi-scan-overlay">
-        <p><strong>Welcome!</strong> Before using this plugin, you need to scan the admin menu.</p>
-        <form method="post">
+        <h1>Welcome</h1>
+        <p class="hdmi">
+            <strong>Before using this plugin, you need to scan the admin menu.</strong>
+        </p>
+        <form method="post" class="hdmi-first-scan-form">
             <input type="hidden" name="hdmi_scan_request" value="1">
-            <?php submit_button('Start First Scan', 'primary', '', false); ?>
+            <?php submit_button('Start First Scan', 'primary', '', false, array('class' => 'hdmi-first-scan-submit')); ?>
         </form>
     </div>
 <?php endif;
