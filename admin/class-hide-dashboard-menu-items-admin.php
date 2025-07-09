@@ -111,6 +111,41 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Get the registered top-level admin menu items.
+	 *
+	 * @since    1.0.0
+	 * @return   array    An array of top-level admin menu items.
+	 */
+	public function get_registered_top_level_admin_menu_items()
+	{
+		global $menu;
+
+		$menu_items = array();
+
+		foreach ($menu as $item) {
+			$title      = isset($item[0]) ? strip_tags($item[0]) : '';
+			$capability = isset($item[1]) ? $item[1] : '';
+			$slug       = isset($item[2]) ? $item[2] : '';
+			$icon       = isset($item[6]) ? $item[6] : '';
+
+			if (empty($slug) || empty($title) || empty($icon)) {
+				// Skip items with missing data
+				continue;
+			}
+
+			if (current_user_can($capability)) {
+				$menu_items[] = array(
+					'slug'     => $slug,
+					'title'    => $title,
+					'dashicon' => $icon,
+				);
+			}
+		}
+
+		return $menu_items;
+	}
+
+	/**
 	 * Sanitize user inputs
 	 * 
 	 * @since 1.0.0
