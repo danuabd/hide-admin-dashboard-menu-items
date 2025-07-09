@@ -55,6 +55,32 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Process scanning for menu items.
+	 *
+	 * @since    1.0.0
+	 */
+	public function process_triggered_scan()
+	{
+		if (!isset($_GET['hdmi_trigger_scan']) || $_GET['page'] !== 'hide-dashboard-menu-items-settings') {
+			return;
+		}
+
+		if (!current_user_can('manage_options')) {
+			wp_die('Not allowed');
+		}
+
+		// Perform scan and cache
+		$menu_items = $this->get_registered_top_level_admin_menu_items();
+		update_option('hdmi_cached_menu_items', $menu_items);
+		update_option('hdmi_scan_completed', 1);
+
+		// Redirect back with success param
+		wp_redirect(add_query_arg('hdmi_scan_success', '1', admin_url('admin.php?page=hide-dashboard-menu-items-settings')));
+		exit;
+	}
+
+
+	/**
 	 * Initialize the scan for the plugin admin area. Run only once.
 	 *
 	 * @since    1.0.0
