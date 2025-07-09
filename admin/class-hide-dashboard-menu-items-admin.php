@@ -129,29 +129,6 @@ class Hide_Dashboard_Menu_Items_Admin
 
 
 	/**
-	 * Initialize the scan for the plugin admin area. Run only once.
-	 *
-	 * @since    1.0.0
-	 */
-	public function maybe_trigger_first_time_scan()
-	{
-		// Only run on plugin settings page
-		if (!isset($_GET['page']) || $_GET['page'] !== 'hide-dashboard-menu-items-settings') {
-			return;
-		}
-
-		// Only run once
-		if (get_option($this->menu_items_option_name)) {
-			return;
-		}
-
-		// Redirect to trigger scan via URL param
-		wp_redirect(add_query_arg('hdmi_trigger_scan', '1', admin_url('admin.php?page=hide-dashboard-menu-items-settings')));
-		exit;
-	}
-
-
-	/**
 	 * Register the admin menu for this plugin (dashboard area).
 	 *
 	 * @since    1.0.0
