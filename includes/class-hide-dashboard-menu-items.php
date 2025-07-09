@@ -114,8 +114,6 @@ class Hide_Dashboard_Menu_Items
 
 		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings');
 
-		$this->loader->add_action('admin_init', $plugin_admin, 'maybe_trigger_first_time_scan');
-
 		$this->loader->add_action('admin_init', $plugin_admin, 'process_triggered_scan');
 
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
