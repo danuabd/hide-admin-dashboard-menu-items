@@ -1,4 +1,3 @@
-/* override default bg color */
 .wp-admin #wpcontent {
   padding-left: 0;
 }
@@ -6,6 +5,21 @@
 .wp-admin #wpbody {
   background-color: #fff;
   padding-left: 20px;
+}
+
+/* 1rem = 16px */
+
+#hdmi-heading {
+  font-size: 2rem;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+#hdmi-subheading {
+  font-size: 1rem;
+  line-height: 1;
+  margin: 0;
+  margin-bottom: 2rem;
 }
 
 .hdmi-scanned-menu {
@@ -134,4 +148,18 @@
 .hdmi-toggle-label {
   font-size: 11px;
   color: #555d66;
+}
+
+#hdmi-re-scan {
+  margin-bottom: 10px;
+}
+
+#hdmi-re-scan-button {
+  margin-bottom: 6px;
+}
+
+#hdmi-re-scan-description {
+  display: block;
+  font-style: italic;
+  margin-bottom: 2rem;
 }

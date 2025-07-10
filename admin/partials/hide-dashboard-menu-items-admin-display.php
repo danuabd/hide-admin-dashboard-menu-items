@@ -60,8 +60,8 @@ if (get_option('hdmi_scan_completed')):
 ?>
     <div id="hdmi-container">
         <div class="wrap">
-            <h1>Hide Dashboard Menu Items</h1>
-            <p>Use the form below to hide specific dashboard menu items.</p>
+            <h1 id="hdmi-heading">Hide Dashboard Menu Items</h1>
+            <p id="hdmi-subheading">Use the form below to hide specific dashboard menu items.</p>
 
             <form method="post" action="options.php" id="hdmi-settings-form">
                 <?php
@@ -71,9 +71,9 @@ if (get_option('hdmi_scan_completed')):
                 do_settings_sections($settings_page_slug);
 
                 // Button for the re-scan request
-                echo '<div class="hdmi-re-scan">';
-                submit_button('Re-Scan Menu Items', 'primary', 'hdmi_scan_request', false, array('value' => '1'));
-                echo '<span class="hdmi-re-scan-description">This will re-scan the admin menu items and update the list.</span>';
+                echo '<div id="hdmi-re-scan">';
+                submit_button('Re-Scan Menu Items', 'primary', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi-re-scan-button'));
+                echo '<span id="hdmi-re-scan-description">This will re-scan the admin menu items and update the list.</span>';
                 echo '</div>';
 
                 echo '<div class="hdmi-scanned-menu">';
