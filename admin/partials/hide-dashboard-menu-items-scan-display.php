@@ -26,9 +26,9 @@
     }
 </style>
 <div id="hdmi-scan-overlay">
-    <h1>Welcome!</h1>
+    <h1><?php $title ?></h1>
     <p>
-        <strong>Before using this plugin, you need to scan the admin menu.</strong>
+        <strong><?php $description ?></strong>
     </p>
     <form method="post">
         <input type="hidden" name="hdmi_scan_request" value="1">

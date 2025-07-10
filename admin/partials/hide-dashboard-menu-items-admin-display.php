@@ -21,6 +21,24 @@ $plugin_options = get_option($this->settings_option_name, array());
 $hidden_menus = isset($plugin_options['hidden_menus']) ? $plugin_options['hidden_menus'] : array();
 
 if (!$scan_done && !isset($_GET['hdmi_scan_success']) || empty($menu_items)) {
+
+    $title = $description = '';
+
+    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !empty($menu_items)) {
+        // If scan is not done, show the scan overlay
+        $title = 'Welcome to Hide Admin Menu Items Plugin!';
+        $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the menu items and allow you to hide them later.';
+    } else {
+        // If scan is done but no items found, show a message
+        $title = 'Admin Menu Items Scan';
+        $description = 'The admin menu items have not been scanned yet. Please start the scan.';
+    }
+
+    // pass the title and description to the scan display
+    extract(array(
+        'title' => $title,
+        'description' => $description,
+    ));
     require_once __DIR__ . '/hide-dashboard-menu-items-scan-display.php';
     return;
 }
