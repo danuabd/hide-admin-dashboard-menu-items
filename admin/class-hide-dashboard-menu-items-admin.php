@@ -161,6 +161,18 @@ class Hide_Dashboard_Menu_Items_Admin
 		);
 	}
 
+	public function register_fields_and_sections()
+	{
+		add_settings_section(
+			$this->plugin_name . '_settings_section',
+			'',
+			function () {
+				echo '';
+			},
+			$this->settings_page_slug
+		);
+	}
+
 	/**
 	 * Get the registered top-level admin menu items.
 	 *

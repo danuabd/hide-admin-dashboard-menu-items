@@ -70,6 +70,12 @@ if (get_option('hdmi_scan_completed')):
                 // Output setting sections and their fields
                 do_settings_sections($settings_page_slug);
 
+                // Button for the re-scan request
+                echo '<div class="hdmi-re-scan">';
+                submit_button('Re-Scan Menu Items', 'primary', 'hdmi_scan_request', false, array('value' => '1'));
+                echo '<span class="hdmi-re-scan-description">This will re-scan the admin menu items and update the list.</span>';
+                echo '</div>';
+
                 echo '<div class="hdmi-scanned-menu">';
                 echo '<div class="hdmi-grid">';
 
