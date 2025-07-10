@@ -51,6 +51,24 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $menu_items_option_name;
 
 	/**
+	 * The key of the option where hidden menus are stored.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $hidden_menus_option_key    The key of the option where hidden menus are stored.
+	 */
+	private $hidden_menus_option_key;
+
+	/**
+	 * The name of the option where scan success status is stored.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $scan_success_option_name    The name of the option where scan success status is stored.
+	 */
+	private $scan_success_option_name;
+
+	/**
 	 * The slug for the settings page.
 	 *
 	 * @since    1.0.0
@@ -98,8 +116,14 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		$this->plugin_name = $plugin_name;
 		$this->version = $version;
+
+		// Define the option names for settings, cached menu items, scan success status, and hidden menus
 		$this->settings_option_name = $this->plugin_name . '_settings';
 		$this->menu_items_option_name = $this->plugin_name . '_cached_menu_items';
+		$this->scan_success_option_name = '_scan_completed';
+		$this->hidden_menus_option_key = 'hidden_menus';
+
+		// Define the slugs for the settings and debug pages
 		$this->settings_page_slug = $this->plugin_name . '-settings';
 		$this->debug_page_slug = $this->plugin_name . '-debug';
 	}
@@ -119,7 +143,7 @@ class Hide_Dashboard_Menu_Items_Admin
 
 			// Store in DB
 			update_option($this->menu_items_option_name, $menu_items);
-			update_option('hdmi_scan_completed', 1);
+			update_option($this->scan_success_option_name, 1);
 
 			// Redirect back with success transient
 			set_transient('hdmi_scan_success_notice', true, 30);
