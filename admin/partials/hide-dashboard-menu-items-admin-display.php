@@ -72,7 +72,7 @@ if (get_option('hdmi_scan_completed')):
 
                 // Button for the re-scan request
                 echo '<div id="hdmi-re-scan">';
-                submit_button('Re-Scan Menu Items', 'primary', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi-re-scan-button'));
+                submit_button('Re-Scan Menu Items', 'large', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi-re-scan-button'));
                 echo '<span id="hdmi-re-scan-description">This will re-scan the admin menu items and update the list.</span>';
                 echo '</div>';
 
