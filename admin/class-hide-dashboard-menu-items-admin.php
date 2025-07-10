@@ -174,7 +174,18 @@ class Hide_Dashboard_Menu_Items_Admin
 		$menu_items = array();
 
 		foreach ($menu as $item) {
-			$title      = isset($item[0]) ? strip_tags($item[0]) : '';
+			$raw_title = isset($item[0]) ? $item[0] : '';
+
+			// extract clean title
+			if (strpos($raw_title, '<') !== false) {
+				// Contains HTML, extract only the part before it
+				preg_match('/^[^<]+/', $raw_title, $matches);
+				$title = isset($matches[0]) ? trim($matches[0]) : '';
+			} else {
+				// No HTML, use as-is
+				$title = trim($raw_title);
+			}
+
 			$capability = isset($item[1]) ? $item[1] : '';
 			$slug       = isset($item[2]) ? $item[2] : '';
 			$icon       = isset($item[6]) ? $item[6] : '';
