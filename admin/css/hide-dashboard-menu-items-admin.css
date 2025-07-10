@@ -7,3 +7,131 @@
   background-color: #fff;
   padding-left: 20px;
 }
+
+.hdmi-scanned-menu {
+  width: fit-content;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccd0d4;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.hdmi-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #1d2327;
+}
+
+.hdmi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 165px);
+  gap: 20px;
+  max-width: 1000px;
+  box-sizing: border-box;
+  justify-content: start;
+  grid-auto-flow: row;
+}
+
+.hdmi-item {
+  max-width: 140px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 12px;
+  background-color: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.hdmi-item:hover {
+  background-color: #f0f0f1;
+}
+
+.hdmi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  border: 1px solid #dcdcde;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hdmi-icon .dashicons {
+  font-size: 22px;
+  color: #2c3338;
+}
+
+.hdmi-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3338;
+  margin-bottom: 8px;
+}
+
+.hdmi-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Toggle Switch Styles */
+.hdmi-switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+
+.hdmi-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.hdmi-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccd0d4;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.hdmi-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+.hdmi-switch input:checked + .hdmi-slider {
+  background-color: #2271b1;
+}
+
+.hdmi-switch input:checked + .hdmi-slider:before {
+  transform: translateX(18px);
+}
+
+.hdmi-toggle-label {
+  font-size: 11px;
+  color: #555d66;
+}
