@@ -121,9 +121,29 @@ class Hide_Dashboard_Menu_Items_Admin
 			update_option($this->menu_items_option_name, $menu_items);
 			update_option('hdmi_scan_completed', 1);
 
-			// Redirect back with success param
-			wp_redirect(add_query_arg('hdmi_scan_success', '1', admin_url('admin.php?page=' . $this->settings_page_slug)));
+			// Redirect back with success transient
+			set_transient('hdmi_scan_success_notice', true, 30);
+			wp_redirect(admin_url('admin.php?page=' . $this->settings_page_slug));
 			exit;
+		}
+	}
+
+	/**
+	 * Display a success notice after a successful scan.
+	 * 
+	 * This will be called in the admin_notices action
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_scan_success_notice()
+	{
+		if (get_transient('hdmi_scan_success_notice')) {
+?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php esc_html_e('Menu scan completed successfully.', 'hide-dashboard-menu-items'); ?></p>
+			</div>
+<?php
+			delete_transient('hdmi_scan_success_notice');
 		}
 	}
 
