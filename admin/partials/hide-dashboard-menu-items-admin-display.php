@@ -88,21 +88,21 @@ settings_errors('hdmi_scan_notice');
                 $name_attr = esc_attr($this->settings_option_name) . "[hidden_menus][]";
 
                 echo <<<HTML
-		<div class="hdmi-item">
-			<div class="hdmi-icon">
-				<span class="dashicons {$dashicon}"></span>
-			</div>
-			<div class="hdmi-label">{$title}</div>
+            <div class="hdmi-item">
+                <div class="hdmi-icon">
+                    <span class="dashicons {$dashicon}"></span>
+                </div>
+                <div class="hdmi-label">{$title}</div>
 
-			<div class="hdmi-toggle">
-				<label class="hdmi-switch">
-					<input type="checkbox" name="{$name_attr}" value="{$slug}" {$checked}>
-					<span class="hdmi-slider"></span>
-				</label>
-				<small class="hdmi-toggle-label">{$status}</small>
-			</div>
-		</div>
-		HTML;
+                <div class="hdmi-toggle">
+                    <label class="hdmi-switch">
+                        <input type="checkbox" name="{$name_attr}" value="{$slug}" {$checked}>
+                        <span class="hdmi-slider"></span>
+                    </label>
+                    <small class="hdmi-toggle-label">{$status}</small>
+                </div>
+            </div>
+            HTML;
             }
 
             echo '</div></div>';
