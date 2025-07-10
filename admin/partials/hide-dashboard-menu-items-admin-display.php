@@ -16,46 +16,14 @@ if (!defined('ABSPATH')) {
 // Check if the scan is already done
 $scan_done = get_option('hdmi_scan_completed');
 
-if (!$scan_done && !isset($_GET['hdmi_scan_success'])): ?>
-    <style>
-        #hdmi-scan-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            min-height: 100vh;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.95);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-size: 18px;
-        }
+$menu_items = get_option($this->menu_items_option_name, array());
+$plugin_options = get_option($this->settings_option_name, array());
+$hidden_menus = isset($plugin_options['hidden_menus']) ? $plugin_options['hidden_menus'] : array();
 
-        #hdmi-scan-overlay button {
-            margin-top: 1rem;
-            padding: 0.6rem 1.2rem;
-            font-size: 20px;
-            background-color: #0073aa;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-
-    <div id="hdmi-scan-overlay">
-        <h1>Welcome</h1>
-        <p class="hdmi">
-            <strong>Before using this plugin, you need to scan the admin menu.</strong>
-        </p>
-        <form method="post" class="hdmi-first-scan-form">
-            <input type="hidden" name="hdmi_scan_request" value="1">
-            <?php submit_button('Start First Scan', 'primary', '', false, array('class' => 'hdmi-first-scan-submit')); ?>
-        </form>
-    </div>
-<?php endif;
+if (!$scan_done && !isset($_GET['hdmi_scan_success']) || empty($menu_items)) {
+    require_once __DIR__ . '/hide-dashboard-menu-items-scan-display.php';
+    return;
+}
 
 // If scan is done, show success message
 if (isset($_GET['hdmi_scan_success'])) {
@@ -70,8 +38,55 @@ if (isset($_GET['hdmi_scan_success'])) {
 settings_errors('hdmi_scan_notice');
 
 // Only show the rest of the form if scan is done
-if (get_option('hdmi_scan_completed')): ?>
+if (get_option('hdmi_scan_completed')):
+?>
+    <div id="hdmi-container">
+        <div class="wrap">
+            <h1>Hide Dashboard Menu Items</h1>
+            <p>Use the form below to hide specific dashboard menu items.</p>
 
-    <!-- <form method="post" action="options.php"></form> -->
+            <form method="post" action="options.php" id="hdmi-settings-form">
+                <?php
+                // Output security fields for the registered setting "hdmi_settings"
+                settings_fields($settings_option_name);
+                // Output setting sections and their fields
+                do_settings_sections($settings_page_slug);
 
+                echo '<div class="hdmi-scanned-menu">';
+                echo '<div class="hdmi-grid">';
+
+                foreach ($menu_items as $item) {
+                    $slug     = esc_attr($item['slug']);
+                    $title    = esc_html($item['title']);
+                    $dashicon = esc_attr($item['dashicon']);
+                    $checked  = in_array($item['slug'], $hidden_menus) ? 'checked' : '';
+                    $status   = in_array($item['slug'], $hidden_menus) ? 'Hidden' : 'Visible';
+                    $name_attr = esc_attr($this->settings_option_name) . "[hidden_menus][]";
+
+                    echo <<<HTML
+		<div class="hdmi-item">
+			<div class="hdmi-icon">
+				<span class="dashicons {$dashicon}"></span>
+			</div>
+			<div class="hdmi-label">{$title}</div>
+
+			<div class="hdmi-toggle">
+				<label class="hdmi-switch">
+					<input type="checkbox" name="{$name_attr}" value="{$slug}" {$checked}>
+					<span class="hdmi-slider"></span>
+				</label>
+				<small class="hdmi-toggle-label">{$status}</small>
+			</div>
+		</div>
+		HTML;
+                }
+
+                echo '</div></div>';
+
+                // Output save settings button
+                submit_button();
+                ?>
+            </form>
+        </div>
+    </div>
 <?php endif; ?>
