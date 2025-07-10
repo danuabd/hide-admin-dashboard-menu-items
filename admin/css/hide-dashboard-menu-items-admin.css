@@ -1,0 +1,9 @@
+/* override default bg color */
+.wp-admin #wpcontent {
+  padding-left: 0;
+}
+
+.wp-admin #wpbody {
+  background-color: #fff;
+  padding-left: 20px;
+}
