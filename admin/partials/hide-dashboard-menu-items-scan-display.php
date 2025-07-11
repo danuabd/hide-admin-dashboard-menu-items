@@ -26,9 +26,9 @@
     }
 </style>
 <div id="hdmi-scan-overlay">
-    <h1><?php $title ?></h1>
+    <h1><?php echo esc_html($title) ?></h1>
     <p>
-        <strong><?php $description ?></strong>
+        <strong><?php echo esc_html($description) ?></strong>
     </p>
     <form method="post">
         <input type="hidden" name="hdmi_scan_request" value="1">
