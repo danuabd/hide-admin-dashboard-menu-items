@@ -168,3 +168,65 @@
   font-style: italic;
   margin-bottom: 2rem;
 }
+
+/* Toggle styling */
+#hdmi-bypass-settings {
+  display: none;
+  margin-top: 1rem;
+}
+.hdmi-toggle-inline {
+  position: relative;
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  cursor: pointer;
+  gap: 8px;
+  font-weight: 500;
+  user-select: none;
+}
+
+.hdmi-toggle-inline input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.hdmi-toggle-inline-slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: background-color 0.3s ease;
+}
+
+.hdmi-toggle-inline-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  top: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.hdmi-toggle-inline input:checked + .hdmi-toggle-inline-slider {
+  background-color: #0073aa;
+}
+
+.hdmi-toggle-inline input:checked + .hdmi-toggle-inline-slider::before {
+  transform: translateX(20px);
+}
+
+.hdmi-bypass-input-label {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.hdmi-warning-text {
+  color: #a00;
+  font-size: 13px;
+  margin-top: 6px;
+}
