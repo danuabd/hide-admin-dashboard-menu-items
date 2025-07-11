@@ -107,6 +107,30 @@ settings_errors('hdmi_scan_notice');
 
             echo '</div></div>';
 
+            ?>
+
+            <h2>Bypass Plugin Functionality</h2>
+            <p>Use a custom query parameter to temporarily bypass hidden menu restrictions. This is useful for admins who want quick access without deactivating the plugin.</p>
+
+            <div class="hdmi-bypass-section">
+                <label class="hdmi-toggle-inline">
+                    <input type="checkbox" id="hdmi-bypass-toggle" name="hdmi_bypass_enabled" value="1" />
+                    <span class="hdmi-toggle-inline-slider"></span>
+                    Enable bypass feature
+                </label>
+
+                <div id="hdmi-bypass-settings">
+                    <label class="hdmi-bypass-input-label" for="hdmi-bypass-key"><strong>Custom Query Parameter</strong></label>
+                    <input type="text" id="hdmi-bypass-key" name="hdmi_bypass_key" placeholder="e.g. bypass_access" class="regular-text" />
+
+                    <p class="description hdmi-warning-text">
+                        ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
+                    </p>
+                </div>
+            </div>
+
+            <?php
+
             // Output save settings button
             submit_button();
             ?>
