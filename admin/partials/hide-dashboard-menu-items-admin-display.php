@@ -132,7 +132,7 @@ settings_errors('hdmi_scan_notice');
             <?php
 
             // Output save settings button
-            submit_button();
+            submit_button('Save changes', 'primary', 'submit', true, array('id' => 'hdmi-save-settings-button'));
             ?>
         </form>
     </div>
