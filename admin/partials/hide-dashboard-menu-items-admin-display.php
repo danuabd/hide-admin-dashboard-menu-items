@@ -14,12 +14,12 @@ if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 // Check if the scan is already done
-$scan_done = get_option($this->scan_success_option_name, false);
-$hidden_menus_key = $this->hidden_menus_option_key;
+$scan_done = get_option($this->scan_success_option, false);
+$hidden_menus_key = $this->hidden_menus_key;
 
-$menu_items = get_option($this->menu_items_option_name, array());
-$plugin_options = get_option($this->settings_option_name, array());
-$hidden_menus = isset($plugin_options[$this->hidden_menus_option_key]) ? $plugin_options[$this->hidden_menus_option_key] : array();
+$menu_items = get_option($this->menu_items_option, array());
+$plugin_options = get_option($this->settings_option, array());
+$hidden_menus = isset($plugin_options[$this->hidden_menus_key]) ? $plugin_options[$this->hidden_menus_key] : array();
 
 if (!$scan_done && !isset($_GET['hdmi_scan_success']) || empty($menu_items)) {
 
@@ -66,7 +66,7 @@ settings_errors('hdmi_scan_notice');
         <form method="post" action="options.php" id="hdmi-settings-form">
             <?php
             // Output security fields for the registered setting "hdmi_settings"
-            settings_fields($settings_option_name);
+            settings_fields($settings_option);
             // Output setting sections and their fields
             do_settings_sections($settings_page_slug);
 
@@ -85,7 +85,7 @@ settings_errors('hdmi_scan_notice');
                 $dashicon = esc_attr($item['dashicon']);
                 $checked  = in_array($item['slug'], $hidden_menus) ? 'checked' : '';
                 $status   = in_array($item['slug'], $hidden_menus) ? 'Hidden' : 'Visible';
-                $name_attr = esc_attr($this->settings_option_name) . "[hidden_menus][]";
+                $name_attr = esc_attr($this->settings_option) . "[hidden_menus][]";
 
                 echo <<<HTML
             <div class="hdmi-item">
