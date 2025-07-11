@@ -309,7 +309,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', 'all');
 	}
 
 	/**
@@ -324,6 +324,6 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), $this->version, false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', false);
 	}
 }
