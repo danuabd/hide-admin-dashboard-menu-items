@@ -13,6 +13,53 @@
   padding-left: 20px;
 }
 
+/* scan */
+
+#hdmi-scan-overlay {
+  position: absolute;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  font-size: 18px;
+}
+
+#hdmi-scan-overlay input[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  font-size: 20px;
+  background-color: #0073aa;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#hdmi-scan-title {
+  max-width: 1000px;
+  font-size: 2.5rem;
+  text-align: center;
+  line-height: 1.2;
+  margin: 0 auto 1rem auto;
+}
+
+#hdmi-scan-description {
+  max-width: 700px;
+  font-size: 1rem;
+  text-align: center;
+  margin: 0 auto 2rem auto;
+}
+
+#hdmi-scan-request-button:hover {
+  background-color: #004a7c !important;
+}
+
 /* 1rem = 16px */
 
 #hdmi-heading {
@@ -104,7 +151,7 @@
   gap: 4px;
 }
 
-/* Toggle Switch Styles */
+/* Toggle Switch */
 .hdmi-switch {
   position: relative;
   display: inline-block;
