@@ -1,11 +1,11 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", function () {
-  const hdmiBypassForm = document.getElementById("hdmi-settings-form");
-  const hdmiBypassToggle = document.getElementById("hdmi-bypass-toggle");
+  const hdmiBypassForm = document.getElementById("hdmi__form");
+  const hdmiBypassToggle = document.getElementById("hdmi__bypass-toggle");
   const hdmiBypassSettingsView = document.getElementById(
-    "hdmi-bypass-settings"
+    "hdmi__bypass-controls"
   );
-  const hdmiBypassInput = document.getElementById("hdmi-bypass-key");
+  const hdmiBypassInput = document.getElementById("hdmi__bypass-key");
 
   // Toggle visibility on load if checked
   if (hdmiBypassToggle.checked) {

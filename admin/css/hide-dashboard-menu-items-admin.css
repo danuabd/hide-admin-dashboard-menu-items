@@ -14,23 +14,7 @@
 }
 
 /* scan */
-/* #hdmi-scan-overlay {
-  position: absolute;
-  width: 100%;
-  min-height: 100vh;
-  height: 100%;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.95);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  font-size: 18px;
-  z-index: 9999;
-  overflow: hidden;
-  background: image();
-} */
-#hdmi-scan-overlay {
+#hdmi-scan {
   position: relative;
   width: 100%;
   min-height: 100vh;
@@ -44,7 +28,7 @@
   overflow: hidden;
 }
 
-#hdmi-scan-overlay svg {
+#hdmi-scan svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -55,39 +39,39 @@
   pointer-events: none; /* Prevent accidental interaction */
 }
 
-#hdmi-scan-figure,
-#hdmi-scan-title,
-#hdmi-scan-description,
-#hdmi-scan-overlay form {
+#hdmi-scan__figure,
+#hdmi-scan__title,
+#hdmi-scan__description,
+#hdmi-scan form {
   position: relative;
   z-index: 1;
 }
 
 /* bg */
-#hdmi-overlay-bg {
+#hdmi-scan__background {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-#hdmi-overlay-icons {
+#hdmi-scan__background-icons {
   stroke: none;
   fill-rule: evenodd;
   fill: #000;
   fill-opacity: 0.06;
 }
 
-#hdmi-scan-figure {
+#hdmi-scan__figure {
   max-width: 180px;
 }
 
-#hdmi-scan-figure img {
+#hdmi-scan__logo {
   width: 100%;
   height: auto;
   border-radius: 6px;
 }
 
-#hdmi-scan-overlay input[type="submit"] {
+#hdmi-scan__button {
   margin-top: 1rem;
   padding: 0.6rem 1.2rem;
   font-size: 20px;
@@ -98,7 +82,7 @@
   cursor: pointer;
 }
 
-#hdmi-scan-title {
+#hdmi-scan__title {
   max-width: 1000px;
   font-size: 2.5rem;
   text-align: center;
@@ -106,7 +90,7 @@
   margin: 0 auto 1rem auto;
 }
 
-#hdmi-scan-description {
+#hdmi-scan__description {
   max-width: 700px;
   font-size: 1rem;
   text-align: center;
@@ -115,26 +99,26 @@
   margin: 0 auto 2rem auto;
 }
 
-#hdmi-scan-request-button:hover {
+#hdmi-scan__button:hover {
   background-color: #004a7c !important;
 }
 
 /* 1rem = 16px */
 
-#hdmi-heading {
+#hdmi__heading {
   font-size: 2rem;
   margin: 0;
   margin-bottom: 10px;
 }
 
-#hdmi-subheading {
+#hdmi__subheading {
   font-size: 1rem;
   line-height: 1;
   margin: 0;
   margin-bottom: 2rem;
 }
 
-.hdmi-scanned-menu {
+.hdmi__scanned-menu {
   width: fit-content;
   padding: 20px;
   background-color: var(--hdmi-white);
@@ -143,14 +127,14 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.hdmi-title {
+.hdmi__title {
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
   color: #1d2327;
 }
 
-.hdmi-grid {
+.hdmi__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, 165px);
   gap: 20px;
@@ -160,7 +144,7 @@
   grid-auto-flow: row;
 }
 
-.hdmi-item {
+.hdmi__item {
   max-width: 140px;
   width: 100%;
   display: flex;
@@ -174,11 +158,11 @@
   transition: background-color 0.2s ease;
 }
 
-.hdmi-item:hover {
+.hdmi__item:hover {
   background-color: #f0f0f1;
 }
 
-.hdmi-icon {
+.hdmi__item-icon {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -191,19 +175,19 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.hdmi-icon .dashicons {
+.hdmi__item-icon .dashicons {
   font-size: 22px;
   color: #2c3338;
 }
 
-.hdmi-label {
+.hdmi__item-label {
   font-size: 13px;
   font-weight: 500;
   color: #2c3338;
   margin-bottom: 8px;
 }
 
-.hdmi-toggle {
+.hdmi__item-toggle {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,20 +195,20 @@
 }
 
 /* Toggle Switch Styles */
-.hdmi-switch {
+.hdmi__item-switch {
   position: relative;
   display: inline-block;
   width: 38px;
   height: 20px;
 }
 
-.hdmi-switch input {
+.hdmi__item-switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.hdmi-slider {
+.hdmi__item-slider {
   position: absolute;
   cursor: pointer;
   top: 0;
@@ -236,7 +220,7 @@
   border-radius: 34px;
 }
 
-.hdmi-slider:before {
+.hdmi__item-slider:before {
   position: absolute;
   content: "";
   height: 14px;
@@ -249,44 +233,45 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
-.hdmi-switch input:checked + .hdmi-slider {
+.hdmi__item-switch input:checked + .hdmi__item-slider {
   background-color: var(--hdmi-accent);
 }
 
-.hdmi-switch input:checked + .hdmi-slider:before {
+.hdmi__item-switch input:checked + .hdmi__item-slider:before {
   transform: translateX(18px);
 }
 
-.hdmi-toggle-label {
+.hdmi__item-label {
   font-size: 11px;
   color: #555d66;
 }
 
-.hdmi-re-scan {
+.hdmi__rescan {
   margin-bottom: 10px;
 }
 
-#hdmi-re-scan-button,
+#hdmi__rescan-button,
 #hdmi-save-settings-button {
   font-size: 0.875rem;
+}
+
+#hdmi__rescan-description {
+  display: block;
+  font-style: italic;
+  margin-bottom: 2rem;
 }
 
 #hdmi-re-scan-button {
   margin-bottom: 6px;
 }
 
-.hdmi-re-scan-description {
-  display: block;
-  font-style: italic;
-  margin-bottom: 2rem;
-}
-
 /* Toggle styling */
-#hdmi-bypass-settings {
+#hdmi__bypass {
   display: none;
   margin-top: 1rem;
 }
-.hdmi-toggle-inline {
+
+#hdmi__bypass-controls {
   position: relative;
   display: inline-flex;
   flex-direction: row-reverse;
@@ -297,13 +282,13 @@
   user-select: none;
 }
 
-.hdmi-toggle-inline input[type="checkbox"] {
+#hdmi__bypass-toggle {
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.hdmi-toggle-inline-slider {
+#hdmi__bypass-slider {
   position: relative;
   width: 40px;
   height: 20px;
@@ -312,7 +297,7 @@
   transition: background-color 0.3s ease;
 }
 
-.hdmi-toggle-inline-slider::before {
+#hdmi__bypass-slider::before {
   content: "";
   position: absolute;
   height: 16px;
@@ -324,20 +309,20 @@
   transition: transform 0.3s ease;
 }
 
-.hdmi-toggle-inline input:checked + .hdmi-toggle-inline-slider {
+#hdmi__bypass-toggle:checked + #hdmi__bypass-slider {
   background-color: var(--hdmi-accent);
 }
 
-.hdmi-toggle-inline input:checked + .hdmi-toggle-inline-slider::before {
+#hdmi__bypass-toggle:checked + #hdmi__bypass-slider::before {
   transform: translateX(20px);
 }
 
-.hdmi-bypass-input-label {
+.hdmi__bypass-label {
   display: block;
   margin-bottom: 8px;
 }
 
-.hdmi-warning-text {
+.hdmi__bypass-warning {
   color: var(--hdmi-red);
   font-size: 13px;
   margin-top: 6px;
