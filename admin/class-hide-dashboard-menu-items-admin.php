@@ -31,6 +31,15 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	private $version;
 
+	/**
+	 * The name of the option group for settings.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_option_group    The name of the option group for settings.
+	 */
+	private $plugin_option_group;
+
 
 	/**
 	 * The name of the option where settings are stored.
@@ -58,6 +67,24 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @var      string    $hidden_menus_key    The key of the option where hidden menus are stored.
 	 */
 	private $hidden_menus_key;
+
+	/**
+	 * The key of the option where bypass enabled status is stored.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $bypass_enabled_key	The key of the option where bypass enabled status is stored.
+	 */
+	private $bypass_enabled_key;
+
+	/**
+	 * The key of the option where bypass key is stored.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $bypass_key    The key of the option where bypass key is stored.
+	 */
+	private $bypass_query_key;
 
 	/**
 	 * The name of the option where scan success status is stored.
@@ -118,10 +145,15 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->version = $version;
 
 		// Define the option names for settings, cached menu items, scan success status, and hidden menus
+		$this->plugin_option_group = $this->plugin_name . '_group';
+
 		$this->settings_option = $this->plugin_name . '_settings';
 		$this->menu_items_option = $this->plugin_name . '_cached_menu_items';
 		$this->scan_success_option = '_scan_completed';
-		$this->hidden_menus_key = '_hidden_menus';
+
+		$this->hidden_menus_key = 'hidden_menus';
+		$this->bypass_enabled_key = 'hdmi_bypass_enabled';
+		$this->bypass_query_key = 'hdmi_bypass_key';
 
 		// Define the slugs for the settings and debug pages
 		$this->settings_page_slug = $this->plugin_name . '-settings';
@@ -199,20 +231,23 @@ class Hide_Dashboard_Menu_Items_Admin
 	public function register_settings()
 	{
 		register_setting(
-			$this->plugin_name . '_group',
+			$this->plugin_option_group,
 			$this->settings_option,
 			array($this, 'sanitize_settings_options')
 		);
 	}
 
+	/**
+	 * Register the settings fields and sections for this plugin.
+	 *
+	 * @since    1.0.0
+	 */
 	public function register_fields_and_sections()
 	{
 		add_settings_section(
 			$this->plugin_name . '_settings_section',
 			'',
-			function () {
-				echo '';
-			},
+			'__return_false',
 			$this->settings_page_slug
 		);
 	}
@@ -298,6 +333,57 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Function to hide Menu items.
+	 *
+	 * @since    1.0.0
+	 */
+	public function hide_menu_items()
+	{
+		$settings = get_option($this->settings_option, []);
+
+		$hidden = $settings[$this->hidden_menus_key] ?? [];
+
+		if (!is_array($hidden) || empty($hidden)) {
+			return;
+		}
+
+		foreach ($hidden as $slug) {
+			remove_menu_page($slug);
+		}
+	}
+
+	/**
+	 * Function to restrict access to hidden menu items.
+	 *
+	 * @since    1.0.0
+	 */
+	public function restrict_hidden_menu_access()
+	{
+		if (!is_admin() || !is_user_logged_in()) {
+			return;
+		}
+
+		$settings = get_option($this->settings_option, []);
+		$hidden = $settings[$this->hidden_menus_key] ?? [];
+
+		if (empty($hidden)) {
+			return;
+		}
+
+		$current_screen = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : basename($_SERVER['PHP_SELF']);
+
+		foreach ($hidden as $slug) {
+			if (
+				strpos($_SERVER['REQUEST_URI'], $slug) !== false
+				|| $current_screen === $slug
+			) {
+				wp_die(__('Access to this page has been restricted by the admin.', $this->plugin_name), '', ['response' => 403]);
+			}
+		}
+	}
+
+
+	/**
 	 * Register the stylesheets for the admin area.
 	 *
 	 * @since    1.0.0
@@ -309,7 +395,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), filemtime(plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-admin.css'), 'all');
 	}
 
 	/**
