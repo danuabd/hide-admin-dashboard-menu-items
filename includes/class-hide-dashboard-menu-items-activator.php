@@ -34,7 +34,7 @@ class Hide_Dashboard_Menu_Items_Activator
 		}
 
 		if ($hasError) {
-			deactivate_plugins(plugin_basename(__FILE__));
+			deactivate_plugins(plugin_basename(dirname(__DIR__) . '/hide-dashboard-menu-items.php'));
 			wp_die(
 				esc_html__('Plugin activation failed: ', $domain) . $error_message,
 				esc_html__('Plugin Activation Error', $domain),
