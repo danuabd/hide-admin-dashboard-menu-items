@@ -273,12 +273,12 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function sanitize_settings_options($input)
 	{
-		/**
-		 * To hold sanitized data
-		 */
-		$sanitized_data = array();
-
-		return $sanitized_data;
+		if (!is_array($input)) {
+			return [];
+		}
+		return array_filter($input, function ($item) {
+			return is_string($item) && !empty($item);
+		});
 	}
 
 	/**
