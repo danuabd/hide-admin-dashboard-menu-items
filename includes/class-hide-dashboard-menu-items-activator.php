@@ -18,23 +18,27 @@ class Hide_Dashboard_Menu_Items_Activator
 	 */
 	public static function activate()
 	{
+		$domain = 'hide-dashboard-menu-items';
+		$hasError = false;
+		$error_message = '';
+
 		if (version_compare(PHP_VERSION, '7.4', '<')) {
-			wp_die(
-				esc_html__('Hide Dashboard Menu Items requires PHP version 7.4 or higher.', 'hide-dashboard-menu-items')
-			);
+			$hasError = true;
+			$error_message = 'Hide Dashboard Menu Items requires PHP version 7.4 or higher.';
 		}
 
 		// Check if the current user has the capability to activate plugins
 		if (! current_user_can('activate_plugins')) {
-			wp_die(
-				esc_html__('You do not have sufficient permissions to activate this plugin.', 'hide-dashboard-menu-items')
-			);
+			$hasError = true;
+			$error_message = 'You do not have sufficient permissions to activate this plugin.';
 		}
 
-		// Check if the plugin is already activated
-		if (is_plugin_active('hide-dashboard-menu-items/hide-dashboard-menu-items.php')) {
+		if ($hasError) {
+			deactivate_plugins(plugin_basename(__FILE__));
 			wp_die(
-				esc_html__('The Hide Dashboard Menu Items plugin is already activated.', 'hide-dashboard-menu-items')
+				esc_html__('Plugin activation failed: ', $domain) . $error_message,
+				esc_html__('Plugin Activation Error', $domain),
+				array('back_link' => true)
 			);
 		}
 	}
