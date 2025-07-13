@@ -13,10 +13,10 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-// Check if the scan is already done
+// Initial scan is completed?
 $scan_done = get_option($this->scan_success_option, false);
 
-// Get the cached menu items and plugin options
+// Get plugin options
 $plugin_options = get_option($this->settings_option, array());
 $cached_menu_items = get_option($this->menu_items_option, array());
 $hidden_menu_items = isset($plugin_options[$this->hidden_menus_key]) ? $plugin_options[$this->hidden_menus_key] : array();
@@ -24,17 +24,16 @@ $hidden_menu_items = isset($plugin_options[$this->hidden_menus_key]) ? $plugin_o
 $bypass_enabled = !empty($plugin_options[$this->bypass_enabled_key]) ? 'checked' : '';
 $bypass_value = isset($plugin_options[$this->bypass_query_key]) ? esc_attr($plugin_options[$this->bypass_query_key]) : '';
 
-
 if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_menu_items) {
 
     $title = $description = '';
 
     if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_menu_items) {
-        // If scan is not done, show the scan overlay
+        // If initial scan is not done
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
         $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the menu items and allow you to hide them later.';
     } else {
-        // If scan is done but no items found, show a message
+        // If scan is done but no items found
         $title = 'Admin Menu Items Scan';
         $description = 'The admin menu items have not been scanned yet. Please start the scan.';
     }
@@ -43,7 +42,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_menu_items) {
     return;
 }
 
-// If scan is done, show success message
+// If scan is completed, show success message
 if (isset($_GET['hdmi_scan_success'])) {
     add_settings_error(
         'hdmi_scan_notice',
@@ -55,7 +54,7 @@ if (isset($_GET['hdmi_scan_success'])) {
 
 settings_errors('hdmi_scan_notice');
 
-// Only show the rest of the form if scan is done
+// Only show the rest of the form if a scan is completed and menu items present
 ?>
 <div id="hdmi">
     <div class="wrap">
@@ -64,12 +63,9 @@ settings_errors('hdmi_scan_notice');
 
         <form method="post" action="options.php" id="hdmi__form">
             <?php
-            // Output security fields for the registered setting "hdmi_settings"
             settings_fields($this->plugin_option_group);
-            // Output setting sections and their fields
             do_settings_sections($this->settings_page_slug);
 
-            // Button for the re-scan request
             echo '<div id="hdmi__rescan">';
             submit_button('Re-Scan Menu Items', 'large', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi__rescan-button', 'class' => 'hdmi__button'));
             echo '<span id="hdmi__rescan-description">This will re-scan the admin menu items and update the list.</span>';
@@ -110,7 +106,7 @@ settings_errors('hdmi_scan_notice');
 
             <div id="hdmi__bypass">
                 <h2 id="hdmi__bypass-heading">Bypass Plugin Functionality</h2>
-                <p id="hdmi__bypass-description">Use a custom query parameter to temporarily bypass hidden menu restrictions. This is useful for admins who want quick access without deactivating the plugin.</p>
+                <p id="hdmi__bypass-description">Use a custom query parameter to temporarily bypass hidden menu restrictions. This allows administrators to access hidden menu pages directly by visiting the menu link with the query automatically appended—no need to disable the plugin.</p>
 
                 <div id="hdmi__bypass-controls">
                     <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
@@ -122,7 +118,7 @@ settings_errors('hdmi_scan_notice');
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_query_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_query_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
@@ -133,7 +129,7 @@ settings_errors('hdmi_scan_notice');
 
             <?php
 
-            // Output save settings button
+            // save settings
             submit_button('Save changes', 'primary', 'submit', true, array('id' => 'hdmi__save-button', 'class' => 'hdmi__button'));
             ?>
         </form>

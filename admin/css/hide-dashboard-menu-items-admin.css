@@ -17,6 +17,10 @@
   padding-left: 1.25rem;
 }
 
+#hdmi {
+  max-width: 1200px;
+}
+
 /* ---------------------------------------------------
    BUTTONS
 --------------------------------------------------- */
@@ -194,7 +198,7 @@
   height: 100%;
   object-fit: cover;
   z-index: 0;
-  pointer-events: none; /* Prevent accidental interaction */
+  pointer-events: none;
 }
 
 #hdmi-scan__figure,
@@ -205,7 +209,6 @@
   z-index: 1;
 }
 
-/* bg */
 #hdmi-scan__background {
   width: 100%;
   height: 100%;
@@ -268,12 +271,14 @@
 
 #hdmi__scanned-menu {
   width: fit-content;
+  max-height: 35.375rem;
   padding: 1.25rem;
   background-color: var(--hdmi-white);
   border: 1px solid var(--hdmi-border);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   margin-bottom: 2rem;
+  overflow-y: auto;
 }
 
 /* ---------------------------------------------------
@@ -293,7 +298,20 @@
 --------------------------------------------------- */
 #hdmi__bypass-settings {
   display: none;
-  margin-top: 1rem;
+}
+
+#hdmi__bypass-heading {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+}
+
+#hdmi__bypass-description {
+  font-size: 0.9rem;
+  margin: 0 0 2rem 0;
+}
+
+#hdmi__bypass-toggle-wrapper {
+  margin-bottom: 1rem;
 }
 
 #hdmi__bypass-label {
@@ -312,10 +330,10 @@
 --------------------------------------------------- */
 /* @media (prefers-color-scheme: dark) {
   :root {
-    --hdmi-white: #1e1e1e;
-    --hdmi-light-gray: #2c2c2c;
-    --hdmi-border: #444;
-    --hdmi-muted-text: #aaa;
-    --hdmi-accent: #50bfff;
+    --hdmi-white: ;
+    --hdmi-light-gray: ;
+    --hdmi-border: ;
+    --hdmi-muted-text: ;
+    --hdmi-accent: ;
   }
 } */
