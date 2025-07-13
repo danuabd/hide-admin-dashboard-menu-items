@@ -350,17 +350,77 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function hide_menu_items()
 	{
-		$settings = get_option($this->settings_option, []);
+		$settings = get_option($this->settings_option, array());
 
-		$hidden = $settings[$this->hidden_menus_key] ?? [];
+		$hidden = $settings[$this->hidden_menus_key] ?? array();
 
 		if (!is_array($hidden) || empty($hidden)) {
 			return;
 		}
 
-		foreach ($hidden as $slug) {
-			remove_menu_page($slug);
+		$bypass_active = $this->bypass_key_valid();
+
+		if (!$bypass_active) {
+			// No access — remove the menu items
+			foreach ($hidden as $slug) {
+				remove_menu_page($slug);
+			}
+			return;
 		}
+
+		// If access is allowed, append the bypass query to menu URLs
+		global $menu;
+		$bypass_key = $settings[$this->bypass_query_key] ?? '';
+		if (!$bypass_key) {
+			return;
+		}
+
+		$this->update_menu_item_slugs($menu, $hidden, $bypass_key);
+	}
+
+	/**
+	 * Modify menu items URLs to append bypass key.
+	 *
+	 * @since    1.0.0
+	 * @param array $menu The global menu array.
+	 * @param array $hidden The hidden menu slugs.
+	 * @param string $bypass_key The bypass query key.
+	 */
+	public function update_menu_item_slugs($menu, $hidden, $bypass_key)
+	{
+		foreach ($menu as $index => $menu_item) {
+			if (in_array($menu_item[2], $hidden, true)) {
+				if (strpos($menu[$index][2], $bypass_key) === false) {
+					if (strpos($menu[$index][2], '?') !== false) {
+						$menu[$index][2] .= '&' . $bypass_key;
+					} else {
+						$menu[$index][2] .= '?' . $bypass_key;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if the bypass key is enabled and if the current request matches the bypass query.
+	 *
+	 * @since    1.0.0
+	 * @return   bool    True if bypass is enabled and query matches, false otherwise.
+	 */
+	public function bypass_key_valid()
+	{
+		$settings = get_option($this->settings_option, array());
+
+		if (
+			!empty($settings[$this->bypass_enabled_key]) &&
+			!empty($settings[$this->bypass_query_key]) &&
+			isset($_SERVER['REQUEST_URI']) &&
+			strpos($_SERVER['REQUEST_URI'], $settings[$this->bypass_query_key]) !== false
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
