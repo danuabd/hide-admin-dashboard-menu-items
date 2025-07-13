@@ -308,12 +308,23 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function sanitize_settings_options($input)
 	{
+
 		if (!is_array($input)) {
 			return [];
 		}
-		return array_filter($input, function ($item) {
-			return is_string($item) && !empty($item);
+
+		$sanitized = array_filter($input, function ($item) {
+
+			if (is_array($item)) {
+				// If it's an array, sanitize each element
+				return array_filter($item, function ($sub_item) {
+					return is_string($sub_item) && !empty($sub_item);
+				});
+			} else
+				return is_string($item) && !empty($item);
 		});
+
+		if (!empty($sanitized)) return $sanitized;
 	}
 
 	/**
