@@ -115,6 +115,8 @@ class Hide_Dashboard_Menu_Items
 
 		$this->loader->add_action('admin_init', $plugin_admin, 'process_triggered_scan');
 
+		$this->loader->add_action('admin_init', $plugin_admin, 'restrict_hidden_menu_access');
+
 		$this->loader->add_action('admin_notices', $plugin_admin, 'display_scan_success_notice');
 
 		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
