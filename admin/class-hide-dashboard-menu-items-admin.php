@@ -148,12 +148,12 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->plugin_option_group = $this->plugin_name . '_group';
 
 		$this->settings_option = $this->plugin_name . '_settings';
-		$this->menu_items_option = $this->plugin_name . '_cached_menu_items';
+		$this->menu_items_option = $this->plugin_name . '_cached';
 		$this->scan_success_option = '_scan_completed';
 
 		$this->hidden_menus_key = 'hidden_menus';
-		$this->bypass_enabled_key = 'hdmi_bypass_enabled';
-		$this->bypass_query_key = 'hdmi_bypass_key';
+		$this->bypass_enabled_key = 'bypass_enabled';
+		$this->bypass_query_key = 'bypass_key';
 
 		// Define the slugs for the settings and debug pages
 		$this->settings_page_slug = $this->plugin_name . '-settings';
