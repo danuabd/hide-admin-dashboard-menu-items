@@ -430,12 +430,9 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function restrict_hidden_menu_access()
 	{
-		if (!is_admin() || !is_user_logged_in()) {
-			return;
-		}
 
-		$settings = get_option($this->settings_option, []);
-		$hidden = $settings[$this->hidden_menus_key] ?? [];
+		$settings = get_option($this->settings_option, array());
+		$hidden = $settings[$this->hidden_menus_key] ?? array();
 
 		if (empty($hidden)) {
 			return;
@@ -448,7 +445,15 @@ class Hide_Dashboard_Menu_Items_Admin
 				strpos($_SERVER['REQUEST_URI'], $slug) !== false
 				|| $current_screen === $slug
 			) {
-				wp_die(__('Access to this page has been restricted by the admin.', $this->plugin_name), '', ['response' => 403]);
+				// If the bypass is enabled, allow access
+				if ($this->bypass_key_valid()) {
+					return; // Allow access
+				}
+
+				// Otherwise, restrict access
+				status_header(403);
+				nocache_headers();
+				exit;
 			}
 		}
 	}
