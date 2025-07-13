@@ -2,6 +2,10 @@
   --hdmi-accent: #004a7c;
   --hdmi-white: #fff;
   --hdmi-red: #a00;
+  --hdmi-accent-light: #0073aa;
+  --hdmi-light-gray: #f6f7f7;
+  --hdmi-border: #dcdcde;
+  --hdmi-muted-text: #555d66;
 }
 
 .wp-admin #wpcontent {
@@ -10,10 +14,164 @@
 
 .wp-admin #wpbody {
   background-color: var(--hdmi-white);
-  padding-left: 20px;
+  padding-left: 1.25rem;
 }
 
-/* scan */
+/* ---------------------------------------------------
+   BUTTONS
+--------------------------------------------------- */
+.hdmi__button {
+  display: inline-block;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  background-color: var(--hdmi-accent-light);
+  color: var(--hdmi-white);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.hdmi__button:focus-visible,
+.hdmi-toggle-slider:focus-visible {
+  outline: 2px solid var(--hdmi-accent);
+  outline-offset: 2px;
+}
+
+.hdmi__button:hover {
+  background-color: var(--hdmi-accent);
+}
+
+#hdmi-scan__button {
+  margin-top: 1rem;
+  font-size: 1.25rem;
+}
+
+#hdmi__rescan-button,
+#hdmi__save-button {
+  font-size: 0.875rem;
+}
+
+#hdmi__rescan-button {
+  margin-bottom: 6px;
+}
+
+/* ---------------------------------------------------
+   GRID MENU ITEMS
+--------------------------------------------------- */
+.hdmi__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 165px);
+  gap: 1.25rem;
+  max-width: 1200px;
+  box-sizing: border-box;
+  justify-content: start;
+  grid-auto-flow: row;
+}
+
+.hdmi__item {
+  max-width: 140px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 16px 12px;
+  background-color: var(--hdmi-light-gray);
+  border: 1px solid var(--hdmi-border);
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.hdmi__item:hover {
+  background-color: #f0f0f1;
+}
+
+.hdmi__item-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--hdmi-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  border: 1px solid var(--hdmi-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.hdmi__item-icon .dashicons {
+  font-size: 22px;
+  color: #2c3338;
+}
+
+.hdmi__item-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2c3338;
+  margin-bottom: 8px;
+}
+
+/* ---------------------------------------------------
+   TOGGLE COMPONENT
+--------------------------------------------------- */
+.hdmi-toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.hdmi-toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.hdmi-toggle-slider {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: background-color 0.3s ease;
+}
+
+.hdmi-toggle-slider::before {
+  content: "";
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  top: 2px;
+  left: 2px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.hdmi-toggle-input:checked + .hdmi-toggle-slider {
+  background-color: var(--hdmi-accent, #0073aa);
+}
+
+.hdmi-toggle-input:checked + .hdmi-toggle-slider::before {
+  transform: translateX(20px);
+}
+
+.hdmi__item-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ---------------------------------------------------
+   INITIAL SCAN
+--------------------------------------------------- */
 #hdmi-scan {
   position: relative;
   width: 100%;
@@ -71,17 +229,6 @@
   border-radius: 6px;
 }
 
-#hdmi-scan__button {
-  margin-top: 1rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 20px;
-  background-color: #0073aa;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 #hdmi-scan__title {
   max-width: 1000px;
   font-size: 2.5rem;
@@ -100,15 +247,16 @@
 }
 
 #hdmi-scan__button:hover {
-  background-color: #004a7c !important;
+  background-color: var(--hdmi-accent) !important;
 }
 
-/* 1rem = 16px */
-
+/* ---------------------------------------------------
+   MAIN SETTINGS
+--------------------------------------------------- */
 #hdmi__heading {
   font-size: 2rem;
-  margin: 0;
-  margin-bottom: 10px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
 }
 
 #hdmi__subheading {
@@ -118,203 +266,34 @@
   margin-bottom: 2rem;
 }
 
-.hdmi__scanned-menu {
+#hdmi__scanned-menu {
   width: fit-content;
-  padding: 20px;
+  padding: 1.25rem;
   background-color: var(--hdmi-white);
-  border: 1px solid #ccd0d4;
+  border: 1px solid var(--hdmi-border);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  margin-bottom: 2rem;
 }
 
-.hdmi__title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #1d2327;
-}
-
-.hdmi__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, 165px);
-  gap: 20px;
-  max-width: 1200px;
-  box-sizing: border-box;
-  justify-content: start;
-  grid-auto-flow: row;
-}
-
-.hdmi__item {
-  max-width: 140px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 16px 12px;
-  background-color: #f6f7f7;
-  border: 1px solid #dcdcde;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
-}
-
-.hdmi__item:hover {
-  background-color: #f0f0f1;
-}
-
-.hdmi__item-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--hdmi-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-  border: 1px solid #dcdcde;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.hdmi__item-icon .dashicons {
-  font-size: 22px;
-  color: #2c3338;
-}
-
-.hdmi__item-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: #2c3338;
-  margin-bottom: 8px;
-}
-
-.hdmi__item-toggle {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Toggle Switch Styles */
-.hdmi__item-switch {
-  position: relative;
-  display: inline-block;
-  width: 38px;
-  height: 20px;
-}
-
-.hdmi__item-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.hdmi__item-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccd0d4;
-  transition: 0.4s;
-  border-radius: 34px;
-}
-
-.hdmi__item-slider:before {
-  position: absolute;
-  content: "";
-  height: 14px;
-  width: 14px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--hdmi-white);
-  transition: 0.4s;
-  border-radius: 50%;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-}
-
-.hdmi__item-switch input:checked + .hdmi__item-slider {
-  background-color: var(--hdmi-accent);
-}
-
-.hdmi__item-switch input:checked + .hdmi__item-slider:before {
-  transform: translateX(18px);
-}
-
-.hdmi__item-label {
-  font-size: 11px;
-  color: #555d66;
-}
-
-.hdmi__rescan {
-  margin-bottom: 10px;
-}
-
-#hdmi__rescan-button,
-#hdmi-save-settings-button {
-  font-size: 0.875rem;
+/* ---------------------------------------------------
+   RE-SCAN
+--------------------------------------------------- */
+#hdmi__rescan {
+  margin-bottom: 2rem;
 }
 
 #hdmi__rescan-description {
   display: block;
   font-style: italic;
-  margin-bottom: 2rem;
 }
 
-#hdmi-re-scan-button {
-  margin-bottom: 6px;
-}
-
-/* Toggle styling */
+/* ---------------------------------------------------
+   BYPASS
+--------------------------------------------------- */
 #hdmi__bypass-settings {
   display: none;
   margin-top: 1rem;
-}
-
-#hdmi__bypass-toggle-wrapper {
-  position: relative;
-  display: inline-flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  cursor: pointer;
-  gap: 8px;
-  font-weight: 500;
-  user-select: none;
-}
-
-#hdmi__bypass-toggle {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-#hdmi__bypass-slider {
-  position: relative;
-  width: 40px;
-  height: 20px;
-  background-color: #ccc;
-  border-radius: 34px;
-  transition: background-color 0.3s ease;
-}
-
-#hdmi__bypass-slider::before {
-  content: "";
-  position: absolute;
-  height: 16px;
-  width: 16px;
-  left: 2px;
-  top: 2px;
-  background-color: var(--hdmi-white);
-  border-radius: 50%;
-  transition: transform 0.3s ease;
-}
-
-#hdmi__bypass-toggle:checked + #hdmi__bypass-slider {
-  background-color: var(--hdmi-accent);
-}
-
-#hdmi__bypass-toggle:checked + #hdmi__bypass-slider::before {
-  transform: translateX(20px);
 }
 
 #hdmi__bypass-label {
@@ -324,6 +303,19 @@
 
 #hdmi__bypass-warning {
   color: var(--hdmi-red);
-  font-size: 13px;
+  font-size: 0.8125rem;
   margin-top: 6px;
 }
+
+/* ---------------------------------------------------
+   DARK MODE
+--------------------------------------------------- */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --hdmi-white: #1e1e1e;
+    --hdmi-light-gray: #2c2c2c;
+    --hdmi-border: #444;
+    --hdmi-muted-text: #aaa;
+    --hdmi-accent: #50bfff;
+  }
+} */

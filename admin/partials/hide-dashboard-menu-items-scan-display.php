@@ -25,6 +25,6 @@ if (!defined('ABSPATH')) {
     </p>
     <form id="hdmi-scan__form" method="post">
         <input id="hdmi-scan__input" type="hidden" name="hdmi_scan_request" value="1">
-        <?php submit_button('Start First Scan', 'primary', '', false, array('id' => 'hdmi-scan__button')); ?>
+        <?php submit_button('Start First Scan', 'primary', '', false, array('id' => 'hdmi-scan__button', 'class' => 'hdmi__button')); ?>
     </form>
 </div>

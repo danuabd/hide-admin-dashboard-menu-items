@@ -71,11 +71,11 @@ settings_errors('hdmi_scan_notice');
 
             // Button for the re-scan request
             echo '<div id="hdmi__rescan">';
-            submit_button('Re-Scan Menu Items', 'large', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi__rescan-button'));
+            submit_button('Re-Scan Menu Items', 'large', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi__rescan-button', 'class' => 'hdmi__button'));
             echo '<span id="hdmi__rescan-description">This will re-scan the admin menu items and update the list.</span>';
             echo '</div>';
 
-            echo '<div class="hdmi__scanned-menu">';
+            echo '<div id="hdmi__scanned-menu">';
             echo '<div class="hdmi__grid">';
 
             foreach ($cached_menu_items as $item) {
@@ -94,9 +94,9 @@ settings_errors('hdmi_scan_notice');
                 <div class="hdmi__item-label">{$title}</div>
 
                 <div class="hdmi__item-toggle">
-                    <label class="hdmi__item-switch">
-                        <input type="checkbox" name="{$name_attr}" value="{$slug}" {$checked}>
-                        <span class="hdmi__item-slider"></span>
+                    <label class="hdmi__item-switch hdmi-toggle-wrapper">
+                        <input type="checkbox" name="{$name_attr}" value="{$slug}" class="hdmi-toggle-input" {$checked}>
+                        <span class="hdmi-toggle-slider"></span>
                     </label>
                     <small class="hdmi__item-status">{$status}</small>
                 </div>
@@ -113,10 +113,10 @@ settings_errors('hdmi_scan_notice');
                 <p id="hdmi__bypass-description">Use a custom query parameter to temporarily bypass hidden menu restrictions. This is useful for admins who want quick access without deactivating the plugin.</p>
 
                 <div id="hdmi__bypass-controls">
-                    <label id="hdmi__bypass-toggle-wrapper">
-                        <input type="checkbox" id="hdmi__bypass-toggle"
+                    <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
+                        <input type="checkbox" id="hdmi__bypass-toggle" class="hdmi-toggle-input"
                             name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_enabled_key}]") ?>" value="1" <?php echo $bypass_enabled ?> />
-                        <span id="hdmi__bypass-slider"></span>
+                        <span id="hdmi__bypass-slider" class="hdmi-toggle-slider"></span>
                         Enable bypass feature
                     </label>
 
@@ -134,7 +134,7 @@ settings_errors('hdmi_scan_notice');
             <?php
 
             // Output save settings button
-            submit_button('Save changes', 'primary', 'submit', true, array('id' => 'hdmi__save-button'));
+            submit_button('Save changes', 'primary', 'submit', true, array('id' => 'hdmi__save-button', 'class' => 'hdmi__button'));
             ?>
         </form>
     </div>
