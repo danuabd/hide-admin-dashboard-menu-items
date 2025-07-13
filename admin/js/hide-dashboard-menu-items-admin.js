@@ -1,28 +1,28 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", function () {
-  const hdmiBypassForm = document.getElementById("hdmi__form");
+  const hdmiForm = document.getElementById("hdmi__form");
   const hdmiBypassToggle = document.getElementById("hdmi__bypass-toggle");
   const hdmiBypassSettingsView = document.getElementById(
-    "hdmi__bypass-controls"
+    "hdmi__bypass-settings"
   );
   const hdmiBypassInput = document.getElementById("hdmi__bypass-key");
 
   // Toggle visibility on load if checked
   if (hdmiBypassToggle.checked) {
-    hdmiBypassSettingsView.style.display = "block";
-    hdmiBypassInput.required = true;
+    enableByPassKey();
   }
 
-  hdmiBypassForm.addEventListener("change", function (e) {
+  hdmiForm.addEventListener("change", function (e) {
     if (e.target.closest("input").id !== hdmiBypassToggle.id) return;
 
-    hdmiBypassSettingsView.style.display = hdmiBypassToggle.checked
-      ? "block"
-      : "none";
-    hdmiBypassInput.required = hdmiBypassToggle.checked ? true : false;
+    if (hdmiBypassToggle.checked) {
+      enableByPassKey();
+    } else {
+      disableByPassKey();
+    }
   });
 
-  hdmiBypassForm.addEventListener("input", function () {
+  hdmiForm.addEventListener("input", function () {
     const value = hdmiBypassInput.value.trim();
     const hasInvalidChars = /[^a-zA-Z0-9_-]/.test(value);
 
@@ -38,3 +38,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+function enableByPassKey() {
+  hdmiBypassSettingsView.style.display = "block";
+  hdmiBypassInput.required = true;
+  hdmiBypassInput.removeAttribute("disabled");
+}
+
+function disableByPassKey() {
+  hdmiBypassSettingsView.style.display = "none";
+  hdmiBypassInput.required = false;
+  hdmiBypassInput.setAttribute("disabled", "");
+}

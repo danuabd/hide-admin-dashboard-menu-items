@@ -112,19 +112,19 @@ settings_errors('hdmi_scan_notice');
                 <h2 id="hdmi__bypass-heading">Bypass Plugin Functionality</h2>
                 <p id="hdmi__bypass-description">Use a custom query parameter to temporarily bypass hidden menu restrictions. This is useful for admins who want quick access without deactivating the plugin.</p>
 
-                <div class="hdmi__bypass-controls">
-                    <label class="hdmi__bypass-toggle-wrapper">
+                <div id="hdmi__bypass-controls">
+                    <label id="hdmi__bypass-toggle-wrapper">
                         <input type="checkbox" id="hdmi__bypass-toggle"
                             name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_enabled_key}]") ?>" value="1" <?php echo $bypass_enabled ?> />
-                        <span class="hdmi__bypass-slider"></span>
+                        <span id="hdmi__bypass-slider"></span>
                         Enable bypass feature
                     </label>
 
                     <div id="hdmi__bypass-settings">
-                        <label class="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_query_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" />
+                        <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_query_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" disabled />
 
-                        <p class="description hdmi__bypass-warning">
+                        <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
                         </p>
                     </div>

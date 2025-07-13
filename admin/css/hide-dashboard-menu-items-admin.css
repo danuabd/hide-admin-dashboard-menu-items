@@ -266,12 +266,12 @@
 }
 
 /* Toggle styling */
-#hdmi__bypass {
+#hdmi__bypass-settings {
   display: none;
   margin-top: 1rem;
 }
 
-#hdmi__bypass-controls {
+#hdmi__bypass-toggle-wrapper {
   position: relative;
   display: inline-flex;
   flex-direction: row-reverse;
@@ -317,12 +317,12 @@
   transform: translateX(20px);
 }
 
-.hdmi__bypass-label {
+#hdmi__bypass-label {
   display: block;
   margin-bottom: 8px;
 }
 
-.hdmi__bypass-warning {
+#hdmi__bypass-warning {
   color: var(--hdmi-red);
   font-size: 13px;
   margin-top: 6px;
