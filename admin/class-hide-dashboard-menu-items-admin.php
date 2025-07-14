@@ -55,9 +55,9 @@ class Hide_Dashboard_Menu_Items_Admin
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $menu_items_option    The name of the option where menu items are cached.
+	 * @var      string    $db_menu_items_option    The name of the option where menu items are cached.
 	 */
-	private $menu_items_option;
+	private $db_menu_items_option;
 
 	/**
 	 * The key of the option where hidden menus are stored.
@@ -148,7 +148,7 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->plugin_option_group = $this->plugin_name . '_group';
 
 		$this->settings_option = $this->plugin_name . '_settings';
-		$this->menu_items_option = $this->plugin_name . '_cached';
+		$this->db_menu_items_option = $this->plugin_name . '_db_cached';
 		$this->scan_success_option = '_scan_completed';
 
 		$this->hidden_menus_key = 'hidden_menus';
@@ -159,50 +159,6 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->settings_page_slug = $this->plugin_name . '-settings';
 		$this->debug_page_slug = $this->plugin_name . '-debug';
 	}
-
-	/**
-	 * Process scanning for menu items.
-	 *
-	 * @since    1.0.0
-	 */
-	public function process_triggered_scan()
-	{
-		if (
-			isset($_POST['hdmi_scan_request']) &&
-			current_user_can('manage_options')
-		) {
-			$menu_items = $this->get_registered_top_level_admin_menu_items();
-
-			// Store in DB
-			update_option($this->menu_items_option, $menu_items);
-			update_option($this->scan_success_option, 1);
-
-			// Redirect back with success transient
-			set_transient('hdmi_scan_success_notice', true, 30);
-			wp_redirect(admin_url('admin.php?page=' . $this->settings_page_slug));
-			exit;
-		}
-	}
-
-	/**
-	 * Display a success notice after a successful scan.
-	 * 
-	 * This will be called in the admin_notices action
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_scan_success_notice()
-	{
-		if (get_transient('hdmi_scan_success_notice')) {
-?>
-			<div class="notice notice-success is-dismissible">
-				<p><?php esc_html_e('Menu scan completed successfully.', 'hide-dashboard-menu-items'); ?></p>
-			</div>
-<?php
-			delete_transient('hdmi_scan_success_notice');
-		}
-	}
-
 
 	/**
 	 * Register the admin menu for this plugin (dashboard area).
@@ -253,12 +209,68 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
+	 * Register the settings page for this plugin.
+	 * 
+	 * @since    1.0.0
+	 */
+	public function display_settings_page()
+	{
+		// Check if the user has the required capability.
+		if (!current_user_can('manage_options')) {
+			return;
+		}
+
+		// Include the settings page template.
+		include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
+	}
+
+	/**
+	 * Process scanning for menu items.
+	 *
+	 * @since    1.0.0
+	 */
+	public function process_triggered_scan()
+	{
+		if (
+			isset($_POST['hdmi_scan_request']) &&
+			current_user_can('manage_options')
+		) {
+			$this->get_db_menu_items();
+
+			update_option($this->scan_success_option, 1);
+
+			set_transient('hdmi_scan_success_notice', true, 30);
+			wp_redirect(admin_url('admin.php?page=' . $this->settings_page_slug));
+			exit;
+		}
+	}
+
+	/**
+	 * Display a success notice after a successful scan.
+	 * 
+	 * This will be called in the admin_notices action
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_scan_success_notice()
+	{
+		if (get_transient('hdmi_scan_success_notice')) {
+?>
+			<div class="notice notice-success is-dismissible">
+				<p><?php esc_html_e('Menu scan completed successfully.', 'hide-dashboard-menu-items'); ?></p>
+			</div>
+<?php
+			delete_transient('hdmi_scan_success_notice');
+		}
+	}
+
+	/**
 	 * Get the registered top-level admin menu items.
 	 *
 	 * @since    1.0.0
 	 * @return   array    An array of top-level admin menu items.
 	 */
-	public function get_registered_top_level_admin_menu_items()
+	public function get_db_menu_items()
 	{
 		global $menu;
 
@@ -295,6 +307,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			}
 		}
 
+		update_option($this->db_menu_items_option, $menu_items);
 		return $menu_items;
 	}
 
@@ -325,22 +338,6 @@ class Hide_Dashboard_Menu_Items_Admin
 		});
 
 		if (!empty($sanitized)) return $sanitized;
-	}
-
-	/**
-	 * Register the settings page for this plugin.
-	 * 
-	 * @since    1.0.0
-	 */
-	public function display_settings_page()
-	{
-		// Check if the user has the required capability.
-		if (!current_user_can('manage_options')) {
-			return;
-		}
-
-		// Include the settings page template.
-		include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
 	}
 
 	/**

@@ -16,22 +16,26 @@ if (!defined('ABSPATH')) {
 // Initial scan is completed?
 $scan_done = get_option($this->scan_success_option, false);
 
-// Get plugin options
+// plugin options
 $plugin_options = get_option($this->settings_option, array());
-$cached_menu_items = get_option($this->menu_items_option, array());
-$hidden_menu_items = isset($plugin_options[$this->hidden_menus_key]) ? $plugin_options[$this->hidden_menus_key] : array();
+
+// Cached menu items
+$cached_db_menu_items = get_option($this->db_menu_items_option, array());
+
+// Hidden menu items
+$hidden_db_menu_items = isset($plugin_options[$this->hidden_db_menus_key]) ? $plugin_options[$this->hidden_db_menus_key] : array();
 
 $bypass_enabled = !empty($plugin_options[$this->bypass_enabled_key]) ? 'checked' : '';
 $bypass_value = isset($plugin_options[$this->bypass_query_key]) ? esc_attr($plugin_options[$this->bypass_query_key]) : '';
 
-if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_menu_items) {
+if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items)) {
 
     $title = $description = '';
 
-    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_menu_items) {
+    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items) {
         // If initial scan is not done
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
-        $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the menu items and allow you to hide them later.';
+        $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the dashboard menu and toolbar menu items and allow you to hide them later.';
     } else {
         // If scan is done but no items found
         $title = 'Admin Menu Items Scan';
@@ -58,8 +62,8 @@ settings_errors('hdmi_scan_notice');
 ?>
 <div id="hdmi">
     <div class="wrap">
-        <h1 id="hdmi__heading">Hide Dashboard Menu Items</h1>
-        <p id="hdmi__subheading">Use the form below to hide specific dashboard menu items.</p>
+        <h1 id="hdmi__title">Hide Dashboard Menu Items</h1>
+        <p id="hdmi__subtitle">Use the form below to hide specific dashboard menu items.</p>
 
         <form method="post" action="options.php" id="hdmi__form">
             <?php
@@ -71,26 +75,31 @@ settings_errors('hdmi_scan_notice');
             echo '<span id="hdmi__rescan-description">This will re-scan the admin menu items and update the list.</span>';
             echo '</div>';
 
-            echo '<div id="hdmi__scanned-menu">';
-            echo '<div class="hdmi__grid">';
+            /* ---------------------------------------------------
+                ADMIN Dashboard ITEMS
+            --------------------------------------------------- */
+            if (!empty($cached_db_menu_items)) {
+                echo '<h2 class="hdmi__subheading">Dashboard Menu Items</h2>';
+                echo '<div class="hdmi__menu" id="hdmi__menu--db">';
+                echo '<div class="hdmi__grid">';
 
-            foreach ($cached_menu_items as $item) {
-                $slug     = esc_attr($item['slug']);
-                $title    = esc_html($item['title']);
-                $dashicon = esc_attr($item['dashicon']);
-                $checked  = in_array($item['slug'], $hidden_menu_items) ? 'checked' : '';
-                $status   = in_array($item['slug'], $hidden_menu_items) ? 'Hidden' : 'Visible';
-                $name_attr = esc_attr($this->settings_option . "[$this->hidden_menus_key][]");
+                foreach ($cached_db_menu_items as $item) {
+                    $slug     = esc_attr($item['slug']);
+                    $title    = esc_html($item['title']);
+                    $dashicon = esc_attr($item['dashicon']);
+                    $checked  = in_array($item['slug'], $hidden_db_menu_items) ? 'checked' : '';
+                    $status   = in_array($item['slug'], $hidden_db_menu_items) ? 'Hidden' : 'Visible';
+                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_db_menus_key][]");
 
-                echo <<<HTML
-            <div class="hdmi__item">
-                <div class="hdmi__item-icon">
+                    echo <<<HTML
+            <div class="hdmi__grid-item">
+                <div class="hdmi__grid-item-icon">
                     <span class="dashicons {$dashicon}"></span>
                 </div>
                 <div class="hdmi__item-label">{$title}</div>
 
                 <div class="hdmi__item-toggle">
-                    <label class="hdmi__item-switch hdmi-toggle-wrapper">
+                    <label class="hdmi-toggle-wrapper">
                         <input type="checkbox" name="{$name_attr}" value="{$slug}" class="hdmi-toggle-input" {$checked}>
                         <span class="hdmi-toggle-slider"></span>
                     </label>
@@ -98,14 +107,18 @@ settings_errors('hdmi_scan_notice');
                 </div>
             </div>
             HTML;
-            }
+                }
 
-            echo '</div></div>';
+                echo '</div></div>';
+            }
 
             ?>
 
+            <!------------------------------------------------------->
+            <!-- BYPASS -->
+            <!------------------------------------------------------->
             <div id="hdmi__bypass">
-                <h2 id="hdmi__bypass-heading">Bypass Plugin Functionality</h2>
+                <h2 id="hdmi__bypass-heading" class="hdmi__subheading">Bypass Plugin Functionality</h2>
                 <p id="hdmi__bypass-description">Use a custom query parameter to temporarily bypass hidden menu restrictions. This allows administrators to access hidden menu pages directly by visiting the menu link with the query automatically appended—no need to disable the plugin.</p>
 
                 <div id="hdmi__bypass-controls">

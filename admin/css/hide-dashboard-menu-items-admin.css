@@ -61,7 +61,7 @@
 }
 
 /* ---------------------------------------------------
-   GRID MENU ITEMS
+   DASHBOARD ITEMS
 --------------------------------------------------- */
 .hdmi__grid {
   display: grid;
@@ -73,7 +73,7 @@
   grid-auto-flow: row;
 }
 
-.hdmi__item {
+.hdmi__grid-item {
   max-width: 140px;
   width: 100%;
   display: flex;
@@ -87,11 +87,11 @@
   transition: background-color 0.2s ease;
 }
 
-.hdmi__item:hover {
+.hdmi__grid-item:hover {
   background-color: #f0f0f1;
 }
 
-.hdmi__item-icon {
+.hdmi__grid-item-icon {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -104,7 +104,7 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.hdmi__item-icon .dashicons {
+.hdmi__grid-item-icon .dashicons {
   font-size: 22px;
   color: #2c3338;
 }
@@ -256,21 +256,25 @@
 /* ---------------------------------------------------
    MAIN SETTINGS
 --------------------------------------------------- */
-#hdmi__heading {
+#hdmi__title {
   font-size: 2rem;
   font-weight: 600;
   margin: 0 0 10px 0;
 }
 
-#hdmi__subheading {
+.hdmi__subheading {
+  font-size: 1.5rem;
+  margin: 0 0 1.25rem 0;
+}
+
+#hdmi__subtitle {
   font-size: 1rem;
   line-height: 1;
   margin: 0;
   margin-bottom: 2rem;
 }
 
-#hdmi__scanned-menu {
-  width: fit-content;
+#hdmi__menu--db {
   max-height: 35.375rem;
   padding: 1.25rem;
   background-color: var(--hdmi-white);
@@ -279,6 +283,10 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   margin-bottom: 2rem;
   overflow-y: auto;
+}
+
+#hdmi__menu--db {
+  width: fit-content;
 }
 
 /* ---------------------------------------------------
@@ -298,11 +306,6 @@
 --------------------------------------------------- */
 #hdmi__bypass-settings {
   display: none;
-}
-
-#hdmi__bypass-heading {
-  font-size: 1.5rem;
-  margin: 0 0 1rem 0;
 }
 
 #hdmi__bypass-description {
