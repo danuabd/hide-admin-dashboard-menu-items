@@ -17,5 +17,6 @@ $plugin_name = 'hide_dashboard_menu_items';
 
 // Delete the options set by the plugin
 delete_option($plugin_name . '_settings');
-delete_option($plugin_name . '_menu_items');
+delete_option($plugin_name . '_db_cached');
+delete_option($plugin_name . '_tb_cached');
 delete_option($plugin_name . '_scan_success');
