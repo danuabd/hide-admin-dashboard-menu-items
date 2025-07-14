@@ -21,18 +21,20 @@ $plugin_options = get_option($this->settings_option, array());
 
 // Cached menu items
 $cached_db_menu_items = get_option($this->db_menu_items_option, array());
+$cached_tb_menu_items = get_option($this->tb_menu_items_option, array());
 
 // Hidden menu items
 $hidden_db_menu_items = isset($plugin_options[$this->hidden_db_menus_key]) ? $plugin_options[$this->hidden_db_menus_key] : array();
+$hidden_tb_menu_items = isset($plugin_options[$this->hidden_tb_menus_key]) ? $plugin_options[$this->hidden_tb_menus_key] : array();
 
 $bypass_enabled = !empty($plugin_options[$this->bypass_enabled_key]) ? 'checked' : '';
 $bypass_value = isset($plugin_options[$this->bypass_query_key]) ? esc_attr($plugin_options[$this->bypass_query_key]) : '';
 
-if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items)) {
+if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items || !$cached_tb_menu_items)) {
 
     $title = $description = '';
 
-    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items) {
+    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items || !$cached_tb_menu_items) {
         // If initial scan is not done
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
         $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the dashboard menu and toolbar menu items and allow you to hide them later.';
@@ -107,6 +109,40 @@ settings_errors('hdmi_scan_notice');
                 </div>
             </div>
             HTML;
+                }
+
+                echo '</div></div>';
+            }
+
+
+
+            /* ---------------------------------------------------
+                ADMIN TOOLBAR ITEMS
+            --------------------------------------------------- */
+            if (isset($cached_tb_menu_items) && !empty($cached_tb_menu_items)) {
+                echo '<h2 class="hdmi__subheading">Toolbar Menu Items</h2>';
+                echo '<div id="hdmi__menu--tb">';
+                echo '<div class="hdmi__list">';
+
+                foreach ($cached_tb_menu_items as $item) {
+                    $id     = esc_attr($item['id']);
+                    $title    = esc_html($item['title']);
+                    $checked  = in_array($id, $hidden_tb_menu_items) ? 'checked' : '';
+                    $status   = in_array($id, $hidden_tb_menu_items) ? 'Hidden' : 'Visible';
+                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_tb_menus_key][]");
+
+                    echo <<<HTML
+                    <div class="hdmi__list-item">
+                        <span class="hdmi__list-title">{$title}</span>
+                        <div class="hdmi__list-controls">
+                            <label class="hdmi-toggle-wrapper">
+                                <input type="checkbox" name="{$name_attr}" value="{$id}" class="hdmi-toggle-input" {$checked}>
+                                <span class="hdmi-toggle-slider"></span>
+                            </label>
+                            <small class="hdmi__list-status">{$status}</small>
+                        </div>
+                    </div>
+                HTML;
                 }
 
                 echo '</div></div>';

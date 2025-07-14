@@ -117,6 +117,46 @@
 }
 
 /* ---------------------------------------------------
+   TOOLBAR ITEMS
+--------------------------------------------------- */
+.hdmi__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.hdmi__list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 12px 16px;
+  background-color: var(--hdmi-light-gray);
+  border: 1px solid var(--hdmi-border);
+  border-radius: 6px;
+}
+
+.hdmi__list-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2c3338;
+  flex-grow: 1;
+}
+
+.hdmi__list-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hdmi__list-status {
+  min-width: 38.63px;
+  font-size: 12px;
+  color: var(--hdmi-muted-text);
+}
+
+/* ---------------------------------------------------
    TOGGLE COMPONENT
 --------------------------------------------------- */
 .hdmi-toggle-wrapper {
@@ -274,7 +314,8 @@
   margin-bottom: 2rem;
 }
 
-#hdmi__menu--db {
+#hdmi__menu--db,
+#hdmi__menu--tb {
   max-height: 35.375rem;
   padding: 1.25rem;
   background-color: var(--hdmi-white);
@@ -286,6 +327,12 @@
 }
 
 #hdmi__menu--db {
+  width: fit-content;
+}
+
+#hdmi__menu--tb {
+  min-width: 200px;
+  max-width: 600px;
   width: fit-content;
 }
 
