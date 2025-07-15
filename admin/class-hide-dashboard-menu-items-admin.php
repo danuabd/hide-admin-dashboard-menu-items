@@ -32,11 +32,11 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $version;
 
 	/**
-	 * The array to store debug info.
+	 * The array to store info.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      array    $info_data    The array to store debug info.
+	 * @var      array    $info_data    The array to store info.
 	 */
 	private $info_data;
 
@@ -60,11 +60,11 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $settings_option;
 
 	/**
-	 * The name of the option where menu items are cached.
+	 * The name of the option where dashboard menu items are cached.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $db_menu_items_option    The name of the option where menu items are cached.
+	 * @var      string    $db_menu_items_option    The name of the option where dashboard menu items are cached.
 	 */
 	private $db_menu_items_option;
 
@@ -271,7 +271,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Process scanning for menu items.
+	 * Process scanning menu items.
 	 *
 	 * @since    1.0.0
 	 */
@@ -301,10 +301,9 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Get the registered top-level admin menu items.
+	 * Get the registered top-level dashboard menu items.
 	 *
 	 * @since    1.0.0
-	 * @return   array    An array of top-level admin menu items.
 	 */
 	public function store_db_menu()
 	{
@@ -364,7 +363,6 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * Get the registered top-level admin toolbar (admin bar) menu items.
 	 *
 	 * @since 1.0.0
-	 * @return array An array of admin toolbar menu items with ID, title, and optional meta.
 	 */
 	public function store_tb_menu()
 	{
@@ -578,7 +576,7 @@ class Hide_Dashboard_Menu_Items_Admin
 
 
 	/**
-	 * Function to hide Dashboard Menu items.
+	 * Function to hide dashboard Menu items.
 	 *
 	 * @since    1.0.0
 	 */
@@ -615,7 +613,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Function to hide Admin Toolbar items.
+	 * Function to hide admin toolbar items.
 	 *
 	 * @since 1.0.0
 	 */
@@ -647,7 +645,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Modify menu items URLs to append bypass key.
+	 * Modify dashboard menu items URLs to append bypass key.
 	 *
 	 * @since    1.0.0
 	 * @param array $menu The global menu array.
@@ -789,7 +787,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', false);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), filemtime(plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js'), false);
 	}
 
 	/**
