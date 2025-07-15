@@ -1,0 +1,183 @@
+/* ---------------------------------------------------
+   DEBUG PAGE
+--------------------------------------------------- */
+@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
+
+#hdmi__debug {
+  max-width: 900px;
+  padding: 2rem 1.5rem;
+  background-color: var(--hdmi-white);
+  border: 1px solid var(--hdmi-border);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  margin-top: 2rem;
+}
+
+.hdmi__copy-button,
+.hdmi__debug-heading,
+.hdmi__debug-description,
+.hdmi__debug-section,
+.hdmi__debug-subheading,
+.hdmi__debug-subtitle,
+.hdmi__log-box,
+.hdmi__debug-error-list,
+.hdmi__debug-section.hdmi__debug-help {
+  margin: 0;
+}
+
+.hdmi__debug-heading {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: #2c3338;
+  margin-bottom: 0.8rem;
+}
+
+.hdmi__debug-description {
+  margin: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1rem;
+  color: var(--hdmi-muted-text);
+}
+
+.hdmi__debug-divider {
+  margin-bottom: 2rem;
+}
+
+.hdmi__debug-section {
+  margin-bottom: 2rem;
+}
+
+.hdmi__debug-subheading {
+  font-size: 1.25rem;
+  line-height: 1;
+  margin-bottom: 0.8rem;
+  color: #2c3338;
+}
+
+.hdmi__debug-subtitle {
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.hdmi__log-box {
+  font-family: "Source Sans 3", monospace;
+  background-color: var(--hdmi-light-gray);
+  border: 1px solid var(--hdmi-border);
+  border-radius: 6px;
+  padding: 1rem;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#hdmi__debug .hdmi__copy-button {
+  margin-bottom: 1rem;
+}
+
+.hdmi__debug-section.hdmi__debug-help {
+  margin-bottom: 0;
+}
+
+.hdmi__debug-help {
+  font-size: 0.9rem;
+  background: var(--hdmi-light-gray);
+  border: 1px solid var(--hdmi-border);
+  padding: 1rem;
+  border-radius: 6px;
+}
+
+.hdmi__debug-help a {
+  color: var(--hdmi-accent-light);
+  text-decoration: none;
+}
+
+.hdmi__debug-help a:hover {
+  text-decoration: underline;
+}
+
+/* ---------------------------------------------------
+   DEBUG LIST FORMATTING (NESTED UL)
+--------------------------------------------------- */
+#hdmi__debug strong {
+  display: inline-block;
+}
+
+.hdmi__error-box {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.hdmi__log-box > ul {
+  margin: 0 0 0.5rem 1rem;
+  padding: 0;
+  list-style-type: disc;
+  color: var(--hdmi-muted-text);
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.hdmi__log-box > ul > li {
+  color: #202020;
+  margin-bottom: 0;
+}
+
+.hdmi__debug-box > ul > li > strong {
+  color: #004a7c;
+  margin-bottom: 1rem;
+}
+
+.hdmi__error-box > ul > li > strong {
+  color: var(--hdmi-red);
+  margin-bottom: 1rem;
+}
+
+.hdmi__log-box > ul > li > ul {
+  color: #202020;
+  font-weight: 400;
+}
+
+.hdmi__log-box > ul > li > ul > li {
+  color: #2c3338;
+  font-weight: 400;
+}
+
+.hdmi__log-box > ul > li > ul > li:last-child {
+  margin-bottom: 1rem;
+}
+
+.hdmi__log-box > ul > li > ul > li > strong {
+  color: #202020;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.hdmi__log-box > ul > li > ul > li > ul {
+  color: #202020;
+  font-weight: 400;
+}
+
+.hdmi__log-box > ul > li > ul > li > ul > li {
+  color: #2c3338;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.hdmi__log-box > ul > li > ul > li > ul > li > strong {
+  color: #202020;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+
+.hdmi__log-box > ul > li > ul > li > ul > li:last-child {
+  margin-bottom: 1rem;
+}
+
+.hdmi__log-box li {
+  line-height: 1.4;
+}
+
+.hdmi__log-box ul > li > ul > li > ul > li > ul > li > strong {
+  color: #2c3338;
+  font-weight: 400;
+}

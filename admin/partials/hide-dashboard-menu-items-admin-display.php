@@ -30,18 +30,18 @@ $hidden_tb_menu_items = isset($plugin_options[$this->hidden_tb_menus_key]) ? $pl
 $bypass_enabled = !empty($plugin_options[$this->bypass_enabled_key]) ? 'checked' : '';
 $bypass_value = isset($plugin_options[$this->bypass_query_key]) ? esc_attr($plugin_options[$this->bypass_query_key]) : '';
 
-if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items || !$cached_tb_menu_items)) {
+if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items && !$cached_tb_menu_items)) {
 
     $title = $description = '';
 
-    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items || !$cached_tb_menu_items) {
+    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items && !$cached_tb_menu_items) {
         // If initial scan is not done
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
         $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the dashboard menu and toolbar menu items and allow you to hide them later.';
     } else {
         // If scan is done but no items found
         $title = 'Admin Menu Items Scan';
-        $description = 'The admin menu items have not been scanned yet. Please start the scan.';
+        $description = 'The admin menu items have not been scanned yet or corrupted. Please start the scan.';
     }
 
     include_once __DIR__ . '/hide-dashboard-menu-items-scan-display.php';

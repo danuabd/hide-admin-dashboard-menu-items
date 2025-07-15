@@ -21,9 +21,10 @@ class Hide_Dashboard_Menu_Items_Deactivator
 	{
 		$plugin_name = 'hide_dashboard_menu_items';
 
-		// Delete the cache and scan success options
-		delete_option($plugin_name . '_db_cached');
+		// Delete the options set by the plugin
 		delete_option($plugin_name . '_tb_cached');
-		delete_option($plugin_name . '_scan_success');
+		delete_option($plugin_name . '_db_cached');
+		delete_option($plugin_name . '_scan_completed');
+		delete_option($plugin_name . '_debug');
 	}
 }
