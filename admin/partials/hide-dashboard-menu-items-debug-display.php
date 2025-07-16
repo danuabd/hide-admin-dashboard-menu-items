@@ -34,7 +34,7 @@ if (!defined('ABSPATH')) {
         <h2 class="hdmi__debug-subheading">Error Info</h2>
         <p class="hdmi__debug-subtitle">This part shows last 40 errors occurred during the plugin function executions.</p>
         <button data-key="errorInfo" onclick="copyInfo(event)" id="hdmi__copy-error" class="button-primary hdmi__copy-button">Copy Error Info</button>
-        <div class="hdmi__log-box hdmi__error-box"><?php echo $error_log_markup ?></div>
+        <div class="hdmi__log-box hdmi__error-box"><?php echo $error_markup ?></div>
     </div>
 
     <hr class="hdmi__debug-divider">
@@ -46,8 +46,8 @@ if (!defined('ABSPATH')) {
 
 <script>
     const debuggingData = {
-        'debugInfo': <?php echo json_encode($debug_data ?? []) ?>,
-        'errorInfo': <?php echo json_encode($error_data ?? []) ?>
+        'debugInfo': <?php echo json_encode($final_info_data ?? []) ?>,
+        'errorInfo': <?php echo json_encode($stored_error_data ?? []) ?>
     }
 
     const copyInfo = function(e) {

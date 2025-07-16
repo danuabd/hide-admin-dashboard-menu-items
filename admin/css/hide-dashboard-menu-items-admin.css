@@ -322,7 +322,7 @@
   border: 1px solid var(--hdmi-border);
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
   overflow-y: auto;
 }
 
@@ -340,7 +340,7 @@
    RE-SCAN
 --------------------------------------------------- */
 #hdmi__rescan {
-  margin-bottom: 2rem;
+  margin-bottom: 4rem;
 }
 
 #hdmi__rescan-description {

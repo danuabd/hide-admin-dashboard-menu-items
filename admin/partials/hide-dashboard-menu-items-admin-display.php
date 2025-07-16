@@ -16,25 +16,22 @@ if (!defined('ABSPATH')) {
 // Initial scan is completed?
 $scan_done = get_option($this->scan_success_option, false);
 
-// plugin options
-$plugin_options = get_option($this->settings_option, array());
-
 // Cached menu items
-$cached_db_menu_items = get_option($this->db_menu_items_option, array());
-$cached_tb_menu_items = get_option($this->tb_menu_items_option, array());
+$cached_db_menu = get_option($this->db_menu_option, array());
+$cached_tb_menu = get_option($this->tb_menu_option, array());
 
 // Hidden menu items
-$hidden_db_menu_items = isset($plugin_options[$this->hidden_db_menus_key]) ? $plugin_options[$this->hidden_db_menus_key] : array();
-$hidden_tb_menu_items = isset($plugin_options[$this->hidden_tb_menus_key]) ? $plugin_options[$this->hidden_tb_menus_key] : array();
+$hidden_db_menu = $this->get_plugin_option($this->hidden_db_menu_key, array());
+$hidden_tb_menu = $this->get_plugin_option($this->hidden_tb_menu_key, array());
 
-$bypass_enabled = !empty($plugin_options[$this->bypass_enabled_key]) ? 'checked' : '';
-$bypass_value = isset($plugin_options[$this->bypass_query_key]) ? esc_attr($plugin_options[$this->bypass_query_key]) : '';
+$bypass_enabled = $this->get_bypass_param()  ? 'checked' : '';
+$bypass_value = esc_attr($this->get_bypass_param()) ?? '';
 
-if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu_items && !$cached_tb_menu_items)) {
+if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$cached_tb_menu)) {
 
     $title = $description = '';
 
-    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu_items && !$cached_tb_menu_items) {
+    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu && !$cached_tb_menu) {
         // If initial scan is not done
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
         $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the dashboard menu and toolbar menu items and allow you to hide them later.';
@@ -71,6 +68,7 @@ settings_errors('hdmi_scan_notice');
             <?php
             settings_fields($this->plugin_option_group);
             do_settings_sections($this->settings_page_slug);
+            wp_nonce_field('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field');
 
             echo '<div id="hdmi__rescan">';
             submit_button('Re-Scan Menu Items', 'large', 'hdmi_scan_request', false, array('value' => '1', 'id' => 'hdmi__rescan-button', 'class' => 'hdmi__button'));
@@ -80,17 +78,17 @@ settings_errors('hdmi_scan_notice');
             /* ---------------------------------------------------
                 ADMIN Dashboard ITEMS
             --------------------------------------------------- */
-            if (!empty($cached_db_menu_items)) {
+            if (!empty($cached_db_menu)) {
                 echo '<h2 class="hdmi__subheading">Dashboard Menu Items</h2>';
                 echo '<div class="hdmi__menu" id="hdmi__menu--db">';
                 echo '<div class="hdmi__grid">';
 
-                foreach ($cached_db_menu_items as $item) {
+                foreach ($cached_db_menu as $item) {
                     $slug     = esc_attr($item['slug']);
                     $title    = esc_html($item['title']);
                     $dashicon = esc_attr($item['dashicon']);
-                    $checked  = in_array($item['slug'], $hidden_db_menu_items) ? 'checked' : '';
-                    $status   = in_array($item['slug'], $hidden_db_menu_items) ? 'Hidden' : 'Visible';
+                    $checked  = in_array($item['slug'], $hidden_db_menu) ? 'checked' : '';
+                    $status   = in_array($item['slug'], $hidden_db_menu) ? 'Hidden' : 'Visible';
                     $name_attr = esc_attr($this->settings_option . "[$this->hidden_db_menus_key][]");
 
                     echo <<<HTML
@@ -119,16 +117,16 @@ settings_errors('hdmi_scan_notice');
             /* ---------------------------------------------------
                 ADMIN TOOLBAR ITEMS
             --------------------------------------------------- */
-            if (isset($cached_tb_menu_items) && !empty($cached_tb_menu_items)) {
+            if (isset($cached_tb_menu) && !empty($cached_tb_menu)) {
                 echo '<h2 class="hdmi__subheading">Toolbar Menu Items</h2>';
                 echo '<div id="hdmi__menu--tb">';
                 echo '<div class="hdmi__list">';
 
-                foreach ($cached_tb_menu_items as $item) {
+                foreach ($cached_tb_menu as $item) {
                     $id     = esc_attr($item['id']);
                     $title    = esc_html($item['title']);
-                    $checked  = in_array($id, $hidden_tb_menu_items) ? 'checked' : '';
-                    $status   = in_array($id, $hidden_tb_menu_items) ? 'Hidden' : 'Visible';
+                    $checked  = in_array($id, $hidden_tb_menu) ? 'checked' : '';
+                    $status   = in_array($id, $hidden_tb_menu) ? 'Hidden' : 'Visible';
                     $name_attr = esc_attr($this->settings_option . "[$this->hidden_tb_menus_key][]");
 
                     echo <<<HTML

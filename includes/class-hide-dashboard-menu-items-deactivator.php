@@ -19,12 +19,12 @@ class Hide_Dashboard_Menu_Items_Deactivator
 	 */
 	public static function deactivate()
 	{
-		$plugin_name = 'hide_dashboard_menu_items';
+		$plugin_option_name = 'hdmi';
 
 		// Delete the options set by the plugin
-		delete_option($plugin_name . '_tb_cached');
-		delete_option($plugin_name . '_db_cached');
-		delete_option($plugin_name . '_scan_completed');
-		delete_option($plugin_name . '_debug');
+		delete_option($plugin_option_name . '_tb_cached');
+		delete_option($plugin_option_name . '_db_cached');
+		delete_option($plugin_option_name . '_scan_completed');
+		delete_option($plugin_option_name . '_debug');
 	}
 }

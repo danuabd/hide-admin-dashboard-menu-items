@@ -23,6 +23,15 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $plugin_name;
 
 	/**
+	 * The name of this plugin option.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string    $plugin_option_name    The name of this plugin option.
+	 */
+	private $plugin_option_name;
+
+	/**
 	 * The version of this plugin.
 	 *
 	 * @since    1.0.0
@@ -30,15 +39,6 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @var      string    $version    The current version of this plugin.
 	 */
 	private $version;
-
-	/**
-	 * The array to store info.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      array    $info_data    The array to store info.
-	 */
-	private $info_data;
 
 	/**
 	 * The name of the option group for settings.
@@ -60,22 +60,22 @@ class Hide_Dashboard_Menu_Items_Admin
 	private $settings_option;
 
 	/**
-	 * The name of the option where dashboard menu items are cached.
+	 * The name of the option where menu items are cached.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $db_menu_items_option    The name of the option where dashboard menu items are cached.
+	 * @var      string    $db_menu_option    The name of the option where menu items are cached.
 	 */
-	private $db_menu_items_option;
+	private $db_menu_option;
 
 	/**
 	 * The name of the option where admin toolbar menu items are cached.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $tb_menu_items_option    The name of the option where menu items are cached.
+	 * @var      string    $tb_menu_option    The name of the option where menu items are cached.
 	 */
-	private $tb_menu_items_option;
+	private $tb_menu_option;
 
 	/**
 	 * The key of the option where hidden dashboard menus are stored.
@@ -84,16 +84,16 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @access   private
 	 * @var      string    $hidden_db_menus_key    The key of the option where hidden menus are stored.
 	 */
-	private $hidden_db_menus_key;
+	private $hidden_db_menu_key;
 
 	/**
 	 * The key of the option where hidden admin toolbar menus are stored.
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string    $hidden_db_menus_key    The key of the option where hidden menus are stored.
+	 * @var      string    $hidden_tb_menus_key    The key of the option where hidden menus are stored.
 	 */
-	private $hidden_tb_menus_key;
+	private $hidden_tb_menu_key;
 
 	/**
 	 * The key of the option where bypass enabled status is stored.
@@ -111,7 +111,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @access   private
 	 * @var      string    $bypass_key    The key of the option where bypass key is stored.
 	 */
-	private $bypass_query_key;
+	private $bypass_param_key;
 
 	/**
 	 * The name of the option where scan success status is stored.
@@ -176,42 +176,111 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function __construct($plugin_name, $version)
 	{
-		if (empty($plugin_name) || empty($version)) {
-			throw new InvalidArgumentException('Plugin name and version must be provided.');
-		}
 
 		$this->plugin_name = $plugin_name;
+		$this->plugin_option_name = 'hdmi';
 		$this->version = $version;
 
 		// Define the option names for settings, cached menu items, scan success status, and hidden menus
-		$this->plugin_option_group = $this->plugin_name . '_group';
+		$this->plugin_option_group = $this->plugin_option_name . '_group';
 
-		$this->settings_option = $this->plugin_name . '_settings';
-		$this->db_menu_items_option = $this->plugin_name . '_db_cached';
-		$this->tb_menu_items_option = $this->plugin_name . '_tb_cached';
-		$this->scan_success_option = $this->plugin_name . '_scan_completed';
-		$this->debug_option = $this->plugin_name . '_debug';
+		$this->settings_option = $this->plugin_option_name . '_settings';
+		$this->db_menu_option = $this->plugin_option_name . '_db_cached';
+		$this->tb_menu_option = $this->plugin_option_name . '_tb_cached';
+		$this->scan_success_option = $this->plugin_option_name . '_scan_completed';
+		$this->debug_option = $this->plugin_option_name . '_debug';
 
-		$this->hidden_db_menus_key = 'hidden_db_menus';
-		$this->hidden_tb_menus_key = 'hidden_tb_menus';
+		$this->hidden_db_menu_key = 'hidden_db_menu';
+		$this->hidden_tb_menu_key = 'hidden_tb_menu';
 		$this->bypass_enabled_key = 'bypass_enabled';
-		$this->bypass_query_key = 'bypass_key';
+		$this->bypass_param_key = 'bypass_param';
 
 		// Define the slugs for the settings and debug pages
 		$this->settings_page_slug = $this->plugin_name . '-settings';
 		$this->debug_page_slug = $this->plugin_name . '-debug';
+	}
 
-		$this->info_data = [
+	private function get_environment_info()
+	{
+		return [
 			'Plugin Version' => $this->version,
 			'Environment' => [
 				'WordPress Version' => get_bloginfo('version'),
 				'PHP Version' => PHP_VERSION,
 				'Memory Limit' => WP_MEMORY_LIMIT,
 				'Active Theme' => wp_get_theme()->get('Name'),
-				'Active Plugins Count' => count(get_option('active_plugins', [])),
+				'Active Plugins Count' => count($this->get_plugin_option('active_plugins', [])),
 			]
 		];
 	}
+
+	/**
+	 * Get the plugin option value for a specific key.
+	 *
+	 * @since    1.0.0
+	 * @param string $key The key to retrieve the option value for.
+	 * @param mixed $default The default value to return if the key does not exist.
+	 * @return mixed The option value or the default value if the key does not exist.
+	 */
+	private function get_plugin_option($key, $default = [])
+	{
+		$options = get_option($this->settings_option, []);
+		return $options[$key] ?? $default;
+	}
+
+	/**
+	 * Log a info message to the plugin's info log.
+	 *
+	 * @since 1.0.0
+	 * @param string $key The key for the info message.
+	 * @param string|array $message The info message to log.
+	 */
+	private function log_info($key, $message)
+	{
+		if (!$key || (!$message || empty($message))) {
+			return;
+		}
+		$debug_data = get_option($this->debug_option, []);
+
+		$debug_data['info'] = [$key => $message];
+
+		update_option($this->debug_option, $debug_data);
+	}
+
+	/**
+	 * Log an error message to the plugin's error log.
+	 *
+	 * @since 1.0.0
+	 * @param string $message The error message to log.
+	 */
+	private function log_error($message)
+	{
+		if (empty($message)) {
+			return;
+		}
+
+		$debug_data = get_option($this->debug_option, []);
+
+		$key = current_time('mysql');
+
+		$debug_data['error'] = [
+			$key => $message
+		];
+
+		// Keep only the last 50 entries
+		if (count($debug_data['error']) > 50) {
+			$debug_data['error'] = array_slice($debug_data['error'], -50, null, true);
+		}
+
+		update_option($this->debug_option, $debug_data);
+		$this->log_timed_info('Last Error Log Updated');
+	}
+
+	private function log_timed_info($key)
+	{
+		$this->log_info($key, current_time('mysql'));
+	}
+
 
 	/**
 	 * Register the admin menu for this plugin (dashboard area).
@@ -223,7 +292,7 @@ class Hide_Dashboard_Menu_Items_Admin
 		// Add a new top-level menu item.
 		$this->settings_page_hook_suffix =	add_menu_page(
 			'Configure Hide Menu Items',
-			__('Hide Menu Items', 'hide-dashboard-menu-items'),
+			__('Configure', $this->plugin_name),
 			'manage_options',
 			$this->settings_page_slug,
 			array($this, 'display_settings_page'),
@@ -233,8 +302,8 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		$this->debug_page_hook_suffix = add_submenu_page(
 			$this->settings_page_slug,
-			__('Debug Info', 'hide-dashboard-menu-items'),
-			__('Debug Info', 'hide-dashboard-menu-items'),
+			__('Debug Info', $this->plugin_name),
+			__('Debug Info', $this->plugin_name),
 			'manage_options',
 			$this->debug_page_slug,
 			[$this, 'display_debug_page']
@@ -271,7 +340,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Process scanning menu items.
+	 * Process scanning for menu items.
 	 *
 	 * @since    1.0.0
 	 */
@@ -279,7 +348,8 @@ class Hide_Dashboard_Menu_Items_Admin
 	{
 		if (
 			isset($_POST['hdmi_scan_request']) &&
-			current_user_can('manage_options')
+			current_user_can('manage_options') &&
+			check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
 		) {
 
 			add_action('admin_menu', [$this, 'store_db_menu'], 999, 1);
@@ -291,7 +361,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			// Store in DB
 			update_option($this->scan_success_option, 1);
 
-			$this->log_info('Last Scan Time', current_time('mysql'));
+			$this->log_timed_info('Last Scan Time');
 
 			// Redirect back with success transient
 			set_transient('hdmi_scan_success_notice', true, 30);
@@ -301,17 +371,16 @@ class Hide_Dashboard_Menu_Items_Admin
 	}
 
 	/**
-	 * Get the registered top-level dashboard menu items.
+	 * Get the registered top-level admin menu items.
 	 *
 	 * @since    1.0.0
 	 */
-	public function store_db_menu()
+	public function store_db_menu($menu)
 	{
-		global $menu;
 
-		if (empty($menu)) {
+		if (empty($menu) || !is_array($menu)) {
 			$this->log_error('Menu is not initialized or empty.');
-			return array();
+			return;
 		}
 
 		$menu_items = array();
@@ -349,35 +418,33 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		if (empty($menu_items)) {
 			$this->log_error('No top-level menu items found.');
-			return array();
+			return;
 		}
 
-		update_option($this->db_menu_items_option, $menu_items);
+		update_option($this->db_menu_option, $menu_items);
 
-		$this->log_info('Last time DB menu items were updated', current_time('mysql'));
+		$this->log_timed_info('Last time DB menu items were updated');
 		$this->log_info('Dashboard menu items count', count($menu_items));
 		$this->log_info('Dashboard menu items', $menu_items);
 	}
 
 	/**
-	 * Get the registered top-level admin toolbar (admin bar) menu items.
+	 * Get the registered top-level toolbar menu items.
 	 *
-	 * @since 1.0.0
+	 * @since    1.0.0
 	 */
-	public function store_tb_menu()
+	public function store_tb_menu($wp_admin_bar)
 	{
-		global $wp_admin_bar;
-
 		if (!is_object($wp_admin_bar)) {
 			$this->log_error('WP Admin Bar is not initialized.');
-			return array();
+			return;
 		}
 
 		$nodes = $wp_admin_bar->get_nodes();
 
 		if (empty($nodes)) {
 			$this->log_error('No admin bar nodes found.');
-			return array();
+			return;
 		}
 
 		$menu_items  = array();
@@ -390,7 +457,7 @@ class Hide_Dashboard_Menu_Items_Admin
 					continue;
 				}
 
-				$title = str_contains($title, 'Comments') ? 'Comments' : $title;
+				$title = strpos($title, 'Comments') !== false ? 'Comments' : $title;
 
 				$menu_items[] = array(
 					'id'    => $node->id,
@@ -401,12 +468,12 @@ class Hide_Dashboard_Menu_Items_Admin
 
 		if (empty($menu_items)) {
 			$this->log_error('No top-level admin bar menu items found.');
-			return array();
+			return;
 		}
 
-		update_option($this->tb_menu_items_option, $menu_items);
+		update_option($this->tb_menu_option, $menu_items);
 
-		$this->log_info('Last time TB menu items were updated', current_time('mysql'));
+		$this->log_timed_info('Last time TB menu items were updated');
 		$this->log_info('Admin bar menu items count', count($menu_items));
 		$this->log_info('Admin bar menu items', $menu_items);
 	}
@@ -447,29 +514,31 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function sanitize_submissions($input)
 	{
-		$this->log_info('Settings form last submitted', current_time('mysql'));
+		$this->log_timed_info('Settings form last submitted');
 
 		if (!is_array($input)) {
 			return [];
 		}
 
-		$sanitized = array_filter($input, function ($item) {
+		$sanitize_recursive = function ($value) use (&$sanitize_recursive) {
+			if (is_array($value)) {
+				return array_map($sanitize_recursive, $value);
+			} elseif (is_bool($value)) {
+				return $value;
+			} elseif (is_string($value)) {
+				return sanitize_text_field($value);
+			}
+			// You can choose to filter out other types (objects, etc.) or keep them
+			return '';
+		};
 
-			if (is_array($item)) {
-				// If it's an array, sanitize each element
-				return array_filter($item, function ($sub_item) {
-					return is_string($sub_item) && !empty($sub_item);
-				});
-			} else if (is_bool($item)) {
-				return $item;
-			} else
-				return is_string($item) && !empty($item);
-		});
+		$sanitized = array_map($sanitize_recursive, $input);
 
 		if (!empty($sanitized)) {
-			$this->log_info('Settings last updated', current_time('mysql'));
-			return $sanitized;
+			$this->log_timed_info('Settings last updated');
 		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -531,68 +600,71 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		$settings = get_option($this->settings_option, array());
-		$scan_status = get_option($this->scan_success_option, false);
+		$scan_status = $this->get_plugin_option($this->scan_success_option, false);
 
 		if (!$scan_status) {
 			$this->log_error('Scan has not been completed. Please run the scan first.');
 		}
 
-		$debug_data = get_option($this->debug_option, []);
-		$info_data = $debug_data['info'] ?? [];
-		$error_data = $debug_data['error'] ?? [];
+		$hidden_db_menus = $this->get_plugin_option($this->hidden_db_menu_key, 'No hidden dashboard menu items configured.');
+		$hidden_tb_menus = $this->get_plugin_option($this->hidden_tb_menu_key, 'No hidden admin bar menu items configured.');
+
+		$stored_debug_data = $this->get_plugin_option($this->debug_option, []);
+		$stored_info_data = $stored_debug_data['info'] ?? [];
+		$stored_error_data = $stored_debug_data['error'] ?? [];
 
 		$user = wp_get_current_user();
-		$hidden_db_menus = $settings[$this->hidden_db_menus_key] ?? 'No hidden dashboard menu items configured.';
-		$hidden_tb_menus = $settings[$this->hidden_tb_menus_key] ?? 'No hidden admin bar menu items configured.';
-		$bypass_enabled = $settings[$this->bypass_enabled_key] ?? false;
-		$bypass_key = $settings[$this->bypass_query_key] ?? false;
+
+		$bypass_enabled = $this->get_plugin_option($this->bypass_enabled_key, false);
+		$bypass_key = $this->get_plugin_option($this->bypass_param_key, false);
 
 		if ($bypass_enabled && empty($bypass_key)) {
 			$this->log_error('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.');
 		}
 
-		$this->info_data['Current User'] = [
+		$curr_info_data = $this->get_environment_info();
+
+		$curr_info_data['Current User'] = [
 			'ID' => $user->ID,
 			'Username' => $user->user_login,
 			'Roles' => implode(', ', $user->roles),
 			'Can manage_options' => current_user_can('manage_options') ? 'Yes' : 'No',
 		];
 
-		$this->info_data['Hidden Dashboard Items'] = $hidden_db_menus;
-		$this->info_data['Hidden Admin Bar Items']	 = $hidden_tb_menus;
-		$this->info_data['Bypass Settings']	 = [
+		$curr_info_data['Hidden Dashboard Menu'] = $hidden_db_menus;
+		$curr_info_data['Hidden Admin Bar Menu']	 = $hidden_tb_menus;
+		$curr_info_data['Bypass Settings']	 = [
 			'Bypass Enabled' => $bypass_enabled ? 'Yes' : 'No',
-			'Bypass Query Key' => $bypass_key ? $bypass_key : 'Not set',
+			'Bypass Query Key' => $bypass_key ? 'is set' : 'is not set',
 		];
 
-		$this->info_data = array_merge($this->info_data, $info_data);
+		$final_info_data = array_merge($curr_info_data, $stored_info_data);
 
-		$debug_markup = $this->generate_debug_markup($this->info_data);
-		$error_log_markup = empty($error_data) ? '<li>No errors logged.</li>' : $this->generate_debug_markup($error_data);
+		$debug_markup = $this->generate_debug_markup($final_info_data);
+		$error_markup = empty($stored_error_data) ? '<li>No errors logged.</li>' : $this->generate_debug_markup($stored_error_data);
 
 		require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';
 	}
 
 
 	/**
-	 * Function to hide dashboard Menu items.
+	 * Function to hide Dashboard Menu items.
 	 *
 	 * @since    1.0.0
 	 */
 	public function hide_db_menu()
 	{
-		$settings = get_option($this->settings_option, array());
+		global $menu;
 
-		$db_hidden = $settings[$this->hidden_db_menus_key] ?? array();
+		$db_hidden = $this->get_plugin_option($this->hidden_db_menu_key, array());
 
 		if (!is_array($db_hidden) || empty($db_hidden)) {
 			return;
 		}
 
-		$bypass_active = $this->check_bypass_key();
+		$bypass_param = $this->get_bypass_param();
 
-		if (!$bypass_active) {
+		if (!$bypass_param) {
 			// No access — remove the menu items
 			foreach ($db_hidden as $slug) {
 				remove_menu_page($slug);
@@ -601,19 +673,13 @@ class Hide_Dashboard_Menu_Items_Admin
 		}
 
 		// If access is allowed, append the bypass query to menu URLs
-		$bypass_key = $settings[$this->bypass_query_key] ?? '';
-		if (!$bypass_key) {
-			$this->log_info('Updated DB Menu Item Slugs', 'No');
-			return;
-		}
-
-		global $menu;
-
-		$this->update_db_menu_slugs($menu, $db_hidden, $bypass_key);
+		$this->log_info('Updated DB Menu Item Slugs', 'No');
+		$this->update_db_menu($menu, $db_hidden, $bypass_param);
+		return;
 	}
 
 	/**
-	 * Function to hide admin toolbar items.
+	 * Function to hide Admin Toolbar items.
 	 *
 	 * @since 1.0.0
 	 */
@@ -621,38 +687,36 @@ class Hide_Dashboard_Menu_Items_Admin
 	{
 		global $wp_admin_bar;
 
-		$settings = get_option($this->settings_option, array());
+		$settings = $this->get_plugin_option($this->settings_option, array());
 
-		$tb_hidden = $settings[$this->hidden_tb_menus_key] ?? array();
+		$tb_hidden = $settings[$this->hidden_tb_menu_key] ?? array();
 
 		if (!is_array($tb_hidden) || empty($tb_hidden)) {
 			return;
 		}
 
-		$bypass_active = $this->check_bypass_key();
-		$bypass_key = $settings[$this->bypass_query_key] ?? '';
+		$bypass_param = $this->get_bypass_param();
 
-		if (!$bypass_active || empty($bypass_key)) {
+		if (!$bypass_param) {
 			foreach ($tb_hidden as $id) {
 				$wp_admin_bar->remove_menu($id);
-				error_log('Removed TB Menu Item: ' . $id);
 			}
-			$this->log_info('Updated TB Menu Item Slugs', 'Yes');
+			$this->log_info('TB Menu Updated?', 'Yes');
 			return;
 		}
 
-		$this->update_tb_menu_slugs($wp_admin_bar, $tb_hidden, $bypass_key);
+		$this->update_tb_menu($wp_admin_bar, $tb_hidden, $bypass_param);
 	}
 
 	/**
-	 * Modify dashboard menu items URLs to append bypass key.
+	 * Append the bypass query parameter to dashboard menu item URLs.
 	 *
 	 * @since    1.0.0
 	 * @param array $menu The global menu array.
 	 * @param array $hidden The hidden menu slugs.
 	 * @param string $bypass_key The bypass query key.
 	 */
-	public function update_db_menu_slugs($menu, $hidden, $bypass_key)
+	public function update_db_menu($menu, $hidden, $bypass_key)
 	{
 		foreach ($menu as $index => $menu_item) {
 			if (in_array($menu_item[2], $hidden, true)) {
@@ -666,7 +730,7 @@ class Hide_Dashboard_Menu_Items_Admin
 			}
 		}
 
-		$this->log_info('Updated DB Menu Item Slugs', 'Yes' . ('(' . current_time('mysql') . ')'));
+		$this->log_timed_info('Updated DB Menu Item Slugs');
 	}
 
 
@@ -677,7 +741,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @param array        $hidden_slugs
 	 * @param string       $bypass_key
 	 */
-	public function update_tb_menu_slugs($wp_admin_bar, $hidden_slugs, $bypass_key)
+	public function update_tb_menu($wp_admin_bar, $hidden_slugs, $bypass_key)
 	{
 
 		foreach ($hidden_slugs as $slug) {
@@ -692,30 +756,24 @@ class Hide_Dashboard_Menu_Items_Admin
 			}
 		}
 
-		$this->log_info('Updated TB Menu Item Slugs', 'Yes' . ('(' . current_time('mysql') . ')'));
+		$this->log_timed_info('Updated TB Menu Item Slugs');
 	}
 
 
 	/**
-	 * Check if the bypass key is enabled and if the current request matches the bypass query.
+	 * Get the bypass query parameter if enabled.
 	 *
 	 * @since    1.0.0
-	 * @return   bool    True if bypass is enabled and query matches, false otherwise.
+	 * @return   bool|string Returns the bypass query parameter if enabled, otherwise false.
 	 */
-	public function check_bypass_key()
+	private function get_bypass_param()
 	{
-		$settings = get_option($this->settings_option, array());
+		$bypass_active = $this->get_plugin_option($this->bypass_enabled_key, false);
+		$bypass_query_param = $this->get_plugin_option($this->bypass_param_key, false);
 
-		if (
-			!empty($settings[$this->bypass_enabled_key]) &&
-			!empty($settings[$this->bypass_query_key]) &&
-			isset($_SERVER['REQUEST_URI']) &&
-			strpos($_SERVER['REQUEST_URI'], $settings[$this->bypass_query_key]) !== false
-		) {
-			return true;
-		}
-
-		return false;
+		if (!$bypass_active || !$bypass_query_param) {
+			return false;
+		} else return $bypass_query_param;
 	}
 
 	/**
@@ -726,9 +784,8 @@ class Hide_Dashboard_Menu_Items_Admin
 	public function restrict_hidden_menu_access()
 	{
 
-		$settings = get_option($this->settings_option, array());
-		$hidden_db_menu = $settings[$this->hidden_db_menus_key] ?? array();
-		$hidden_tb_menu = $settings[$this->hidden_tb_menus_key] ?? array();
+		$hidden_db_menu = $this->get_plugin_option($this->hidden_db_menu_key, array());
+		$hidden_tb_menu = $this->get_plugin_option($this->hidden_tb_menu_key, array());
 
 		if (empty($hidden_db_menu) && empty($hidden_tb_menu)) {
 			return;
@@ -744,7 +801,7 @@ class Hide_Dashboard_Menu_Items_Admin
 				|| $current_screen === $slug
 			) {
 				// If the bypass is enabled, allow access
-				if ($this->check_bypass_key()) {
+				if ($this->get_bypass_param()) {
 					return; // Allow access
 				}
 
@@ -764,15 +821,18 @@ class Hide_Dashboard_Menu_Items_Admin
 	 */
 	public function enqueue_styles($hook_suffix)
 	{
+		$css_base_url = plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-';
+		$css_base_path = plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-';
+
 		// load styles only in plugin admin settings page
-		if ($hook_suffix !== $this->settings_page_hook_suffix && $hook_suffix !== $this->debug_page_hook_suffix) {
+		if ($hook_suffix === $this->settings_page_hook_suffix || $hook_suffix === $this->debug_page_hook_suffix) {
+			wp_enqueue_style($this->settings_page_slug, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
 			return;
 		}
 
-		wp_enqueue_style($this->settings_page_slug, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-admin.css', array(), filemtime(plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-admin.css'), 'all');
-
-
-		wp_enqueue_style($this->debug_page_slug, plugin_dir_url(__FILE__) . 'css/hide-dashboard-menu-items-debug.css', array(), filemtime(plugin_dir_path(__FILE__) . 'css/hide-dashboard-menu-items-debug.css'), 'all');
+		if ($hook_suffix === $this->debug_page_hook_suffix) {
+			wp_enqueue_style($this->debug_page_slug, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
+		}
 	}
 
 	/**
@@ -787,53 +847,6 @@ class Hide_Dashboard_Menu_Items_Admin
 			return;
 		}
 
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), filemtime(plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js'), false);
-	}
-
-	/**
-	 * Log a info message to the plugin's info log.
-	 *
-	 * @since 1.0.0
-	 * @param string $key The key for the info message.
-	 * @param string $message The info message to log.
-	 */
-	public function log_info($key, $message)
-	{
-		if (empty($key) || empty($message)) {
-			return;
-		}
-
-		$debug_data = get_option($this->debug_option, []);
-
-		$debug_data['info'][$key] = $message;
-
-		update_option($this->debug_option, $debug_data);
-	}
-
-	/**
-	 * Log an error message to the plugin's error log.
-	 *
-	 * @since 1.0.0
-	 * @param string $message The error message to log.
-	 */
-	public function log_error($message)
-	{
-		if (empty($message)) {
-			return;
-		}
-
-		$debug_data = get_option($this->debug_option, []);
-
-		$key = current_time('mysql');
-
-		$debug_data['error'][$key] = $message;
-
-		// Keep only the last 50 entries
-		if (count($debug_data['error']) > 50) {
-			$debug_data['error'] = array_slice($debug_data['error'], -50, null, true); // preserve keys
-		}
-
-		update_option($this->debug_option, $debug_data);
-		$this->log_info('Last Error Log Updated', current_time('mysql'));
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', false);
 	}
 }

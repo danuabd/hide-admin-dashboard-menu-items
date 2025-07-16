@@ -27,12 +27,6 @@ class Hide_Dashboard_Menu_Items_Activator
 			$error_message = 'Hide Dashboard Menu Items requires PHP version 7.4 or higher.';
 		}
 
-		// Check if the plugin is being activated on a multisite network
-		if (is_multisite()) {
-			$hasError = true;
-			$error_message = 'Hide Dashboard Menu Items cannot be activated on a multisite network. Please activate it on individual sites.';
-		}
-
 		// Check if the current user has the capability to activate plugins
 		if (! current_user_can('activate_plugins')) {
 			$hasError = true;
