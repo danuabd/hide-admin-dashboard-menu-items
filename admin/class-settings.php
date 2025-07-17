@@ -17,7 +17,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 {
     private $config;
 
-    private $option_manager;
+    private $storage_manager;
 
     private $debugger;
 
@@ -29,12 +29,12 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
         Hide_Dashboard_Menu_Items_Notices $notices
     ) {
         $this->config = $config;
-        $this->option_manager = $option_manager;
+        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
         $this->notices = $notices;
     }
@@ -99,6 +99,34 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         );
     }
 
+    private function build_settings_page_data()
+    {
+        return array(
+            'scan_done' => $this->storage_manager->get_scan_status(),
+            'bypass_enabled_key' => $this->config->bypass_enabled_key,
+            'hidden_db_menu_key' => $this->config->hidden_db_menu_key,
+            'hidden_tb_menu_key' => $this->config->hidden_tb_menu_key,
+            'settings_option' => $this->config->settings_option,
+            'bypass_param_key' => $this->config->bypass_param_key,
+            'option_group' => $this->config->option_group,
+            'settings_page_slug' => $this->config->settings_page_slug,
+
+            // Cached menu items
+            'cached_db_menu' => $this->storage_manager->get_dashboard_menu_cache(),
+            'cached_tb_menu' => $this->storage_manager->get_toolbar_menu_cache(),
+
+            // Hidden menu items
+            'hidden_db_menu' =>
+            $this->storage_manager->get_hidden_db_menu(),
+            'hidden_tb_menu' =>
+            $this->storage_manager->get_hidden_tb_menu(),
+            'bypass_enabled' =>
+            $this->storage_manager->is_bypass_active()  ? 'checked' : '',
+            'bypass_value' =>
+            esc_attr($this->storage_manager->get_bypass_param()) ?? '',
+        );
+    }
+
     /**
      * Register the settings page for this plugin.
      * 
@@ -111,28 +139,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             return;
         }
 
-        $scan_done = get_option($this->config->scan_success_option, false);
-        $bypass_enabled_key = $this->config->bypass_enabled_key;
-        $hidden_db_menu_key = $this->config->hidden_db_menu_key;
-        $hidden_tb_menu_key = $this->config->hidden_tb_menu_key;
-        $settings_option = $this->config->settings_option;
-        $bypass_param_key = $this->config->bypass_param_key;
-        $option_group = $this->config->option_group;
-        $settings_page_slug = $this->config->settings_page_slug;
-
-        // Cached menu items
-        $cached_db_menu = $this->option_manager->get_dashboard_menu_cache();
-        $cached_tb_menu = $this->option_manager->get_toolbar_menu_cache();
-
-        // Hidden menu items
-        $hidden_db_menu =
-            $this->option_manager->get_hidden_db_menu();
-        $hidden_tb_menu =
-            $this->option_manager->get_hidden_tb_menu();
-        $bypass_enabled =
-            $this->option_manager->is_bypass_active()  ? 'checked' : '';
-        $bypass_value =
-            esc_attr($this->option_manager->get_bypass_param()) ?? '';
+        extract($this->build_settings_page_data());
 
         // Include the settings page template.
         include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
@@ -172,7 +179,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             $this->debugger->log_event('Settings last updated');
         }
 
-        $this->notices->add_notice('hdmi_settings_updated', __('Settings have been updated.', 'hide-dashboard-menu-items'), 'success');
+        $this->notices->add_notice('settings_updated', __('Settings have been updated.', 'hide-dashboard-menu-items'), 'success');
         return $sanitized;
     }
 

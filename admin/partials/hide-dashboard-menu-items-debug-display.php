@@ -46,7 +46,7 @@ if (!defined('ABSPATH')) {
 
 <script>
     const debuggingData = {
-        'debugInfo': <?php echo json_encode($final_info_data ?? []) ?>,
+        'debugInfo': <?php echo json_encode($final_debug_info ?? []) ?>,
         'errorInfo': <?php echo json_encode($stored_error_data ?? []) ?>
     }
 

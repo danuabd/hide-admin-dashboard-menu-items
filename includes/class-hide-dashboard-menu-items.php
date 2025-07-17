@@ -113,24 +113,24 @@ class Hide_Dashboard_Menu_Items
 		$plugin_admin = new Hide_Dashboard_Menu_Items_Admin($this->get_plugin_name(), $this->get_version());
 
 		// Fires as an admin screen or script is being initialized.
-		$this->loader->add_action('admin_init', $plugin_admin->settings, 'register_settings', 10);
+		$this->loader->add_action('admin_init', $plugin_admin->settings_manager, 'register_settings', 10);
 		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'restrict_menu_access');
 
 		// Fires before the administration menu loads in the admin.
-		$this->loader->add_action('admin_menu', $plugin_admin->scanner, 'scan', 10);
-		$this->loader->add_action('admin_menu', $plugin_admin->settings, 'add_admin_menu');
+		$this->loader->add_action('admin_menu', $plugin_admin->scanner, 'scan_dashboard_menu', 10);
+		$this->loader->add_action('admin_menu', $plugin_admin->settings_manager, 'add_admin_menu');
 		$this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu');
 
 		// Loads all necessary admin bar items.
-		$this->loader->add_action('admin_bar_menu', $plugin_admin->scanner, 'scan', 10);
+		$this->loader->add_action('admin_bar_menu', $plugin_admin->scanner, 'scan_toolbar_menu', 10);
 		$this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'hide_toolbar_menu');
 
 		// Prints admin screen notices.
-		$this->loader->add_action('admin_notices', $plugin_admin->notices, 'display_admin_notices');
+		$this->loader->add_action('admin_notices', $plugin_admin->notice_manager, 'render_notices');
 
 		// Runs in the HTML header so a plugin or theme can enqueue JavaScript and CSS to all admin pages.
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings, 'enqueue_styles');
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings, 'enqueue_scripts');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_styles');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_scripts');
 	}
 
 	/**

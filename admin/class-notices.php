@@ -40,19 +40,19 @@ class Hide_Dashboard_Menu_Items_Notices
      */
     public function render_notices()
     {
-        $notice_keys = array('hdmi_scan_success', 'hdmi_settings_updated', 'hdmi_bypass_enabled');
-
-        $is_dismissible = !in_array('hdmi_bypass_enabled', $notice_keys) ? 'is-dismissible' : '';
+        $notice_keys = array('scan_completed', 'settings_updated', 'bypass_enabled');
 
         foreach ($notice_keys as $key) {
             $transient_key = "hdmi_notice_{$key}";
             $notice = get_transient($transient_key);
 
+            $dismissible_attr = $key !== 'bypass_enabled' ? 'is-dismissible' : '';
+
             if ($notice && !empty($notice['message'])) {
                 $type = esc_attr($notice['type'] ?? 'info');
                 $message = esc_html($notice['message']);
 
-                echo "<div class='notice notice-{$type} {$is_dismissible}'><p>{$message}</p></div>";
+                echo "<div class='notice notice-{$type} {$dismissible_attr}'><p>{$message}</p></div>";
 
                 delete_transient($transient_key);
             }

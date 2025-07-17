@@ -17,18 +17,18 @@ class Hide_Dashboard_Menu_Items_Scanner
 {
 
     private $config;
-    private $option_manager;
+    private $storage_manager;
     private $debugger;
     private $notices;
 
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
         Hide_Dashboard_Menu_Items_Notices $notices
     ) {
         $this->config = $config;
-        $this->option_manager = $option_manager;
+        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
         $this->notices = $notices;
     }
@@ -38,9 +38,31 @@ class Hide_Dashboard_Menu_Items_Scanner
      *
      * @since    1.0.0
      */
-    public function scan()
+    private function scan($menu_object)
     {
 
+        if ($menu_object instanceof WP_Admin_Bar && !empty($menu_object)) {
+            $this->store_toolbar_items($menu_object);
+        } else if (is_array($menu_object) && !empty($menu_object)) {
+            $this->store_menu_items($menu_object);
+        } else {
+            $this->debugger->log_event('', "dashboard menu wasn't available to use', 'error");
+        }
+
+        // Store in DB
+        update_option($this->config->scan_success_option, 1);
+        $this->debugger->log_event('Last Scan Time');
+
+        // Redirect back with success transient
+        $this->notices->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
+
+        set_transient('scan_is_completed', 30);
+        wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
+        exit;
+    }
+
+    public function scan_dashboard_menu()
+    {
         if (
             isset($_POST['hdmi_scan_request']) &&
             current_user_can('manage_options') &&
@@ -48,21 +70,18 @@ class Hide_Dashboard_Menu_Items_Scanner
         ) {
 
             global $menu;
+            $this->scan($menu);
+        }
+    }
 
-            if (!empty($menu) || is_array($menu)) $this->store_menu_items($menu);
-
-            global $wp_admin_bar;
-
-            if (!empty($wp_admin_bar) || is_array($wp_admin_bar)) $this->store_toolbar_items($wp_admin_bar);
-
-            // Store in DB
-            $this->option_manager->update($this->config->scan_success_option, 1);
-            $this->debugger->log_event('Last Scan Time');
-
-            // Redirect back with success transient
-            $this->notices->add_notice('hdmi_settings_updated', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
-            wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
-            exit;
+    public function scan_toolbar_menu($wp_admin_bar)
+    {
+        if (
+            isset($_POST['hdmi_scan_request']) &&
+            current_user_can('manage_options') &&
+            check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
+        ) {
+            $this->scan($wp_admin_bar);
         }
     }
 
@@ -73,6 +92,7 @@ class Hide_Dashboard_Menu_Items_Scanner
      */
     public function store_menu_items($menu)
     {
+        error_log('scanning dashboard menu items');
 
         if (empty($menu) || !is_array($menu)) {
             $this->debugger->log_event('', 'Menu is not initialized or empty.', 'error');
@@ -80,7 +100,7 @@ class Hide_Dashboard_Menu_Items_Scanner
         }
 
         $menu_items = array();
-        $hidden_menu_items = $this->option_manager->get($this->config->hidden_db_menu_key, []);
+        $hidden_menu_items = $this->storage_manager->get_hidden_db_menu();
 
         $menu_combined = array_merge($menu, $hidden_menu_items);
 
@@ -120,7 +140,7 @@ class Hide_Dashboard_Menu_Items_Scanner
             return;
         }
 
-        $this->option_manager->update_dashboard_menu($menu_items);
+        $this->storage_manager->update_dashboard_menu($menu_items);
     }
 
     /**
@@ -128,8 +148,11 @@ class Hide_Dashboard_Menu_Items_Scanner
      *
      * @since    1.0.0
      */
-    public function store_toolbar_items($wp_admin_bar)
+    public function store_toolbar_items()
     {
+        global $wp_admin_bar;
+
+        error_log('scanning toolbar menu items');
 
         if (!is_object($wp_admin_bar)) {
             $this->debugger->log_event('', 'WP Admin Bar is not initialized.', 'error');
@@ -167,6 +190,6 @@ class Hide_Dashboard_Menu_Items_Scanner
             return;
         }
 
-        $this->option_manager->update_toolbar_menu($menu_items);
+        $this->storage_manager->update_toolbar_menu($menu_items);
     }
 }

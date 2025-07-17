@@ -17,7 +17,7 @@ class Hide_Dashboard_Menu_Items_Debugger
 {
     private $config;
 
-    private $option_manager;
+    private $storage_manager;
 
     /**
      * @param array $accepted_event_types logging types to log
@@ -26,40 +26,87 @@ class Hide_Dashboard_Menu_Items_Debugger
 
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Options $option_manager
+        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager
     ) {
         $this->config = $config;
-        $this->option_manager = $option_manager;
-        $this->accepted_event_types = ['log', 'debug'];
+        $this->storage_manager = $storage_manager;
+        $this->accepted_event_types = ['info', 'error'];
     }
 
-    private function get_environment_info()
+    public function log_event($key = '', $message = '', $type = 'info')
     {
-        return [
+        if (!in_array($type, $this->accepted_event_types) || !($message || $key)) {
+            return;
+        }
+
+        $current_time = current_time('mysql');
+
+        if (!$message) {
+            $message = $current_time;
+        }
+
+        if (!$key) {
+            $key = $current_time;
+        }
+
+        $this->storage_manager->update_debug_data($key, $message, $type);
+    }
+
+    private function build_debug_data()
+    {
+
+        $scan_status = $this->storage_manager->get_scan_status();
+
+        if (!$scan_status) {
+            error_log('Scan has not been completed. Please run the scan first.');
+        }
+
+        $db_menu_cache = $this->storage_manager->get_dashboard_menu_cache();
+        $tb_menu_cache = $this->storage_manager->get_toolbar_menu_cache();
+
+        $hidden_db_menus =
+            $this->storage_manager->get_hidden_db_menu();
+        $hidden_tb_menus =
+            $this->storage_manager->get_hidden_tb_menu();
+
+        $user = wp_get_current_user();
+
+        $bypass_enabled = $this->storage_manager->is_bypass_active();
+        $bypass_key = $this->storage_manager->get_bypass_param();
+
+        if ($bypass_enabled && empty($bypass_key)) {
+            $this->log_event('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.', 'error');
+        }
+
+        $initial_debug_data = [
             'Plugin Version' => $this->config->version,
             'Environment' => [
                 'WordPress Version' => get_bloginfo('version'),
                 'PHP Version' => PHP_VERSION,
                 'Memory Limit' => WP_MEMORY_LIMIT,
                 'Active Theme' => wp_get_theme()->get('Name'),
-                'Active Plugins Count' => count($this->option_manager->get('active_plugins', [])),
+                'Active Plugins Count' => count(get_option('active_plugins')),
+            ],
+            'Current User' => [
+                'ID' => $user->ID,
+                'Username' => $user->user_login,
+                'Roles' => implode(', ', $user->roles),
+                'Can manage_options' => current_user_can('manage_options') ? 'Yes' : 'No',
+            ],
+            'Scan done?' => $scan_status ? 'Yes' : 'No',
+            'Dashboard Menu Count' => count($db_menu_cache),
+            'Dashboard Menu' => empty($db_menu_cache) ? 'No dashboard menu items were found.' : $db_menu_cache,
+            'Admin Bar Menu Count' => count($tb_menu_cache),
+            'Admin Bar Menu' =>  empty($tb_menu_cache) ? 'No admin bar menu items were found.' : $tb_menu_cache,
+            'Hidden Dashboard Menu' => empty($hidden_db_menus) ? 'No hidden dashboard menu items configured.' : $hidden_db_menus,
+            'Hidden Admin Bar Menu' => empty($hidden_tb_menus) ? 'No hidden admin bar menu items configured.' : $hidden_db_menus,
+            'Bypass Settings' => [
+                'Bypass Enabled' => $bypass_enabled ? 'Yes' : 'No',
+                'Bypass Query Key' => $bypass_key ? 'is set' : 'is not set',
             ]
         ];
-    }
 
-    public function log_event($key, $message = current_time('mysql'), $type = 'info')
-    {
-        if (!in_array($this->accepted_event_types, $message) || (!$message || empty($message))) {
-            return;
-        }
-
-        if (!$key || empty($key) || $key === '') {
-            $key = current_time('mysql');
-        }
-
-        $debug_data = get_option($this->config->debug_option, []);
-        $debug_data[$type][$key] = $message;
-        update_option($this->config->debug_option, $debug_data);
+        return $initial_debug_data;
     }
 
     /**
@@ -104,57 +151,15 @@ class Hide_Dashboard_Menu_Items_Debugger
             return;
         }
 
-        $scan_status = $this->option_manager->get($this->config->scan_success_option, false);
+        $stored_debug_data = $this->storage_manager->get_debug_data();
 
-        if (!$scan_status) {
-            $this->log_event('', 'Scan has not been completed. Please run the scan first.', 'error');
-        }
+        $stored_info_data = !empty($stored_debug_data) && $stored_debug_data['info'] ? $stored_debug_data['info'] : [];
+        $stored_error_data = !empty($stored_debug_data) && $stored_debug_data['error'] ? $stored_debug_data['error'] : [];
 
-        $db_menu_cache = $this->option_manager->get_dashboard_menu_cache();
-        $tb_menu_cache = $this->option_manager->get_toolbar_menu_cache();
+        $final_debug_info = array_merge($this->build_debug_data(), $stored_info_data);
 
-        $hidden_db_menus =
-            $this->option_manager->get_hidden_db_menu() ?? 'No hidden dashboard menu items configured.';
-        $hidden_tb_menus =
-            $this->option_manager->get_hidden_tb_menu() ?? 'No hidden admin bar menu items configured.';
+        $debug_markup = $this->generate_debug_markup($final_debug_info);
 
-        $stored_debug_data = get_option($this->config->debug_option, []);
-        $stored_info_data = $stored_debug_data['info'] ?? [];
-        $stored_error_data = $stored_debug_data['error'] ?? [];
-
-        $user = wp_get_current_user();
-
-        $bypass_enabled = $this->option_manager->is_bypass_active();
-        $bypass_key = $this->option_manager->get_bypass_param();
-
-        if ($bypass_enabled && empty($bypass_key)) {
-            $this->log_event('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.', 'error');
-        }
-
-        $curr_info_data = $this->get_environment_info();
-
-        $curr_info_data['Database Menu Count'] = count($db_menu_cache);
-        $curr_info_data['Database Menu'] = $db_menu_cache;
-        $curr_info_data['Admin Bar Menu Count'] = count($tb_menu_cache);
-        $curr_info_data['Admin Bar Menu'] = $tb_menu_cache;
-
-        $curr_info_data['Current User'] = [
-            'ID' => $user->ID,
-            'Username' => $user->user_login,
-            'Roles' => implode(', ', $user->roles),
-            'Can manage_options' => current_user_can('manage_options') ? 'Yes' : 'No',
-        ];
-
-        $curr_info_data['Hidden Dashboard Menu'] = $hidden_db_menus;
-        $curr_info_data['Hidden Admin Bar Menu']     = $hidden_tb_menus;
-        $curr_info_data['Bypass Settings']     = [
-            'Bypass Enabled' => $bypass_enabled ? 'Yes' : 'No',
-            'Bypass Query Key' => $bypass_key ? 'is set' : 'is not set',
-        ];
-
-        $final_info_data = array_merge($curr_info_data, $stored_info_data);
-
-        $debug_markup = $this->generate_debug_markup($final_info_data);
         $error_markup = empty($stored_error_data) ? '<li>No errors logged.</li>' : $this->generate_debug_markup($stored_error_data);
 
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';

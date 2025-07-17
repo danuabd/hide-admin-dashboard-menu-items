@@ -16,22 +16,22 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
     private $config;
-    private $option_manager;
+    private $storage_manager;
     private $debugger;
-    private $notices;
+    private $notice_manager;
 
     private $bypass_param_query;
 
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
-        Hide_Dashboard_Menu_Items_Notices $notices
+        Hide_Dashboard_Menu_Items_Notices $notice_manager
     ) {
         $this->config = $config;
-        $this->option_manager = $option_manager;
+        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
-        $this->notices = $notices;
+        $this->notice_manager = $notice_manager;
         $this->bypass_param_query = $this->config->option_name;
     }
 
@@ -46,11 +46,11 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($scan_running) return;
 
-        $db_hidden = $this->option_manager->get_hidden_db_menu();
+        $db_hidden = $this->storage_manager->get_hidden_db_menu();
 
-        $bypass_active = $this->option_manager->is_bypass_active();
+        $bypass_active = $this->storage_manager->is_bypass_active();
 
-        $bypass_param = $this->option_manager->get_bypass_param();
+        $bypass_param = $this->storage_manager->get_bypass_param();
 
         $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
@@ -60,7 +60,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($bypass_active && $bypass_param_in_uri) {
             $this->debugger->log_event('Bypass Active', 'Yes');
-            $this->notices->add_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
+            $this->notice_manager->add_notice('bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
             $this->update_dashboard_menu($db_hidden, $bypass_param);
             return;
         }
@@ -84,12 +84,12 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         global $wp_admin_bar;
 
-        $tb_hidden = $this->option_manager->get_hidden_tb_menu();
+        $tb_hidden = $this->storage_manager->get_hidden_tb_menu();
 
         $bypass_active =
-            $this->option_manager->is_bypass_active();
+            $this->storage_manager->is_bypass_active();
         $bypass_param =
-            $this->option_manager->get_bypass_param();
+            $this->storage_manager->get_bypass_param();
 
         $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
@@ -99,7 +99,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($bypass_active && $bypass_param_in_uri) {
             $this->debugger->log_event('Bypass Active', 'Yes');
-            $this->notices->add_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
+            $this->notice_manager->add_notice('bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
             $this->update_toolbar_menu($tb_hidden, $bypass_param);
             return;
         }
@@ -173,15 +173,15 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     public function restrict_menu_access()
     {
 
-        $hidden_db_menu = $this->option_manager->get_hidden_db_menu();
-        $hidden_tb_menu = $this->option_manager->get_hidden_tb_menu();
+        $hidden_db_menu = $this->storage_manager->get_hidden_db_menu();
+        $hidden_tb_menu = $this->storage_manager->get_hidden_tb_menu();
 
         if (empty($hidden_db_menu) && empty($hidden_tb_menu)) {
             return;
         }
 
-        $bypass_active = $this->option_manager->is_bypass_active();
-        $bypass_param = $this->option_manager->get_bypass_param();
+        $bypass_active = $this->storage_manager->is_bypass_active();
+        $bypass_param = $this->storage_manager->get_bypass_param();
         $bypass_param_key = $this->config->option_name;
 
         $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;

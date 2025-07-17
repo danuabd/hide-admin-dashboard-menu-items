@@ -36,14 +36,13 @@ class Hide_Dashboard_Menu_Items_Config
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        $this->config_path = plugin_dir_path(__FILE__);
         $this->option_name = 'hdmi';
         $this->option_group = $this->option_name . '_group';
-        $this->settings_option = 'hdmi_settings';
-        $this->db_menu_option = 'hdmi_db_cached';
-        $this->tb_menu_option = 'hdmi_tb_cached';
-        $this->scan_success_option = 'hdmi_scan_completed';
-        $this->debug_option = 'hdmi_debug';
+        $this->settings_option = $this->option_name . '_settings';
+        $this->db_menu_option = $this->option_name . '_db_cached';
+        $this->tb_menu_option = $this->option_name . '_tb_cached';
+        $this->scan_success_option = $this->option_name . '_scan_completed';
+        $this->debug_option = $this->option_name . '_debug';
 
         $this->settings_page_slug = $plugin_name . '-settings';
         $this->debug_page_slug = $plugin_name . '-debug';

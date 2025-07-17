@@ -33,15 +33,15 @@ class Hide_Dashboard_Menu_Items_Admin
 
 	private $config;
 
-	private $option_manager;
+	private $storage_manager;
 
-	public $settings;
+	public $settings_manager;
 
 	public $scanner;
 
 	public $debugger;
 
-	public $notices;
+	public $notice_manager;
 
 	public $access_manager;
 
@@ -61,25 +61,32 @@ class Hide_Dashboard_Menu_Items_Admin
 
 	private function load_dependencies()
 	{
-		require_once plugin_dir_path(__FILE__) . 'class-config.php';
-		require_once plugin_dir_path(__FILE__) . 'class-settings.php';
-		require_once plugin_dir_path(__FILE__) . 'class-debugger.php';
-		require_once plugin_dir_path(__FILE__) . 'class-scanner.php';
-		require_once plugin_dir_path(__FILE__) . 'class-notices.php';
-		require_once plugin_dir_path(__FILE__) . 'class-access-manager.php';
-		require_once plugin_dir_path(__FILE__) . 'helpers/class-option-manager.php';
+		$file_path = plugin_dir_path(__FILE__);
+		require_once $file_path . 'class-config.php';
+		require_once $file_path . 'class-settings-manager.php';
+		require_once $file_path . 'class-debugger.php';
+		require_once $file_path . 'class-scanner.php';
+		require_once $file_path . 'class-notice-manager.php';
+		require_once $file_path . 'class-access-manager.php';
+		require_once $file_path . 'class-storage-manager.php';
 
 		$this->config = new Hide_Dashboard_Menu_Items_Config($this->plugin_name, $this->version);
-		$this->option_manager = new Hide_Dashboard_Menu_Items_Options($this->config);
-		$this->settings = new Hide_Dashboard_Menu_Items_Admin_Settings($this->config, $this->option_manager, $this->debugger, $this->notices);
-		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->config, $this->option_manager, $this->debugger, $this->notices);
-		$this->debugger = new Hide_Dashboard_Menu_Items_Debugger($this->config, $this->debugger);
-		$this->notices  = new Hide_Dashboard_Menu_Items_Notices();
+
+		$this->storage_manager = new Hide_Dashboard_Menu_Items_Storage_Manager($this->config);
+
+		$this->debugger = new Hide_Dashboard_Menu_Items_Debugger($this->config, $this->storage_manager);
+
+		$this->notice_manager  = new Hide_Dashboard_Menu_Items_Notices();
+
+		$this->settings_manager = new Hide_Dashboard_Menu_Items_Admin_Settings($this->config, $this->storage_manager, $this->debugger, $this->notice_manager);
+
+		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->config, $this->storage_manager, $this->debugger, $this->notice_manager);
+
 		$this->access_manager   = new Hide_Dashboard_Menu_Items_Access_Manager(
 			$this->config,
-			$this->$option_manager,
+			$this->storage_manager,
 			$this->debugger,
-			$this->notices
+			$this->notice_manager
 		);
 	}
 }
