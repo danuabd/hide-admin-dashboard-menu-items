@@ -112,25 +112,24 @@ class Hide_Dashboard_Menu_Items
 
 		$plugin_admin = new Hide_Dashboard_Menu_Items_Admin($this->get_plugin_name(), $this->get_version());
 
+		$this->loader->add_action('admin_init', $plugin_admin->settings, 'register_settings', 10);
 
-		$this->loader->add_action('admin_init', $plugin_admin, 'register_settings', 10);
+		$this->loader->add_action('admin_menu', $plugin_admin->scanner, 'scan_menus', 10);
+		$this->loader->add_action('admin_bar_menu', $plugin_admin->scanner, 'scan_menus', 10);
 
-		$this->loader->add_action('admin_menu', $plugin_admin, 'scan_menus', 10);
-		$this->loader->add_action('admin_bar_menu', $plugin_admin, 'scan_menus', 10);
+		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'restrict_hidden_menu_access');
 
-		$this->loader->add_action('admin_init', $plugin_admin, 'restrict_hidden_menu_access');
+		$this->loader->add_action('admin_notices', $plugin_admin->notices, 'display_admin_notices');
 
-		$this->loader->add_action('admin_notices', $plugin_admin, 'display_admin_notices');
+		$this->loader->add_action('admin_menu', $plugin_admin->settings, 'add_admin_menu');
 
-		$this->loader->add_action('admin_menu', $plugin_admin, 'add_admin_menu');
+		$this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu');
 
-		$this->loader->add_action('admin_menu', $plugin_admin, 'hide_db_menu');
+		$this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'hide_toolbar_menu');
 
-		$this->loader->add_action('wp_before_admin_bar_render', $plugin_admin, 'hide_tb_menu');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings, 'enqueue_styles');
 
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
-
-		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
+		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings, 'enqueue_scripts');
 	}
 
 	/**

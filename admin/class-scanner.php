@@ -16,6 +16,23 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Scanner
 {
 
+    private $config;
+    private $option_manager;
+    private $debugger;
+    private $notices;
+
+    public function __construct(
+        Hide_Dashboard_Menu_Items_Config $config,
+        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Debugger $debugger,
+        Hide_Dashboard_Menu_Items_Notices $notices
+    ) {
+        $this->config = $config;
+        $this->option_manager = $option_manager;
+        $this->debugger = $debugger;
+        $this->notices = $notices;
+    }
+
     /**
      * Process scanning for menu items.
      *
@@ -30,23 +47,21 @@ class Hide_Dashboard_Menu_Items_Scanner
             check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
         ) {
 
-            $this->is_scanning = true;
-
             global $menu;
 
-            if (!empty($menu) || is_array($menu)) $this->store_menu_items();
+            if (!empty($menu) || is_array($menu)) $this->store_menu_items($menu);
 
             global $wp_admin_bar;
 
             if (!empty($wp_admin_bar) || is_array($wp_admin_bar)) $this->store_toolbar_items($wp_admin_bar);
 
             // Store in DB
-            update_option($this->scan_success_option, 1);
-            $this->log_timed_info('Last Scan Time');
+            $this->option_manager->update($this->config->scan_success_option, 1);
+            $this->debugger->log_event('Last Scan Time');
 
             // Redirect back with success transient
-            $this->set_admin_notice('hdmi_settings_updated', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
-            wp_redirect(admin_url('admin.php?page=' . $this->settings_page_slug));
+            $this->notices->add_notice('hdmi_settings_updated', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
+            wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
             exit;
         }
     }
@@ -59,16 +74,13 @@ class Hide_Dashboard_Menu_Items_Scanner
     public function store_menu_items($menu)
     {
 
-
-        global $menu;
-
         if (empty($menu) || !is_array($menu)) {
-            $this->log_error('Menu is not initialized or empty.');
+            $this->debugger->log_event('', 'Menu is not initialized or empty.', 'error');
             return;
         }
 
         $menu_items = array();
-        $hidden_menu_items = $this->get_plugin_option($this->hidden_db_menu_key, []);
+        $hidden_menu_items = $this->option_manager->get($this->config->hidden_db_menu_key, []);
 
         $menu_combined = array_merge($menu, $hidden_menu_items);
 
@@ -89,7 +101,7 @@ class Hide_Dashboard_Menu_Items_Scanner
             $slug       = isset($item[2]) ? $item[2] : '';
             $icon       = isset($item[6]) ? $item[6] : '';
 
-            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->settings_page_slug) {
+            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->config->settings_page_slug) {
                 // Skip items with missing data
                 continue;
             }
@@ -104,13 +116,13 @@ class Hide_Dashboard_Menu_Items_Scanner
         }
 
         if (empty($menu_items)) {
-            $this->log_error('No top-level menu items found.');
+            $this->debugger->log_event('', 'No top-level menu items found.' . 'error');
             return;
         }
 
         error_log(print_r($menu_items));
 
-        update_option($this->db_menu_option, $menu_items);
+        update_option($this->config->db_menu_option, $menu_items);
     }
 
     /**
@@ -118,17 +130,18 @@ class Hide_Dashboard_Menu_Items_Scanner
      *
      * @since    1.0.0
      */
-    public function store_toolbar_items($admin_bar)
+    public function store_toolbar_items($wp_admin_bar)
     {
+
         if (!is_object($wp_admin_bar)) {
-            $this->log_error('WP Admin Bar is not initialized.');
+            $this->debugger->log_event('', 'WP Admin Bar is not initialized.', 'error');
             return;
         }
 
         $nodes = $wp_admin_bar->get_nodes();
 
         if (empty($nodes)) {
-            $this->log_error('No admin bar nodes found.');
+            $this->debugger->log_event('', 'No admin bar nodes found.', 'error');
             return;
         }
 
@@ -152,10 +165,10 @@ class Hide_Dashboard_Menu_Items_Scanner
         }
 
         if (empty($menu_items)) {
-            $this->log_error('No top-level admin bar menu items found.');
+            $this->debugger->log_event('', 'No top-level admin bar menu items found.', 'error');
             return;
         }
 
-        update_option($this->tb_menu_option, $menu_items);
+        $this->option_manager->update($this->config->tb_menu_option, $menu_items);
     }
 }

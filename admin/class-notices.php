@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Notices
 {
+
     /**
      * Set a custom admin notice using transient.
      *

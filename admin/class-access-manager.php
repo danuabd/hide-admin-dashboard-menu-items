@@ -15,6 +15,23 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
+    private $config;
+    private $option_manager;
+    private $debugger;
+    private $notices;
+
+    public function __construct(
+        Hide_Dashboard_Menu_Items_Config $config,
+        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Debugger $debugger,
+        Hide_Dashboard_Menu_Items_Notices $notices
+    ) {
+        $this->config = $config;
+        $this->option_manager = $option_manager;
+        $this->debugger = $debugger;
+        $this->notices = $notices;
+    }
+
     /**
      * Function to hide Dashboard Menu items.
      *
@@ -22,15 +39,17 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     public function hide_dashboard_menu()
     {
-        if ($this->is_scanning) return;
+        $scan_running = get_transient('hdmi_scan_running');
+
+        if ($scan_running) return;
 
         global $menu;
 
-        $db_hidden = $this->get_plugin_option($this->hidden_db_menu_key, array());
+        $db_hidden = $this->option_manager->get($this->config->hidden_db_menu_key, array());
 
         $bypass_active = $this->is_bypass_active();
         $bypass_param = $this->get_bypass_param();
-        $bypass_param_key = $this->plugin_option_name;
+        $bypass_param_key = $this->config->option_name;
 
         $bypass_param_in_uri = isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key])  === $bypass_param;
 
@@ -39,9 +58,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         }
 
         if ($bypass_active && $bypass_param_in_uri) {
-            $this->log_info('Bypass Active', 'Yes');
-            $this->set_admin_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
-            $this->update_db_menu($db_hidden, $bypass_param);
+            $this->debugger->log_event('Bypass Active', 'Yes');
+            $this->notices->add_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
+            $this->update_dashboard_menu($db_hidden, $bypass_param);
             return;
         }
 
@@ -58,15 +77,17 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     public function hide_toolbar_menu()
     {
-        if ($this->is_scanning) return;
+        $scan_running = get_transient('hdmi_scan_running');
+
+        if ($scan_running) return;
 
         global $wp_admin_bar;
 
-        $tb_hidden = $this->get_plugin_option($this->hidden_tb_menu_key, array());
+        $tb_hidden = $this->option_manager->get($this->config->hidden_tb_menu_key, array());
 
         $bypass_active = $this->is_bypass_active();
         $bypass_param = $this->get_bypass_param();
-        $bypass_param_key = $this->plugin_option_name;
+        $bypass_param_key = $this->config->option_name;
 
         $bypass_param_in_uri = isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key])  === $bypass_param;
 
@@ -75,9 +96,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         }
 
         if ($bypass_active && $bypass_param_in_uri) {
-            $this->log_info('Bypass Active', 'Yes');
-            $this->set_admin_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
-            $this->update_tb_menu($tb_hidden, $bypass_param);
+            $this->debugger->log_event('Bypass Active', 'Yes');
+            $this->notices->add_notice('hdmi_bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
+            $this->update_toolbar_menu($tb_hidden, $bypass_param);
             return;
         }
 
@@ -102,16 +123,16 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             if (in_array($menu_item[2], $hidden, true)) {
                 if (strpos($menu[$index][2], $bypass_key) === false) {
                     if (strpos($menu[$index][2], '?') !== false) {
-                        $menu[$index][2] .= '&' . $this->plugin_option_name . '=' . $bypass_key;
+                        $menu[$index][2] .= '&' . $this->config->option_name . '=' . $bypass_key;
                     } else {
-                        $menu[$index][2] .= '?' . $this->plugin_option_name . '=' . $bypass_key;
+                        $menu[$index][2] .= '?' . $this->config->option_name . '=' . $bypass_key;
                     }
                 }
             }
         }
 
-        $this->log_info('Dashboard menu updated?', 'Yes');
-        $this->log_timed_info('Dashboard menu was updated at');
+        $this->debugger->log_event('Dashboard menu updated?', 'Yes');
+        $this->debugger->log_event('Dashboard menu was updated at');
     }
 
 
@@ -131,15 +152,15 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
             if ($node && isset($node->href)) {
                 if (strpos($node->href, $bypass_key) === false) {
-                    $updated_href = add_query_arg($this->plugin_option_name, $bypass_key, $node->href);
+                    $updated_href = add_query_arg($this->config->option_name, $bypass_key, $node->href);
                     $node->href = $updated_href;
                     $wp_admin_bar->add_menu($node);
                 }
             }
         }
 
-        $this->log_info('Admin bar menu updated?', 'Yes');
-        $this->log_timed_info('Admin bar menu was updated at');
+        $this->debugger->log_event('Admin bar menu updated?', 'Yes');
+        $this->debugger->log_event('Admin bar menu was updated at');
     }
 
 
@@ -152,7 +173,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private function get_bypass_param()
     {
         if ($this->is_bypass_active())
-            return $this->get_plugin_option($this->bypass_param_key, '');
+            return $this->option_manager->get($this->config->bypass_param_key, '');
         else return '';
     }
 
@@ -164,7 +185,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     private function is_bypass_active()
     {
-        return $this->get_plugin_option($this->bypass_enabled_key, false);
+        return $this->option_manager->get($this->config->bypass_enabled_key, false);
     }
 
     /**
@@ -175,8 +196,8 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     public function restrict_menu_access()
     {
 
-        $hidden_db_menu = $this->get_plugin_option($this->hidden_db_menu_key, array());
-        $hidden_tb_menu = $this->get_plugin_option($this->hidden_tb_menu_key, array());
+        $hidden_db_menu = $this->option_manager->get($this->config->hidden_db_menu_key, array());
+        $hidden_tb_menu = $this->option_manager->get($this->config->hidden_tb_menu_key, array());
 
         if (empty($hidden_db_menu) && empty($hidden_tb_menu)) {
             return;
@@ -184,7 +205,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         $bypass_active = $this->is_bypass_active();
         $bypass_param = $this->get_bypass_param();
-        $bypass_param_key = $this->plugin_option_name;
+        $bypass_param_key = $this->config->option_name;
 
         $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;
 

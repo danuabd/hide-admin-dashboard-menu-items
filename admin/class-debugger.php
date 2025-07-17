@@ -15,26 +15,32 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Debugger
 {
+    private $config;
+
+    private $option_manager;
+
     /**
      * @param array $accepted_event_types logging types to log
      */
     private $accepted_event_types;
 
-    public function __construct()
+    public function __construct(Hide_Dashboard_Menu_Items_Config $config, Hide_Dashboard_Menu_Items_Options $option_manager)
     {
+        $this->config = $config;
+        $this->option_manager = $option_manager;
         $this->accepted_event_types = ['log', 'debug'];
     }
 
     private function get_environment_info()
     {
         return [
-            'Plugin Version' => $this->version,
+            'Plugin Version' => $this->config->version,
             'Environment' => [
                 'WordPress Version' => get_bloginfo('version'),
                 'PHP Version' => PHP_VERSION,
                 'Memory Limit' => WP_MEMORY_LIMIT,
                 'Active Theme' => wp_get_theme()->get('Name'),
-                'Active Plugins Count' => count($this->get_plugin_option('active_plugins', [])),
+                'Active Plugins Count' => count($this->option_manager->get('active_plugins', [])),
             ]
         ];
     }
@@ -45,12 +51,14 @@ class Hide_Dashboard_Menu_Items_Debugger
             return;
         }
 
-        $key = $key ?? $message;
+        if (!$key || empty($key) || $key === '') {
+            $key = current_time('mysql');
+        }
 
-        $debug_data = get_option($this->debug_option, []);
+        $debug_data = get_option($this->config->debug_option, []);
 
         $debug_data[$type][$key] = $message;
-        update_option($this->debug_option, $debug_data);
+        update_option($this->config->debug_option, $debug_data);
     }
 
     /**
@@ -95,29 +103,29 @@ class Hide_Dashboard_Menu_Items_Debugger
             return;
         }
 
-        $scan_status = $this->get_plugin_option($this->scan_success_option, false);
+        $scan_status = $this->option_manager->get($this->config->scan_success_option, false);
 
         if (!$scan_status) {
-            $this->log_error('Scan has not been completed. Please run the scan first.');
+            $this->log_event('', 'Scan has not been completed. Please run the scan first.', 'error');
         }
 
-        $db_menu_cache = get_option($this->db_menu_option, array());
-        $tb_menu_cache = get_option($this->tb_menu_option, array());
+        $db_menu_cache = get_option($this->config->db_menu_option, array());
+        $tb_menu_cache = get_option($this->config->tb_menu_option, array());
 
-        $hidden_db_menus = $this->get_plugin_option($this->hidden_db_menu_key, 'No hidden dashboard menu items configured.');
-        $hidden_tb_menus = $this->get_plugin_option($this->hidden_tb_menu_key, 'No hidden admin bar menu items configured.');
+        $hidden_db_menus = $this->option_manager->get($this->config->hidden_db_menu_key, 'No hidden dashboard menu items configured.');
+        $hidden_tb_menus = $this->option_manager->get($this->config->hidden_tb_menu_key, 'No hidden admin bar menu items configured.');
 
-        $stored_debug_data = $this->get_plugin_option($this->debug_option, []);
+        $stored_debug_data = $this->option_manager->get($this->config->debug_option, []);
         $stored_info_data = $stored_debug_data['info'] ?? [];
         $stored_error_data = $stored_debug_data['error'] ?? [];
 
         $user = wp_get_current_user();
 
-        $bypass_enabled = $this->get_plugin_option($this->bypass_enabled_key, false);
-        $bypass_key = $this->get_plugin_option($this->bypass_param_key, false);
+        $bypass_enabled = $this->option_manager->get($this->config->bypass_enabled_key, false);
+        $bypass_key = $this->option_manager->get($this->config->bypass_param_key, false);
 
         if ($bypass_enabled && empty($bypass_key)) {
-            $this->log_error('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.');
+            $this->log_event('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.', 'error');
         }
 
         $curr_info_data = $this->get_environment_info();
