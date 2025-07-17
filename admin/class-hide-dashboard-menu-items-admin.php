@@ -209,18 +209,10 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->debug_page_slug = $this->plugin_name . '-debug';
 	}
 
-	private function get_environment_info()
+	private function load_dependencies()
 	{
-		return [
-			'Plugin Version' => $this->version,
-			'Environment' => [
-				'WordPress Version' => get_bloginfo('version'),
-				'PHP Version' => PHP_VERSION,
-				'Memory Limit' => WP_MEMORY_LIMIT,
-				'Active Theme' => wp_get_theme()->get('Name'),
-				'Active Plugins Count' => count($this->get_plugin_option('active_plugins', [])),
-			]
-		];
+		require_once plugin_dir_path(__FILE__) . 'class-admin-settings.php';
+		require_once plugin_dir_path(__FILE__) . 'class-admin-debugger.php';
 	}
 
 	/**
@@ -235,62 +227,6 @@ class Hide_Dashboard_Menu_Items_Admin
 	{
 		$options = get_option($this->settings_option, []);
 		return $options[$key] ?? $default;
-	}
-
-	/**
-	 * Log a info message to the plugin's info log.
-	 *
-	 * @since 1.0.0
-	 * @param string $key The key for the info message.
-	 * @param string|array $message The info message to log.
-	 */
-	private function log_info($key, $message)
-	{
-		if (!$key || (!$message || empty($message))) {
-			return;
-		}
-		$debug_data = get_option($this->debug_option, []);
-
-		$debug_data['info'][$key] = $message;
-		update_option($this->debug_option, $debug_data);
-	}
-
-	/**
-	 * Log an error message to the plugin's error log.
-	 *
-	 * @since 1.0.0
-	 * @param string $message The error message to log.
-	 */
-	private function log_error($message)
-	{
-		if (empty($message)) {
-			return;
-		}
-
-		$debug_data = get_option($this->debug_option, []);
-
-		$key = current_time('mysql');
-
-		$debug_data['error'][$key] =  $message;
-
-		// Keep only the last 50 entries
-		if (count($debug_data['error']) > 50) {
-			$debug_data['error'] = array_slice($debug_data['error'], -50, null, true);
-		}
-
-		update_option($this->debug_option, $debug_data);
-		$this->log_timed_info('Last Error Log Updated');
-	}
-
-	/**
-	 * Log an error message to the plugin's error log with time.
-	 *
-	 * @since 1.0.0
-	 * @param string $key The error key to log.
-	 */
-	private function log_timed_info($key)
-	{
-		$this->log_info($key, current_time('mysql'));
 	}
 
 
@@ -529,103 +465,6 @@ class Hide_Dashboard_Menu_Items_Admin
 		}
 
 		update_option($this->tb_menu_option, $menu_items);
-	}
-
-	/**
-	 * Generate the debug array in a structured format.
-	 *
-	 * @since    1.0.0
-	 * @param array $array The array to generate.
-	 * @param int $depth The current depth of recursion.
-	 * @return string The generated HTML for the array.
-	 */
-	private function generate_debug_markup($array, $depth = 0)
-	{
-		if (!is_array($array)) {
-			return esc_html((string)$array);
-		}
-
-		$output = "<ul style='margin-left: " . (20 * $depth) . "px; list-style-type: none;'>";
-
-		foreach ($array as $key => $value) {
-			$key = esc_html((string)$key);
-			if (is_array($value)) {
-				$output .= "<li><strong>{$key}:</strong> " . $this->generate_debug_markup($value, $depth + 1) . "</li>";
-			} else {
-				$value = esc_html((string)$value);
-				$output .= "<li><strong>{$key}:</strong> {$value}</li>";
-			}
-		}
-
-		$output .= "</ul>";
-
-		return $output;
-	}
-
-
-	/**
-	 * Display the debug page.
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_debug_page()
-	{
-		if (!current_user_can('manage_options')) {
-			return;
-		}
-
-		$scan_status = $this->get_plugin_option($this->scan_success_option, false);
-
-		if (!$scan_status) {
-			$this->log_error('Scan has not been completed. Please run the scan first.');
-		}
-
-		$db_menu_cache = get_option($this->db_menu_option, array());
-		$tb_menu_cache = get_option($this->tb_menu_option, array());
-
-		$hidden_db_menus = $this->get_plugin_option($this->hidden_db_menu_key, 'No hidden dashboard menu items configured.');
-		$hidden_tb_menus = $this->get_plugin_option($this->hidden_tb_menu_key, 'No hidden admin bar menu items configured.');
-
-		$stored_debug_data = $this->get_plugin_option($this->debug_option, []);
-		$stored_info_data = $stored_debug_data['info'] ?? [];
-		$stored_error_data = $stored_debug_data['error'] ?? [];
-
-		$user = wp_get_current_user();
-
-		$bypass_enabled = $this->get_plugin_option($this->bypass_enabled_key, false);
-		$bypass_key = $this->get_plugin_option($this->bypass_param_key, false);
-
-		if ($bypass_enabled && empty($bypass_key)) {
-			$this->log_error('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.');
-		}
-
-		$curr_info_data = $this->get_environment_info();
-
-		$curr_info_data['Database Menu Count'] = count($db_menu_cache);
-		$curr_info_data['Database Menu'] = $db_menu_cache;
-		$curr_info_data['Admin Bar Menu Count'] = count($tb_menu_cache);
-		$curr_info_data['Admin Bar Menu'] = $tb_menu_cache;
-
-		$curr_info_data['Current User'] = [
-			'ID' => $user->ID,
-			'Username' => $user->user_login,
-			'Roles' => implode(', ', $user->roles),
-			'Can manage_options' => current_user_can('manage_options') ? 'Yes' : 'No',
-		];
-
-		$curr_info_data['Hidden Dashboard Menu'] = $hidden_db_menus;
-		$curr_info_data['Hidden Admin Bar Menu']	 = $hidden_tb_menus;
-		$curr_info_data['Bypass Settings']	 = [
-			'Bypass Enabled' => $bypass_enabled ? 'Yes' : 'No',
-			'Bypass Query Key' => $bypass_key ? 'is set' : 'is not set',
-		];
-
-		$final_info_data = array_merge($curr_info_data, $stored_info_data);
-
-		$debug_markup = $this->generate_debug_markup($final_info_data);
-		$error_markup = empty($stored_error_data) ? '<li>No errors logged.</li>' : $this->generate_debug_markup($stored_error_data);
-
-		require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';
 	}
 
 
