@@ -70,7 +70,7 @@ class Hide_Dashboard_Menu_Items_Admin
 		require_once plugin_dir_path(__FILE__) . 'helpers/class-option-manager.php';
 
 		$this->config = new Hide_Dashboard_Menu_Items_Config($this->plugin_name, $this->version);
-		$this->option_manager = new Hide_Dashboard_Menu_Items_Options($this->config->option_name);
+		$this->option_manager = new Hide_Dashboard_Menu_Items_Options($this->config);
 		$this->settings = new Hide_Dashboard_Menu_Items_Admin_Settings($this->config, $this->option_manager, $this->debugger, $this->notices);
 		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->config, $this->option_manager, $this->debugger, $this->notices);
 		$this->debugger = new Hide_Dashboard_Menu_Items_Debugger($this->config, $this->debugger);

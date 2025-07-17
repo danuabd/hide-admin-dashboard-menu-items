@@ -120,9 +120,7 @@ class Hide_Dashboard_Menu_Items_Scanner
             return;
         }
 
-        error_log(print_r($menu_items));
-
-        update_option($this->config->db_menu_option, $menu_items);
+        $this->option_manager->update_dashboard_menu($menu_items);
     }
 
     /**
@@ -169,6 +167,6 @@ class Hide_Dashboard_Menu_Items_Scanner
             return;
         }
 
-        $this->option_manager->update($this->config->tb_menu_option, $menu_items);
+        $this->option_manager->update_toolbar_menu($menu_items);
     }
 }

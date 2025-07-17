@@ -20,8 +20,6 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private $debugger;
     private $notices;
 
-    private $bypass_enabled_key;
-    private $bypass_param_key;
     private $bypass_param_query;
 
     public function __construct(
@@ -34,9 +32,6 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $this->option_manager = $option_manager;
         $this->debugger = $debugger;
         $this->notices = $notices;
-
-        $this->bypass_enabled_key = $this->config->bypass_enabled_key;
-        $this->bypass_param_key = $this->config->bypass_param_key;
         $this->bypass_param_query = $this->config->option_name;
     }
 
@@ -51,11 +46,11 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($scan_running) return;
 
-        $db_hidden = $this->option_manager->get($this->config->hidden_db_menu_key, array());
+        $db_hidden = $this->option_manager->get_hidden_db_menu();
 
-        $bypass_active = $this->option_manager->is_bypass_active($this->bypass_enabled_key);
+        $bypass_active = $this->option_manager->is_bypass_active();
 
-        $bypass_param = $this->option_manager->get_bypass_param($this->bypass_enabled_key, $this->bypass_param_key);
+        $bypass_param = $this->option_manager->get_bypass_param();
 
         $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
@@ -89,12 +84,12 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         global $wp_admin_bar;
 
-        $tb_hidden = $this->option_manager->get($this->config->hidden_tb_menu_key, array());
+        $tb_hidden = $this->option_manager->get_hidden_tb_menu();
 
         $bypass_active =
-            $this->option_manager->is_bypass_active($this->config->bypass_enabled_key);
+            $this->option_manager->is_bypass_active();
         $bypass_param =
-            $this->option_manager->get_bypass_param($this->config->bypass_enabled_key, $this->config->bypass_param_key);
+            $this->option_manager->get_bypass_param();
 
         $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
@@ -178,15 +173,15 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     public function restrict_menu_access()
     {
 
-        $hidden_db_menu = $this->option_manager->get($this->config->hidden_db_menu_key, array());
-        $hidden_tb_menu = $this->option_manager->get($this->config->hidden_tb_menu_key, array());
+        $hidden_db_menu = $this->option_manager->get_hidden_db_menu();
+        $hidden_tb_menu = $this->option_manager->get_hidden_tb_menu();
 
         if (empty($hidden_db_menu) && empty($hidden_tb_menu)) {
             return;
         }
 
-        $bypass_active = $this->option_manager->is_bypass_active($this->config->bypass_enabled_key);
-        $bypass_param = $this->option_manager->get_bypass_param($this->config->bypass_enabled_key, $this->config->bypass_param_key);
+        $bypass_active = $this->option_manager->is_bypass_active();
+        $bypass_param = $this->option_manager->get_bypass_param();
         $bypass_param_key = $this->config->option_name;
 
         $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;

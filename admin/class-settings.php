@@ -67,7 +67,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             __('Hide Menu Items', $this->config->plugin_name),
             'manage_options',
             $this->config->settings_page_slug,
-            array($this, 'display_settings_page'),
+            array($this, 'render_settings_page'),
             'dashicons-hidden',
             99
         );
@@ -78,7 +78,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             __('Debug Info', $this->config->plugin_name),
             'manage_options',
             $this->config->debug_page_slug,
-            [$this, 'display_debug_page']
+            [$this->debugger, 'render_debug_page']
         );
     }
 
@@ -121,19 +121,18 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         $settings_page_slug = $this->config->settings_page_slug;
 
         // Cached menu items
-        $cached_db_menu = get_option($this->config->db_menu_option, array());
-        $cached_tb_menu = get_option($this->config->tb_menu_option, array());
+        $cached_db_menu = $this->option_manager->get_dashboard_menu_cache();
+        $cached_tb_menu = $this->option_manager->get_toolbar_menu_cache();
 
         // Hidden menu items
         $hidden_db_menu =
-            $this->option_manager->get($this->config->hidden_db_menu_key, array());
+            $this->option_manager->get_hidden_db_menu();
         $hidden_tb_menu =
-            $this->option_manager->get($this->config->hidden_tb_menu_key, array());
-
-        $bypass_enabled = $this->option_manager->is_bypass_active($bypass_enabled_key)  ? 'checked' : '';
+            $this->option_manager->get_hidden_tb_menu();
+        $bypass_enabled =
+            $this->option_manager->is_bypass_active()  ? 'checked' : '';
         $bypass_value =
-            esc_attr($this->option_manager->get_bypass_param($bypass_enabled_key, $bypass_param_key)) ?? '';
-
+            esc_attr($this->option_manager->get_bypass_param()) ?? '';
 
         // Include the settings page template.
         include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';

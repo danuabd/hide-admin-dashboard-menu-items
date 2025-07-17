@@ -24,8 +24,10 @@ class Hide_Dashboard_Menu_Items_Debugger
      */
     private $accepted_event_types;
 
-    public function __construct(Hide_Dashboard_Menu_Items_Config $config, Hide_Dashboard_Menu_Items_Options $option_manager)
-    {
+    public function __construct(
+        Hide_Dashboard_Menu_Items_Config $config,
+        Hide_Dashboard_Menu_Items_Options $option_manager
+    ) {
         $this->config = $config;
         $this->option_manager = $option_manager;
         $this->accepted_event_types = ['log', 'debug'];
@@ -56,7 +58,6 @@ class Hide_Dashboard_Menu_Items_Debugger
         }
 
         $debug_data = get_option($this->config->debug_option, []);
-
         $debug_data[$type][$key] = $message;
         update_option($this->config->debug_option, $debug_data);
     }
@@ -109,20 +110,22 @@ class Hide_Dashboard_Menu_Items_Debugger
             $this->log_event('', 'Scan has not been completed. Please run the scan first.', 'error');
         }
 
-        $db_menu_cache = get_option($this->config->db_menu_option, array());
-        $tb_menu_cache = get_option($this->config->tb_menu_option, array());
+        $db_menu_cache = $this->option_manager->get_dashboard_menu_cache();
+        $tb_menu_cache = $this->option_manager->get_toolbar_menu_cache();
 
-        $hidden_db_menus = $this->option_manager->get($this->config->hidden_db_menu_key, 'No hidden dashboard menu items configured.');
-        $hidden_tb_menus = $this->option_manager->get($this->config->hidden_tb_menu_key, 'No hidden admin bar menu items configured.');
+        $hidden_db_menus =
+            $this->option_manager->get_hidden_db_menu() ?? 'No hidden dashboard menu items configured.';
+        $hidden_tb_menus =
+            $this->option_manager->get_hidden_tb_menu() ?? 'No hidden admin bar menu items configured.';
 
-        $stored_debug_data = $this->option_manager->get($this->config->debug_option, []);
+        $stored_debug_data = get_option($this->config->debug_option, []);
         $stored_info_data = $stored_debug_data['info'] ?? [];
         $stored_error_data = $stored_debug_data['error'] ?? [];
 
         $user = wp_get_current_user();
 
-        $bypass_enabled = $this->option_manager->get($this->config->bypass_enabled_key, false);
-        $bypass_key = $this->option_manager->get($this->config->bypass_param_key, false);
+        $bypass_enabled = $this->option_manager->is_bypass_active();
+        $bypass_key = $this->option_manager->get_bypass_param();
 
         if ($bypass_enabled && empty($bypass_key)) {
             $this->log_event('Bypass is enabled but no bypass key is set. Please configure the bypass key in the plugin settings.', 'error');
