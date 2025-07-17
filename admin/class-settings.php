@@ -17,6 +17,8 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 {
     private $config;
 
+    private $option_manager;
+
     private $debugger;
 
     private $notices;
@@ -25,9 +27,14 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
     private $debug_page_hook_suffix;
 
-    public function __construct(Hide_Dashboard_Menu_Items_Config $config, Hide_Dashboard_Menu_Items_Debugger $debugger, Hide_Dashboard_Menu_Items_Notices $notices)
-    {
+    public function __construct(
+        Hide_Dashboard_Menu_Items_Config $config,
+        Hide_Dashboard_Menu_Items_Options $option_manager,
+        Hide_Dashboard_Menu_Items_Debugger $debugger,
+        Hide_Dashboard_Menu_Items_Notices $notices
+    ) {
         $this->config = $config;
+        $this->option_manager = $option_manager;
         $this->debugger = $debugger;
         $this->notices = $notices;
     }
@@ -103,6 +110,30 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         if (!current_user_can('manage_options')) {
             return;
         }
+
+        $scan_done = get_option($this->config->scan_success_option, false);
+        $bypass_enabled_key = $this->config->bypass_enabled_key;
+        $hidden_db_menu_key = $this->config->hidden_db_menu_key;
+        $hidden_tb_menu_key = $this->config->hidden_tb_menu_key;
+        $settings_option = $this->config->settings_option;
+        $bypass_param_key = $this->config->bypass_param_key;
+        $option_group = $this->config->option_group;
+        $settings_page_slug = $this->config->settings_page_slug;
+
+        // Cached menu items
+        $cached_db_menu = get_option($this->config->db_menu_option, array());
+        $cached_tb_menu = get_option($this->config->tb_menu_option, array());
+
+        // Hidden menu items
+        $hidden_db_menu =
+            $this->option_manager->get($this->config->hidden_db_menu_key, array());
+        $hidden_tb_menu =
+            $this->option_manager->get($this->config->hidden_tb_menu_key, array());
+
+        $bypass_enabled = $this->option_manager->is_bypass_active($bypass_enabled_key)  ? 'checked' : '';
+        $bypass_value =
+            esc_attr($this->option_manager->get_bypass_param($bypass_enabled_key, $bypass_param_key)) ?? '';
+
 
         // Include the settings page template.
         include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';

@@ -13,20 +13,6 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-// Initial scan is completed?
-$scan_done = get_option($this->scan_success_option, false);
-
-// Cached menu items
-$cached_db_menu = get_option($this->db_menu_option, array());
-$cached_tb_menu = get_option($this->tb_menu_option, array());
-
-// Hidden menu items
-$hidden_db_menu = $this->get_plugin_option($this->hidden_db_menu_key, array());
-$hidden_tb_menu = $this->get_plugin_option($this->hidden_tb_menu_key, array());
-
-$bypass_enabled = $this->get_bypass_param()  ? 'checked' : '';
-$bypass_value = esc_attr($this->get_bypass_param()) ?? '';
-
 if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$cached_tb_menu)) {
 
     $title = $description = '';
@@ -54,8 +40,8 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
 
         <form method="post" action="options.php" id="hdmi__form">
             <?php
-            settings_fields($this->plugin_option_group);
-            do_settings_sections($this->settings_page_slug);
+            settings_fields($option_group);
+            do_settings_sections($settings_page_slug);
             wp_nonce_field('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field');
 
             echo '<div id="hdmi__rescan">';
@@ -77,7 +63,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                     $dashicon = esc_attr($item['dashicon']);
                     $checked  = in_array($item['slug'], $hidden_db_menu) ? 'checked' : '';
                     $status   = in_array($item['slug'], $hidden_db_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_db_menu_key][]");
+                    $name_attr = esc_attr($settings_option . "[$hidden_db_menu_key][]");
 
                     echo <<<HTML
             <div class="hdmi__grid-item">
@@ -115,7 +101,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                     $title    = esc_html($item['title']);
                     $checked  = in_array($id, $hidden_tb_menu) ? 'checked' : '';
                     $status   = in_array($id, $hidden_tb_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_tb_menu_key][]");
+                    $name_attr = esc_attr($settings_option . "[$hidden_tb_menu_key][]");
 
                     echo <<<HTML
                     <div class="hdmi__list-item">
@@ -146,14 +132,14 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                 <div id="hdmi__bypass-controls">
                     <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
                         <input type="checkbox" id="hdmi__bypass-toggle" class="hdmi-toggle-input"
-                            name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_enabled_key}]") ?>" value="1" <?php echo $bypass_enabled ?> />
+                            name="<?php echo esc_attr($settings_option . "[{$bypass_enabled_key}]") ?>" value="1" <?php echo $bypass_enabled ?> />
                         <span id="hdmi__bypass-slider" class="hdmi-toggle-slider"></span>
                         Enable bypass feature
                     </label>
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_param_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($settings_option . "[{$bypass_param_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.

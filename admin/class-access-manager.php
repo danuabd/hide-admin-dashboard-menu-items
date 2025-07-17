@@ -20,6 +20,10 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private $debugger;
     private $notices;
 
+    private $bypass_enabled_key;
+    private $bypass_param_key;
+    private $bypass_param_query;
+
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Options $option_manager,
@@ -30,6 +34,10 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $this->option_manager = $option_manager;
         $this->debugger = $debugger;
         $this->notices = $notices;
+
+        $this->bypass_enabled_key = $this->config->bypass_enabled_key;
+        $this->bypass_param_key = $this->config->bypass_param_key;
+        $this->bypass_param_query = $this->config->option_name;
     }
 
     /**
@@ -43,15 +51,13 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($scan_running) return;
 
-        global $menu;
-
         $db_hidden = $this->option_manager->get($this->config->hidden_db_menu_key, array());
 
-        $bypass_active = $this->is_bypass_active();
-        $bypass_param = $this->get_bypass_param();
-        $bypass_param_key = $this->config->option_name;
+        $bypass_active = $this->option_manager->is_bypass_active($this->bypass_enabled_key);
 
-        $bypass_param_in_uri = isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key])  === $bypass_param;
+        $bypass_param = $this->option_manager->get_bypass_param($this->bypass_enabled_key, $this->bypass_param_key);
+
+        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
         if (!is_array($db_hidden) || empty($db_hidden)) {
             return;
@@ -85,11 +91,12 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         $tb_hidden = $this->option_manager->get($this->config->hidden_tb_menu_key, array());
 
-        $bypass_active = $this->is_bypass_active();
-        $bypass_param = $this->get_bypass_param();
-        $bypass_param_key = $this->config->option_name;
+        $bypass_active =
+            $this->option_manager->is_bypass_active($this->config->bypass_enabled_key);
+        $bypass_param =
+            $this->option_manager->get_bypass_param($this->config->bypass_enabled_key, $this->config->bypass_param_key);
 
-        $bypass_param_in_uri = isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key])  === $bypass_param;
+        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
 
         if (!is_array($tb_hidden) || empty($tb_hidden)) {
             return;
@@ -163,31 +170,6 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $this->debugger->log_event('Admin bar menu was updated at');
     }
 
-
-    /**
-     * Get the bypass query parameter if enabled.
-     *
-     * @since    1.0.0
-     * @return   string Returns the bypass query parameter if enabled, otherwise empty string.
-     */
-    private function get_bypass_param()
-    {
-        if ($this->is_bypass_active())
-            return $this->option_manager->get($this->config->bypass_param_key, '');
-        else return '';
-    }
-
-    /**
-     * Get the bypass active status.
-     *
-     * @since    1.0.0
-     * @return   bool Returns true if query parameter if enabled, otherwise false.
-     */
-    private function is_bypass_active()
-    {
-        return $this->option_manager->get($this->config->bypass_enabled_key, false);
-    }
-
     /**
      * Function to restrict access to hidden menu items.
      *
@@ -203,8 +185,8 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             return;
         }
 
-        $bypass_active = $this->is_bypass_active();
-        $bypass_param = $this->get_bypass_param();
+        $bypass_active = $this->option_manager->is_bypass_active($this->config->bypass_enabled_key);
+        $bypass_param = $this->option_manager->get_bypass_param($this->config->bypass_enabled_key, $this->config->bypass_param_key);
         $bypass_param_key = $this->config->option_name;
 
         $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;
