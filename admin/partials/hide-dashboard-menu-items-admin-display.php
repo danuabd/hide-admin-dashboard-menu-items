@@ -45,18 +45,6 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
     return;
 }
 
-// If scan is completed, show success message
-if (isset($_GET['hdmi_scan_success'])) {
-    add_settings_error(
-        'hdmi_scan_notice',
-        'hdmi_scan_success',
-        'Admin menu items scanned and cached successfully!',
-        'success'
-    );
-}
-
-settings_errors('hdmi_scan_notice');
-
 // Only show the rest of the form if a scan is completed and menu items present
 ?>
 <div id="hdmi">
@@ -89,7 +77,7 @@ settings_errors('hdmi_scan_notice');
                     $dashicon = esc_attr($item['dashicon']);
                     $checked  = in_array($item['slug'], $hidden_db_menu) ? 'checked' : '';
                     $status   = in_array($item['slug'], $hidden_db_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_db_menus_key][]");
+                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_db_menu_key][]");
 
                     echo <<<HTML
             <div class="hdmi__grid-item">
@@ -127,7 +115,7 @@ settings_errors('hdmi_scan_notice');
                     $title    = esc_html($item['title']);
                     $checked  = in_array($id, $hidden_tb_menu) ? 'checked' : '';
                     $status   = in_array($id, $hidden_tb_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_tb_menus_key][]");
+                    $name_attr = esc_attr($this->settings_option . "[$this->hidden_tb_menu_key][]");
 
                     echo <<<HTML
                     <div class="hdmi__list-item">
@@ -165,7 +153,7 @@ settings_errors('hdmi_scan_notice');
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_query_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($this->settings_option . "[{$this->bypass_param_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
