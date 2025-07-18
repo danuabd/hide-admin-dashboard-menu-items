@@ -186,7 +186,7 @@ class Hide_Dashboard_Menu_Items_Scanner
         foreach ($nodes as $node) {
             if (empty($node->parent)) {
 
-                $title = strip_tags($node->title);
+                $title = wp_strip_all_tags($node->title);
                 if (empty($title) || $node->href === get_site_url() || $node->id === 'site-name') {
                     continue;
                 }
