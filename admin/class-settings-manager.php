@@ -115,7 +115,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         // Add a new top-level menu item.
         $this->settings_page_hook_suffix =    add_menu_page(
             'Configure Hide Menu Items',
-            __('Hide Menu Items', $this->config->plugin_name),
+            __('Hide Menu Items', 'hide-dashboard-menu-items'),
             'manage_options',
             $this->config->settings_page_slug,
             array($this, 'render_settings_page'),
@@ -125,8 +125,8 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
         $this->debug_page_hook_suffix = add_submenu_page(
             $this->config->settings_page_slug,
-            __('Debug Info', $this->config->plugin_name),
-            __('Debug Info', $this->config->plugin_name),
+            __('Debug Info', 'hide-dashboard-menu-items'),
+            __('Debug Info', 'hide-dashboard-menu-items'),
             'manage_options',
             $this->config->debug_page_slug,
             [$this->debugger, 'render_debug_page']
