@@ -65,8 +65,6 @@ class Hide_Dashboard_Menu_Items
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
-
-		date_default_timezone_set('Asia/Colombo');
 	}
 
 	/**
