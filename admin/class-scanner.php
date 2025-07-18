@@ -15,39 +15,67 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Scanner
 {
-
-
-
+    /**
+     * Instance of plugin config.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Config    $config
+     */
     private $config;
-    private $storage_manager;
-    private $debugger;
-    private $notices;
 
+    /**
+     * Instance of plugin storage manager class.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     */
+    private $storage_manager;
+
+    /**
+     * Instance of plugin debugger class.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Debugger      $debugger
+     */
+    private $debugger;
+
+    /**
+     * Instance of plugin notice manager class.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Notice_Manager    $notice_manager
+     */
+    private $notice_manager;
+
+    /**
+     * Initialize class with required instances
+     * 
+     * @since   1.0.0
+     * @param   Hide_Dashboard_Menu_Items_Config            $config
+     * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     * @param   Hide_Dashboard_Menu_Items_Debugger          $debugger
+     * @param   Hide_Dashboard_Menu_Items_Notice_Manager    $notice_manager
+     */
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
-        Hide_Dashboard_Menu_Items_Notices $notices
+        Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
         $this->config = $config;
         $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
-        $this->notices = $notices;
-    }
-
-    public function test_admin_bar_menu($wp_admin_bar)
-    {
-        error_log('test_admin_bar_menu runs 🚀🚀');
-
-        error_log(print_r($wp_admin_bar instanceof WP_Admin_Bar, true));
-
-        // error_log(print_r($wp_admin_bar, true));
+        $this->notice_manager = $notice_manager;
     }
 
     /**
      * Process scanning for menu items.
      *
-     * @since    1.0.0
+     * @since   1.0.0
      */
     public function scan()
     {
@@ -57,17 +85,16 @@ class Hide_Dashboard_Menu_Items_Scanner
             check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
         ) {
             add_action('admin_menu', [$this, 'store_menu_items'], 999);
-            do_action('admin_menu', array($GLOBALS['menu']));
+            do_action('admin_menu', $GLOBALS['menu']);
 
             add_action('admin_bar_menu', [$this, 'store_toolbar_items'], 999);
-            do_action_ref_array('admin_bar_menu', array($GLOBALS['wp_admin_bar']));
+            do_action('admin_bar_menu', $GLOBALS['wp_admin_bar']);
 
-            // Store in DB
             update_option($this->config->scan_success_option, 1);
             $this->debugger->log_event('Last Scan Time');
 
             // Redirect back with success transient
-            $this->notices->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
+            $this->notice_manager->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
 
             set_transient('scan_is_completed', 30);
             wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
@@ -78,7 +105,8 @@ class Hide_Dashboard_Menu_Items_Scanner
     /**
      * Get the registered top-level admin menu items.
      *
-     * @since    1.0.0
+     * @since   1.0.0
+     * @param   object  $menu Dashboard menu
      */
     public function store_menu_items($menu)
     {
@@ -133,9 +161,10 @@ class Hide_Dashboard_Menu_Items_Scanner
     }
 
     /**
-     * Get the registered top-level toolbar menu items.
+     * Get the registered top-level admin bar menu items.
      *
-     * @since    1.0.0
+     * @since   1.0.0
+     * @param   WP_ADMIN_BAR $wp_admin_bar      Admin bar (toolbar) menu
      */
     public function store_toolbar_items($wp_admin_bar)
     {

@@ -4,7 +4,7 @@ Donate link: https://danukaprasad.com/
 Tags: hide menu, hide dashboard menu, hide toolbar menu, restrict admin menu, restrict toolbar menu
 Requires at least: 5.0
 Requires PHP: 8.0
-Tested up to: 6.5
+Tested up to: 8.2.27
 Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html

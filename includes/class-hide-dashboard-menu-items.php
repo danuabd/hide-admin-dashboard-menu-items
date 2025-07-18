@@ -115,9 +115,11 @@ class Hide_Dashboard_Menu_Items
 		// Fires as an admin screen or script is being initialized.
 		$this->loader->add_action('admin_init', $plugin_admin->settings_manager, 'register_settings', 10);
 		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'restrict_menu_access');
-		$this->loader->add_action('admin_init', $plugin_admin->scanner, 'scan', 999);
+		$this->loader->add_action('admin_bar_menu', $plugin_admin->scanner, 'scan', 999);
+
 
 		// Fires before the administration menu loads in the admin.
+		$this->loader->add_action('admin_menu', $plugin_admin->scanner, 'scan', 999);
 		$this->loader->add_action('admin_menu', $plugin_admin->settings_manager, 'add_admin_menu');
 		$this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu');
 

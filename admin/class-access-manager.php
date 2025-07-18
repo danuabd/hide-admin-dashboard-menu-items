@@ -15,18 +15,65 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
+    /**
+     * Config data
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Config    $config
+     */
     private $config;
+
+    /**
+     * Storage manager
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     */
     private $storage_manager;
+
+    /**
+     * Storage manager
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Debugger  $debugger
+     */
     private $debugger;
+
+    /**
+     * Admin notices manager
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     Hide_Dashboard_Menu_Items_Notice_Manager    $notice_manager
+     */
     private $notice_manager;
 
+    /**
+     * Bypass query parameter
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     string  $bypass_param_query
+     */
     private $bypass_param_query;
 
+    /**
+     * Initialize the class and set its properties.
+     * 
+     * @since   1.0.0
+     * @param   Hide_Dashboard_Menu_Items_Config    $config
+     * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     * @param   Hide_Dashboard_Menu_Items_Debugger  $debugger
+     * @param   Hide_Dashboard_Menu_Items_Notices   $notice_manager
+     */
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
-        Hide_Dashboard_Menu_Items_Notices $notice_manager
+        Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
         $this->config = $config;
         $this->storage_manager = $storage_manager;
@@ -36,9 +83,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     }
 
     /**
-     * Function to hide Dashboard Menu items.
+     * Hide Dashboard Menu items.
      *
-     * @since    1.0.0
+     * @since   1.0.0
      */
     public function hide_dashboard_menu()
     {
@@ -72,9 +119,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     }
 
     /**
-     * Function to hide Admin Toolbar items.
-     *
-     * @since 1.0.0
+     * Hide Admin Toolbar items.
+     * 
+     * @since   1.0.0
      */
     public function hide_toolbar_menu()
     {
@@ -104,6 +151,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             return;
         }
 
+        // No access — remove the menu items
         foreach ($tb_hidden as $id) {
             $wp_admin_bar->remove_menu($id);
         }
@@ -112,10 +160,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     /**
      * Append the bypass query parameter to dashboard menu item URLs.
      *
-     * @since    1.0.0
-     * @param array $menu The global menu array.
-     * @param array $hidden The hidden menu slugs.
-     * @param string $bypass_key The bypass query key.
+     * @since   1.0.0
+     * @param   array   $hidden The hidden menu slugs.
+     * @param   string  $bypass_key The bypass query key.
      */
     public function update_dashboard_menu($hidden, $bypass_key)
     {
@@ -141,9 +188,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     /**
      * Append the bypass query parameter to admin toolbar menu item URLs.
      *
-     * @param WP_Admin_Bar $wp_admin_bar
-     * @param array        $hidden_slugs
-     * @param string       $bypass_key
+     * @since   1.0.0
+     * @param   array   $hidden_slugs
+     * @param   string  $bypass_key
      */
     public function update_toolbar_menu($hidden_slugs, $bypass_key)
     {
@@ -168,7 +215,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     /**
      * Function to restrict access to hidden menu items.
      *
-     * @since    1.0.0
+     * @since   1.0.0
      */
     public function restrict_menu_access()
     {
@@ -200,7 +247,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
                     return;
                 }
 
-                // Otherwise, restrict access
+                // Restrict access
                 status_header(403);
                 nocache_headers();
                 exit;

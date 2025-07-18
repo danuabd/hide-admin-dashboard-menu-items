@@ -15,15 +15,39 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Debugger
 {
+    /**
+     * Config data of plugin.
+     * 
+     * @since   1.0.0
+     * @access  private
+     * @var     Hide_Dashboard_Menu_Items_Config    $config
+     */
     private $config;
 
+    /**
+     * Storage manager of plugin.
+     * 
+     * @since   1.0.0
+     * @access  private
+     * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     */
     private $storage_manager;
 
     /**
-     * @param array $accepted_event_types logging types to log
+     * Event types that are accepted.
+     * 
+     * @since   1.0.0
+     * @access  private
+     * @var     array   $accepted_event_types
      */
     private $accepted_event_types;
 
+    /**
+     * 
+     * @since   1.0.0
+     * @param   Hide_Dashboard_Menu_Items_Config            $config
+     * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
+     */
     public function __construct(
         Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager
@@ -33,6 +57,14 @@ class Hide_Dashboard_Menu_Items_Debugger
         $this->accepted_event_types = ['info', 'error'];
     }
 
+    /**
+     * Add event to debug data.
+     * 
+     * @since   1.0.0
+     * @param   string  $key
+     * @param   string  $message
+     * @param   string  $type (info or error)
+     */
     public function log_event($key = '', $message = '', $type = 'info')
     {
         if (!in_array($type, $this->accepted_event_types) || !($message || $key)) {
@@ -52,6 +84,13 @@ class Hide_Dashboard_Menu_Items_Debugger
         $this->storage_manager->update_debug_data($key, $message, $type);
     }
 
+    /**
+     * Build debug info realtime.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @return  array   $initial_debug_data
+     */
     private function build_debug_data()
     {
 
@@ -110,12 +149,13 @@ class Hide_Dashboard_Menu_Items_Debugger
     }
 
     /**
-     * Generate the debug array in a structured format.
+     * Generate debug array markup.
      *
-     * @since    1.0.0
-     * @param array $array The array to generate.
-     * @param int $depth The current depth of recursion.
-     * @return string The generated HTML for the array.
+     * @since   1.0.0
+     * @access  protected
+     * @param   array   $array  The array to generate.
+     * @param   int     $depth  The current depth of recursion.
+     * @return  string  The generated HTML for the array.
      */
     private function generate_debug_markup($array, $depth = 0)
     {
@@ -141,9 +181,9 @@ class Hide_Dashboard_Menu_Items_Debugger
     }
 
     /**
-     * Render the debug page.
+     * Render debug page to frontend.
      *
-     * @since    1.0.0
+     * @since   1.0.0
      */
     public function render_debug_page()
     {

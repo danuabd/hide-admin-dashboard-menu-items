@@ -13,16 +13,17 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-class Hide_Dashboard_Menu_Items_Notices
+class Hide_Dashboard_Menu_Items_Notice_Manager
 {
 
     /**
      * Set a custom admin notice using transient.
      *
-     * @param string $key Unique key for this notice.
-     * @param string $message Message to display.
-     * @param string $type Notice type: success, error, warning, info.
-     * @param int $duration Duration in seconds (default: 30s).
+     * @since   1.0.0
+     * @param   string  $key        Unique key for this notice.
+     * @param   string  $message    Message to display.
+     * @param   string  $type       Notice type: success, error, warning, info.
+     * @param   int     $duration   Duration in seconds (default: 30s).
      */
     public function add_notice($key, $message, $type = 'info', $duration = 30)
     {
@@ -37,6 +38,8 @@ class Hide_Dashboard_Menu_Items_Notices
 
     /**
      * Display admin notices (one per key).
+     * 
+     * @since   1.0.0
      */
     public function render_notices()
     {
