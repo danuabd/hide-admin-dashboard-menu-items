@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 <div id="hdmi-scan">
     <?php include_once plugin_dir_path(__FILE__) . '../../assets/overlay-2560x1440.svg' ?>
     <figure id="hdmi-scan__figure">
-        <img id="hdmi-scan__logo" src="<?php echo plugin_dir_url(__FILE__) . '../../assets/icon-128x128.png' ?>" alt="" srcset="">
+        <img id="hdmi-scan__logo" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../../assets/icon-128x128.png') ?>" alt="" srcset="">
     </figure>
     <h1 id="hdmi-scan__title"><?php echo esc_html($title) ?></h1>
     <p id="hdmi-scan__description">
