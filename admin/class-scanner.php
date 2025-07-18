@@ -16,6 +16,8 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Scanner
 {
 
+
+
     private $config;
     private $storage_manager;
     private $debugger;
@@ -33,55 +35,43 @@ class Hide_Dashboard_Menu_Items_Scanner
         $this->notices = $notices;
     }
 
+    public function test_admin_bar_menu($wp_admin_bar)
+    {
+        error_log('test_admin_bar_menu runs 🚀🚀');
+
+        error_log(print_r($wp_admin_bar instanceof WP_Admin_Bar, true));
+
+        // error_log(print_r($wp_admin_bar, true));
+    }
+
     /**
      * Process scanning for menu items.
      *
      * @since    1.0.0
      */
-    private function scan($menu_object)
-    {
-
-        if ($menu_object instanceof WP_Admin_Bar && !empty($menu_object)) {
-            $this->store_toolbar_items($menu_object);
-        } else if (is_array($menu_object) && !empty($menu_object)) {
-            $this->store_menu_items($menu_object);
-        } else {
-            $this->debugger->log_event('', "dashboard menu wasn't available to use', 'error");
-        }
-
-        // Store in DB
-        update_option($this->config->scan_success_option, 1);
-        $this->debugger->log_event('Last Scan Time');
-
-        // Redirect back with success transient
-        $this->notices->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
-
-        set_transient('scan_is_completed', 30);
-        wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
-        exit;
-    }
-
-    public function scan_dashboard_menu()
+    public function scan()
     {
         if (
             isset($_POST['hdmi_scan_request']) &&
             current_user_can('manage_options') &&
             check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
         ) {
+            add_action('admin_menu', [$this, 'store_menu_items'], 999);
+            do_action('admin_menu', array($GLOBALS['menu']));
 
-            global $menu;
-            $this->scan($menu);
-        }
-    }
+            add_action('admin_bar_menu', [$this, 'store_toolbar_items'], 999);
+            do_action_ref_array('admin_bar_menu', array($GLOBALS['wp_admin_bar']));
 
-    public function scan_toolbar_menu($wp_admin_bar)
-    {
-        if (
-            isset($_POST['hdmi_scan_request']) &&
-            current_user_can('manage_options') &&
-            check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
-        ) {
-            $this->scan($wp_admin_bar);
+            // Store in DB
+            update_option($this->config->scan_success_option, 1);
+            $this->debugger->log_event('Last Scan Time');
+
+            // Redirect back with success transient
+            $this->notices->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
+
+            set_transient('scan_is_completed', 30);
+            wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
+            exit;
         }
     }
 
@@ -92,7 +82,6 @@ class Hide_Dashboard_Menu_Items_Scanner
      */
     public function store_menu_items($menu)
     {
-        error_log('scanning dashboard menu items');
 
         if (empty($menu) || !is_array($menu)) {
             $this->debugger->log_event('', 'Menu is not initialized or empty.', 'error');
@@ -148,13 +137,10 @@ class Hide_Dashboard_Menu_Items_Scanner
      *
      * @since    1.0.0
      */
-    public function store_toolbar_items()
+    public function store_toolbar_items($wp_admin_bar)
     {
-        global $wp_admin_bar;
 
-        error_log('scanning toolbar menu items');
-
-        if (!is_object($wp_admin_bar)) {
+        if (!($wp_admin_bar instanceof WP_Admin_Bar)) {
             $this->debugger->log_event('', 'WP Admin Bar is not initialized.', 'error');
             return;
         }

@@ -38,10 +38,10 @@ class Hide_Dashboard_Menu_Items_Config
         $this->version = $version;
         $this->option_name = 'hdmi';
         $this->option_group = $this->option_name . '_group';
+        $this->scan_success_option = $this->option_name . '_scan_completed';
         $this->settings_option = $this->option_name . '_settings';
         $this->db_menu_option = $this->option_name . '_db_cached';
         $this->tb_menu_option = $this->option_name . '_tb_cached';
-        $this->scan_success_option = $this->option_name . '_scan_completed';
         $this->debug_option = $this->option_name . '_debug';
 
         $this->settings_page_slug = $plugin_name . '-settings';
