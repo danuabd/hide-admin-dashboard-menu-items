@@ -52,10 +52,15 @@ class Hide_Dashboard_Menu_Items_Notice_Manager
             $dismissible_attr = $key !== 'bypass_enabled' ? 'is-dismissible' : '';
 
             if ($notice && !empty($notice['message'])) {
-                $type = esc_attr($notice['type'] ?? 'info');
-                $message = esc_html($notice['message']);
+                $type = $notice['type'] ?? 'info';
+                $message = $notice['message'];
 
-                echo "<div class='notice notice-{$type} {$dismissible_attr}'><p>{$message}</p></div>";
+                printf(
+                    '<div class="notice notice-%s %s"><p>%s</p></div>',
+                    esc_attr($type),
+                    esc_attr($dismissible_attr),
+                    esc_html($message)
+                );
 
                 delete_transient($transient_key);
             }
