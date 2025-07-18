@@ -58,29 +58,29 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                 echo '<div class="hdmi__grid">';
 
                 foreach ($cached_db_menu as $item) {
-                    $slug     = esc_attr($item['slug']);
-                    $title    = esc_html($item['title']);
-                    $dashicon = esc_attr($item['dashicon']);
+                    $slug     = $item['slug'];
+                    $title    = $item['title'];
+                    $dashicon = $item['dashicon'];
                     $checked  = in_array($item['slug'], $hidden_db_menu) ? 'checked' : '';
                     $status   = in_array($item['slug'], $hidden_db_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($settings_option . "[$hidden_db_menu_key][]");
+                    $name_attr = $settings_option . "[$hidden_db_menu_key][]";
 
-                    echo <<<HTML
-            <div class="hdmi__grid-item">
-                <div class="hdmi__grid-item-icon">
-                    <span class="dashicons {$dashicon}"></span>
-                </div>
-                <div class="hdmi__item-label">{$title}</div>
+            ?>
+                    <div class="hdmi__grid-item">
+                        <div class="hdmi__grid-item-icon">
+                            <span class="dashicons <?php echo esc_attr($dashicon) ?>"></span>
+                        </div>
+                        <div class="hdmi__item-label"><?php echo esc_html($title) ?></div>
 
-                <div class="hdmi__item-toggle">
-                    <label class="hdmi-toggle-wrapper">
-                        <input type="checkbox" name="{$name_attr}" value="{$slug}" class="hdmi-toggle-input" {$checked}>
-                        <span class="hdmi-toggle-slider"></span>
-                    </label>
-                    <small class="hdmi__item-status">{$status}</small>
-                </div>
-            </div>
-            HTML;
+                        <div class="hdmi__item-toggle">
+                            <label class="hdmi-toggle-wrapper">
+                                <input type="checkbox" name="<?php echo esc_attr($name_attr) ?>" value="<?php echo esc_attr($slug) ?>>" class="hdmi-toggle-input" <?php echo esc_attr($checked) ?>>
+                                <span class="hdmi-toggle-slider"></span>
+                            </label>
+                            <small class="hdmi__item-status"><?php echo esc_html($status) ?></small>
+                        </div>
+                    </div>
+                <?php
                 }
 
                 echo '</div></div>';
@@ -97,24 +97,25 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                 echo '<div class="hdmi__list">';
 
                 foreach ($cached_tb_menu as $item) {
-                    $id     = esc_attr($item['id']);
-                    $title    = esc_html($item['title']);
+                    $id     = $item['id'];
+                    $title    = $item['title'];
                     $checked  = in_array($id, $hidden_tb_menu) ? 'checked' : '';
                     $status   = in_array($id, $hidden_tb_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = esc_attr($settings_option . "[$hidden_tb_menu_key][]");
+                    $name_attr = $settings_option . "[$hidden_tb_menu_key][]";
 
-                    echo <<<HTML
+                ?>
+
                     <div class="hdmi__list-item">
-                        <span class="hdmi__list-title">{$title}</span>
+                        <span class="hdmi__list-title"><?php echo esc_html($title) ?></span>
                         <div class="hdmi__list-controls">
                             <label class="hdmi-toggle-wrapper">
-                                <input type="checkbox" name="{$name_attr}" value="{$id}" class="hdmi-toggle-input" {$checked}>
+                                <input type="checkbox" name="<?php echo esc_attr($name_attr) ?>" value="<?php echo esc_attr($id) ?>" class="hdmi-toggle-input" <?php echo esc_attr($checked) ?>>
                                 <span class="hdmi-toggle-slider"></span>
                             </label>
-                            <small class="hdmi__list-status">{$status}</small>
+                            <small class="hdmi__list-status"><?php echo esc_html($status) ?></small>
                         </div>
                     </div>
-                HTML;
+            <?php
                 }
 
                 echo '</div></div>';
@@ -132,14 +133,15 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                 <div id="hdmi__bypass-controls">
                     <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
                         <input type="checkbox" id="hdmi__bypass-toggle" class="hdmi-toggle-input"
-                            name="<?php echo esc_attr($settings_option . "[{$bypass_enabled_key}]") ?>" value="1" <?php echo $bypass_enabled ?> />
+                            name="<?php echo esc_attr($settings_option . "[{$bypass_enabled_key}]") ?>" value="1"
+                            <?php echo esc_attr($bypass_enabled) ?> />
                         <span id="hdmi__bypass-slider" class="hdmi-toggle-slider"></span>
                         Enable bypass feature
                     </label>
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($settings_option . "[{$bypass_param_key}]") ?>" value="<?php echo $bypass_value ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($settings_option . "[{$bypass_param_key}]") ?>" value="<?php echo esc_attr($bypass_value) ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
