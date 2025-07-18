@@ -99,7 +99,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         $bypass_param = $this->storage_manager->get_bypass_param();
 
-        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
+        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field(wp_unslash($_GET[$this->bypass_param_query]))  === $bypass_param;
 
         if (!is_array($db_hidden) || empty($db_hidden)) {
             return;
@@ -138,7 +138,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $bypass_param =
             $this->storage_manager->get_bypass_param();
 
-        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
+        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field(wp_unslash($_GET[$this->bypass_param_query]))  === $bypass_param;
 
         if (!is_array($tb_hidden) || empty($tb_hidden)) {
             return;
@@ -231,11 +231,11 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $bypass_param = $this->storage_manager->get_bypass_param();
         $bypass_param_key = $this->config->option_name;
 
-        $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;
+        $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field(wp_unslash($_GET[$bypass_param_key])) === $bypass_param;
 
         $hidden_all = array_merge($hidden_db_menu, $hidden_tb_menu);
 
-        $current_screen = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : basename($_SERVER['PHP_SELF']);
+        $current_screen = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : basename($_SERVER['PHP_SELF']);
 
         foreach ($hidden_all as $slug) {
             if (
