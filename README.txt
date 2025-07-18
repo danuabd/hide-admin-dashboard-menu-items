@@ -54,10 +54,12 @@ Only administrators can configure visibility and restriction settings.
 
 == Screenshots ==
 
-1. Dashboard menu with hiding options.
-2. Toolbar menu visibility settings.
-3. Restriction and bypass settings.
-4. Reset options.
+1. Welcome Screen.
+2. Admin Dashboard Menu Items.
+3. Admin Toolbar Menu Items.
+4. Bypass Feature.
+5. Bypass is activated.
+6. Debug Page.
 
 == Changelog ==
 
