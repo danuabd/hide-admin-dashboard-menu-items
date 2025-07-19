@@ -27,7 +27,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
         $description = 'The admin menu items have not been scanned yet or corrupted. Please start the scan.';
     }
 
-    include_once __DIR__ . '/hide-dashboard-menu-items-scan-display.php';
+    require_once __DIR__ . '/hide-dashboard-menu-items-scan-display.php';
     return;
 }
 

@@ -201,7 +201,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
         extract($this->build_settings_page_data());
 
-        include_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
+        require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
     }
 
     /**

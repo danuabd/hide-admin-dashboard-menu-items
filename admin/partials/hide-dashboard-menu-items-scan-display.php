@@ -17,7 +17,7 @@ $background_img_path = plugin_dir_path(__FILE__) . '../../assets/overlay-2560x14
 $icon_url = plugin_dir_url(__FILE__) . '../../assets/icon-128x128.png';
 ?>
 <div id="hdmi-scan">
-    <?php include_once $background_img_path ?>
+    <?php require_once $background_img_path ?>
     <figure id="hdmi-scan__figure">
         <img id="hdmi-scan__logo" src="<?php echo esc_url($icon_url) ?>" alt="" srcset="">
     </figure>
