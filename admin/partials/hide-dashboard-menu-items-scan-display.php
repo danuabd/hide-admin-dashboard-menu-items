@@ -13,11 +13,13 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+$background_img_path = plugin_dir_path(__FILE__) . '../../assets/overlay-2560x1440.svg';
+$icon_url = plugin_dir_url(__FILE__) . '../../assets/icon-128x128.png';
 ?>
 <div id="hdmi-scan">
-    <?php include_once plugin_dir_path(__FILE__) . '../../assets/overlay-2560x1440.svg' ?>
+    <?php include_once $background_img_path ?>
     <figure id="hdmi-scan__figure">
-        <img id="hdmi-scan__logo" src="<?php echo esc_url(plugin_dir_url(__FILE__) . '../../assets/icon-128x128.png') ?>" alt="" srcset="">
+        <img id="hdmi-scan__logo" src="<?php echo esc_url($icon_url) ?>" alt="" srcset="">
     </figure>
     <h1 id="hdmi-scan__title"><?php echo esc_html($title) ?></h1>
     <p id="hdmi-scan__description">
