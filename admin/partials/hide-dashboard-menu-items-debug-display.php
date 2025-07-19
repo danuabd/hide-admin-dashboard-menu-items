@@ -13,8 +13,10 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-?>
 
+$debug_escaped = esc_html($debug_markup);
+$error_escaped = esc_html($error_markup);
+?>
 <div id="hdmi__debug">
     <h1 class="hdmi__debug-heading">Hide Dashboard Menu Items — Debug Info</h1>
     <p class="hdmi__debug-description">This page shows internal plugin data and environment details for debugging and support.</p>
@@ -25,7 +27,7 @@ if (!defined('ABSPATH')) {
         <h2 class="hdmi__debug-subheading">Debug Info</h2>
         <p class="hdmi__debug-subtitle">Debugging info is as useful as error log to troubleshoot any issues occur during plugin functionality executions.</p>
         <button data-type="copy" data-key="debugInfo" onclick="copyInfo(event)" id="hdmi__copy-debug" class="button-primary hdmi__copy-button">Copy Debug Info</button>
-        <div class="hdmi__log-box hdmi__debug-box"><?php echo esc_html($debug_markup) ?></div>
+        <div class="hdmi__log-box hdmi__debug-box"><?php html_entity_decode($debug_escaped, ENT_QUOTES | ENT_HTML5, 'UTF-8') ?></div>
     </div>
 
     <hr class="hdmi__debug-divider">
@@ -34,7 +36,7 @@ if (!defined('ABSPATH')) {
         <h2 class="hdmi__debug-subheading">Error Info</h2>
         <p class="hdmi__debug-subtitle">This part shows last 40 errors occurred during the plugin function executions.</p>
         <button data-key="errorInfo" onclick="copyInfo(event)" id="hdmi__copy-error" class="button-primary hdmi__copy-button">Copy Error Info</button>
-        <div class="hdmi__log-box hdmi__error-box"><?php echo esc_html($error_markup) ?></div>
+        <div class="hdmi__log-box hdmi__error-box"><?php echo html_entity_decode($error_escaped, ENT_QUOTES | ENT_HTML5, 'UTF-8') ?></div>
     </div>
 
     <hr class="hdmi__debug-divider">
