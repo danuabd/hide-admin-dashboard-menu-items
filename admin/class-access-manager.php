@@ -235,11 +235,16 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         $hidden_all = array_merge($hidden_db_menu, $hidden_tb_menu);
 
-        $current_screen = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : basename($_SERVER['PHP_SELF']);
+        $current_screen = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : basename(wp_unslash(sanitize_url($_SERVER['PHP_SELF'])));
+
+        $screen = get_current_screen();
+        $current_screen = isset($screen->id) ? $screen->id : '';
+
+        $request_uri = isset($_SERVER['REQUEST_URI']) ? wp_unslash($_SERVER['REQUEST_URI']) : '';
 
         foreach ($hidden_all as $slug) {
             if (
-                strpos($_SERVER['REQUEST_URI'], $slug) !== false
+                strpos($request_uri, $slug) !== false
                 || $current_screen === $slug
             ) {
                 // allow access
