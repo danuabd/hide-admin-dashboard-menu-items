@@ -73,7 +73,7 @@ class Hide_Dashboard_Menu_Items_Scanner
     }
 
     /**
-     * Process scanning for menu items.
+     * Start scanning menu items.
      *
      * @since   1.0.0
      */
@@ -84,20 +84,20 @@ class Hide_Dashboard_Menu_Items_Scanner
             current_user_can('manage_options') &&
             check_admin_referer('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field')
         ) {
-            add_action('admin_menu', [$this, 'store_menu_items'], 999);
+            add_action('admin_menu', [$this, 'store_dashboard_menu'], 999);
             do_action('admin_menu', $GLOBALS['menu']);
 
-            add_action('admin_bar_menu', [$this, 'store_toolbar_items'], 999);
+            add_action('admin_bar_menu', [$this, 'store_admin_bar_menu'], 999);
             do_action('admin_bar_menu', $GLOBALS['wp_admin_bar']);
 
-            update_option($this->config->scan_success_option, 1);
+            update_option($this->config::SCAN_SUCCESS_OPTION, 1);
             $this->debugger->log_event('Last Scan Time');
 
             // Redirect back with success transient
             $this->notice_manager->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
 
             set_transient('scan_is_completed', 30);
-            wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
+            wp_redirect(admin_url('admin.php?page=' . $this->config::SETTINGS_PAGE_SLUG));
             exit;
         }
     }
@@ -108,7 +108,7 @@ class Hide_Dashboard_Menu_Items_Scanner
      * @since   1.0.0
      * @param   object  $menu Dashboard menu
      */
-    public function store_menu_items($menu)
+    public function store_dashboard_menu($menu)
     {
 
         if (empty($menu) || !is_array($menu)) {
@@ -138,7 +138,7 @@ class Hide_Dashboard_Menu_Items_Scanner
             $slug       = isset($item[2]) ? $item[2] : '';
             $icon       = isset($item[6]) ? $item[6] : '';
 
-            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->config->settings_page_slug) {
+            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->config::SETTINGS_PAGE_SLUG) {
                 // Skip items with missing data
                 continue;
             }
@@ -166,7 +166,7 @@ class Hide_Dashboard_Menu_Items_Scanner
      * @since   1.0.0
      * @param   WP_ADMIN_BAR $wp_admin_bar      Admin bar (toolbar) menu
      */
-    public function store_toolbar_items($wp_admin_bar)
+    public function store_admin_bar_menu($wp_admin_bar)
     {
 
         if (!($wp_admin_bar instanceof WP_Admin_Bar)) {
