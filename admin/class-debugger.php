@@ -97,8 +97,20 @@ class Hide_Dashboard_Menu_Items_Debugger
 
         $stored_debug_data = $this->storage_manager->get_debug_data();
 
+        $curr_user_id = get_current_user_id();
+        $user = get_user_by('id', $curr_user_id);
+        $scan_status = $this->storage_manager->get_scan_status();
+        $db_menu_cache = $this->storage_manager->get_dashboard_menu_cache();
+        $tb_menu_cache = $this->storage_manager->get_toolbar_menu_cache();
+        $hidden_db_menu = $this->storage_manager->get_hidden_db_menu();
+        $hidden_tb_menu = $this->storage_manager->get_hidden_tb_menu();
+        $bypass_enabled = $this->storage_manager->is_bypass_active();
+        $bypass_key = $this->storage_manager->get_bypass_param();
         $stored_info_data = !empty($stored_debug_data) && isset($stored_debug_data['info']) ? $stored_debug_data['info'] : [];
         $stored_error_data = !empty($stored_debug_data) && isset($stored_debug_data['error']) ? $stored_debug_data['error'] : [];
+
+        error_log(print_r($hidden_db_menu, true));
+        error_log(print_r($hidden_tb_menu, true));
 
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';
     }

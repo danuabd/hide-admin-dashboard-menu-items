@@ -13,8 +13,6 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-
-if ($final_debug_info && $stored_error_data) return;
 ?>
 <div id="hdmi__debug">
     <h1 class="hdmi__debug-heading">Hide Dashboard Menu Items — Debug Info</h1>
@@ -27,28 +25,117 @@ if ($final_debug_info && $stored_error_data) return;
         <p class="hdmi__debug-subtitle">Debugging info is as useful as error log to troubleshoot any issues occur during plugin functionality executions.</p>
         <button data-type="copy" data-key="debugInfo" onclick="copyInfo(event)" id="hdmi__copy-debug" class="button-primary hdmi__copy-button">Copy Debug Info</button>
         <div class="hdmi__log-box hdmi__debug-box">
-            <?php if (empty($stored_error_data)): ?>
-
-                <li>No errors logged.</li>
-
-            <?php else: ?>
-
-                <?php
-
-                foreach ($stored_error_data as $key => $value):
-
-                    if ($key || $value) continue;
-
-                ?>
-
-                    <li>
-                        <strong><?php echo esc_html($key) ?>: </strong>
-                        <?php echo esc_html($value) ?>
+            <ul>
+                <li><strong>Plugin version: </strong><?php echo isset($this->config->version) ? esc_html($this->config->version) : '1.0.0'  ?>
+                </li>
+                <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Environment: </strong>
+                    <ul class="hdmi__inside-list">
+                        <li><strong>1. PHP Version: </strong><?php echo PHP_VERSION !== null ? esc_html(PHP_VERSION) : 'Not available' ?>
+                        </li>
+                        <li><strong>2. WordPress Version: </strong><?php echo get_bloginfo('version') !== null ? esc_html(get_bloginfo('version')) : 'Not available'  ?>
+                        </li>
+                        <li><strong>3. Active Theme: </strong><?php echo wp_get_theme()->get('Name') !== null ? esc_html(wp_get_theme()->get('Name')) : 'Not available' ?>
+                        </li>
+                        <li><strong>4. Active Plugins Count: </strong><?php echo get_option('active_plugins') !== null ? count(get_option('active_plugins')) : 'Not available' ?>
+                        </li>
+                        <li><strong>5. Memory Limit: </strong><?php echo WP_MEMORY_LIMIT !== null ? esc_html(WP_MEMORY_LIMIT) : 'Not available' ?>
+                        </li>
+                    </ul>
+                </li>
+                <?php if (empty($user)): ?>
+                    <li>User Info: </strong>Info not available.</li>
+                <?php else: ?>
+                    <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">User Info: </strong>
+                        <ul class="hdmi__inside-list">
+                            <li><strong>1. ID: </strong><?php echo isset($user->ID) ? esc_html($user->ID) : 'Not available' ?></li>
+                            <li><strong>2. Name: </strong><?php echo isset($user->display_name) ? esc_html($user->display_name) : 'Not available' ?></li>
+                            <li><strong>3. Role/s: </strong><?php echo isset($user->roles) ? esc_html(implode($user->roles)) : 'Not available' ?></li>
+                        </ul>
                     </li>
-
-                <?php endforeach; ?>
-
-            <?php endif; ?>
+                <?php endif; ?>
+                <li><strong>Scan done?: </strong><?php echo $scan_status ? 'Yes' : 'No' ?></li>
+                <li><strong>Dashboard Menu Count: </strong><?php echo !empty($db_menu_cache) ? count($db_menu_cache) : '0' ?></li>
+                <?php if (empty($db_menu_cache)): ?>
+                    <li><strong>Dashboard Menu: </strong>No dashboard menu items were found.</li>
+                <?php else : ?>
+                    <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Dashboard Menu: </strong>
+                        <ul class="hdmi__inside-list">
+                            <?php $i = 1;
+                            foreach ($db_menu_cache as $key => $value) {
+                                if (!isset($value['title'])) continue;
+                                $i_print = strval($i) . '. '; ?>
+                                <li><strong><?php echo esc_html($i_print); ?></strong><?php echo esc_html($value['title']) ?></li>
+                            <?php $i += 1;
+                            } ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+                <li><strong>Admin bar Menu Count: </strong><?php echo !empty($tb_menu_cache) ? count($tb_menu_cache) : '0' ?></li>
+                <?php if (empty($tb_menu_cache)): ?>
+                    <li><strong>Admin bar Menu: </strong>No Admin bar menu items were found.</li>
+                <?php else: ?>
+                    <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Admin bar Menu: </strong>
+                        <ul class="hdmi__inside-list">
+                            <?php $i = 1;
+                            foreach ($tb_menu_cache as $key => $value) {
+                                if (!isset($value['title'])) continue;
+                                $i_print = strval($i) . '. ';
+                            ?>
+                                <li><strong><?php echo esc_html($i_print) ?></strong><?php echo esc_html($value['title']) ?></li>
+                            <?php $i += 1;
+                            } ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+                <?php if (empty($hidden_db_menu)): ?>
+                    <li><strong>Hidden Dashboard Menu: </strong>No menu items configured.</li>
+                <?php else: ?>
+                    <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Hidden Dashboard Menu: </strong>
+                        <ul class="hdmi__inside-list">
+                            <?php $i = 1;
+                            foreach ($hidden_db_menu as $key => $value) {
+                                $i_print = strval($i) . '. ' ?>
+                                <li><strong><?php echo esc_html($i_print) ?></strong><?php echo esc_html(str_replace('>', '', $value)) ?></li>
+                            <?php $i += 1;
+                            } ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+                <?php if (empty($hidden_tb_menu)): ?>
+                    <li><strong>Hidden Admin Bar Menu: </strong>No hidden admin bar menu items configured.</li>
+                <?php else: ?>
+                    <li class="hdmi__has-list-inside">
+                        <ul class="hdmi__inside-list">
+                            <?php $i = 1;
+                            foreach ($hidden_tb_menu as $key => $value) {
+                                $i_print =  strval($i) . '. '; ?>
+                                <li><strong><?php echo esc_html($i_print)  ?></strong><?php echo esc_html(str_repeat('>', '', $value)) ?></li>
+                            <?php $i = 1;
+                            } ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+                <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Bypass Settings: </strong>
+                    <ul class="hdmi__inside-list">
+                        <li><strong>1. Bypass Enabled: </strong><?php echo $bypass_enabled ? 'Yes' : 'No' ?></li>
+                        <li><strong>2. Bypass Query Key: </strong><?php echo $bypass_key ? 'is set' : 'is not set' ?></li>
+                    </ul>
+                </li>
+                <?php if (empty($stored_info_data)): ?>
+                    <li><strong>Additional Info: </strong>No additional information is available at this time.</li>
+                <?php else: ?>
+                    <li class="hdmi__has-list-inside"><strong class="hdmi__list-after">Additional Info: </strong>
+                        <ul class="hdmi__inside-list">
+                            <?php
+                            $i = 1;
+                            foreach ($stored_info_data as $key => $value) {
+                                $i_print =  strval($i) . '. '; ?>
+                                <li><strong><?php echo esc_html($i_print), esc_html($key) ?>: </strong><?php echo esc_html($value) ?></li>
+                            <?php } ?>
+                        </ul>
+                    </li>
+                <?php endif; ?>
+            </ul>
         </div>
     </div>
 
@@ -58,217 +145,34 @@ if ($final_debug_info && $stored_error_data) return;
         <h2 class="hdmi__debug-subheading">Error Info</h2>
         <p class="hdmi__debug-subtitle">This part shows last 40 errors occurred during the plugin function executions.</p>
         <button data-key="errorInfo" onclick="copyInfo(event)" id="hdmi__copy-error" class="button-primary hdmi__copy-button">Copy Error Info</button>
-        <div class="hdmi__log-box hdmi__error-box">
-            <ul>
-                <li>
-                    <strong>Plugin version: </strong>
-                    <?php echo isset($this->config->version) ? esc_html($this->config->version) : '1.0.0'  ?>
-                </li>
-                <li>
-                    <strong>Environment: </strong>
-                    <ul>
-                        <li>
-                            <strong>PHP Version: </strong>
-                            <?php echo isset(PHP_VERSION) ? esc_html_e(PHP_VERSION) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>WordPress Version: </strong>
-                            <?php echo get_bloginfo('version') ? get_bloginfo('version') : 'Not available'  ?>
-                        </li>
-                        <li>
-                            <strong>Active Theme: </strong>
-                            <?php echo isset(wp_get_theme()->get('Name')) ? esc_html(wp_get_theme()->get('Name')) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>Active Plugins Count: </strong>
-                            <?php echo isset(get_option('active_plugins')) ? count(get_option('active_plugins')) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>Memory Limit: </strong>
-                            <?php echo isset(WP_MEMORY_LIMIT) ? esc_html(WP_MEMORY_LIMIT) : 'Not available' ?>
-                        </li>
-                    </ul>
-                </li>
-                <li>Current User:
-                    <ul>
-                        <li>
-                            <strong>ID: </strong>
-                            <?php echo isset($user->ID) ? esc_html($user->ID) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>Username: </strong>
-                            <?php echo isset($user->user_login) ? esc_html($user->user_login) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>Roles: </strong>
-                            <?php echo isset($user->roles) ? esc_html(implode(', ', $user->roles)) : 'Not available' ?>
-                        </li>
-                        <li>
-                            <strong>Can manage_options: </strong>
-                            <?php echo current_user_can('manage_options') ? 'Yes' : 'No' ?>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Scan done?: </strong>
-                    <?php echo $scan_status ? 'Yes' : 'No' ?>
-                </li>
-                <li>
-                    <strong>Dashboard Menu Count: </strong>
-                    <?php echo isset($db_menu_cache) ? count($db_menu_cache) : '0' ?>
-                </li>
-                <li>
-                    <strong>Dashboard Menu: </strong>
-                    <?php if (empty($db_menu_cache)): ?>
-
-                        No dashboard menu items were found.
-
-                    <?php else: ?>
-
-                        <ul>
-
-                            <?php
-
-                            foreach ($db_menu_cache as $key => $value):
-
-                                if ($key !== 'title') continue;
-
-                            ?>
-                                <li><?php echo esc_html($value) ?></li>
-
-                            <?php endforeach; ?>
-
-                        </ul>
-
-                    <?php endif; ?>
-                </li>
-                <li>
-                    <strong>Admin Bar Menu Count: </strong>
-                    <?php echo $tb_menu_cache ? count($tb_menu_cache) : '0' ?>
-                </li>
-                <li>
-                    <strong>Admin Bar Menu: </strong>
-                    <?php if (empty($tb_menu_cache)): ?>
-
-                        No admin bar menu items were found.
-
-                    <?php else: ?>
-
-                        <ul>
-
-                            <?php
-
-                            foreach ($tb_menu_cache as $key => $value):
-
-                                if ($key !== 'title') continue;
-
-                            ?>
-
-                                <li><?php echo esc_html($value) ?></li>
-
-                            <?php endforeach; ?>
-
-                        </ul>
-
-                    <?php endif; ?>
-                </li>
-                <li>
-                    <strong>Hidden Dashboard Menu: </strong>
-                    <?php if (empty($hidden_db_menus)): ?>
-
-                        No hidden dashboard menu items configured.
-
-                    <?php else: ?>
-
-                        <ul>
-
-                            <?php
-
-                            foreach ($hidden_db_menus as $key => $value):
-
-                                if ($key !== 'title') continue;
-
-                            ?>
-
-                                <li><?php echo esc_html($value) ?></li>
-
-                            <?php endforeach; ?>
-
-                        </ul>
-
-                    <?php endif; ?>
-                </li>
-                <li>
-                    <strong>Hidden Admin Bar Menu: </strong>
-                    <?php if (empty($hidden_tb_menus)): ?>
-
-                        No hidden admin bar menu items configured.
-
-                    <?php else: ?>
-
-                        <ul>
-
-                            <?php
-
-                            foreach ($hidden_tb_menus as $key => $value):
-
-                                if ($key !== 'title') continue;
-
-                            ?>
-
-                                <li><?php echo esc_html($value) ?></li>
-
-                            <?php endforeach; ?>
-
-                        </ul>
-
-                    <?php endif; ?>
-                </li>
-                <li>
-                    <strong>Bypass Settings: </strong>
-                    <ul>
-                        <li>
-                            Bypass Enabled: <?php echo $bypass_enabled ? 'Yes' : 'No' ?>
-                        </li>
-                        <li>
-                            Bypass Query Key: <?php echo $bypass_key ? 'is set' : 'is not set' ?>
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Additional Info: </strong>
-                    <?php if (empty($stored_info_data)):  ?>
-                        No additional information is available at this time.
-                    <?php else: ?>
-                        <ul>
-                            <?php
-
-                            foreach ($stored_info_data as $key => $value):
-
-                                if ($key || $value) continue;
-                            ?>
-                                <li>
-                                    <?php echo esc_html($key) ?>: <?php echo esc_html($value) ?>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php endif; ?>
-                </li>
-            </ul>
-
+        <div id="hdmi__error-box" class="hdmi__log-box">
+            <?php if (empty($stored_error_data)): ?>
+                <ul>
+                    <li>No errors logged.</li>
+                </ul>
+            <?php else: ?>
+                <ul>
+                    <?php $i = 1;
+                    foreach ($stored_error_data as $key => $cvalue) {
+                        $i_print =  strval($i) . '. '; ?>
+                        <li><strong><?php echo $i_print, esc_html($key);  ?>: </strong><?php echo esc_html($value); ?></li>
+                    <?php $i += 1;
+                    } ?>
+                </ul>
+            <?php endif; ?>
         </div>
     </div>
 
     <hr class="hdmi__debug-divider">
 
-    <div class="hdmi__debug-section hdmi__debug-help">
+    <div id="hdmi__debug-help" class="hdmi__debug-section">
         <strong>Need help?</strong> Contact <a href="mailto:support@danukaprasad.com">support@danukaprasad.com</a> or visit <a href="https://danukaprasad.com" target="_blank">danukaprasad.com</a>.
     </div>
 </div>
 
 <script>
     const debuggingData = {
-        'debugInfo': <?php echo json_encode($final_debug_info ?? []) ?>,
+        'debugInfo': <?php echo json_encode($stored_info_data ?? []) ?>,
         'errorInfo': <?php echo json_encode($stored_error_data ?? []) ?>
     }
 
