@@ -99,8 +99,8 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     {
 
         register_setting(
-            $this->config->option_group,
-            $this->config->settings_option,
+            $this->config::OPTION_GROUP,
+            $this->config::SETTINGS_OPTION,
             array($this, 'sanitize_submissions')
         );
     }
@@ -117,18 +117,18 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             'Configure Hide Menu Items',
             __('Hide Menu Items', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config->settings_page_slug,
+            $this->config::SETTINGS_PAGE_SLUG,
             array($this, 'render_settings_page'),
             'dashicons-hidden',
             99
         );
 
         $this->debug_page_hook_suffix = add_submenu_page(
-            $this->config->settings_page_slug,
+            $this->config::SETTINGS_PAGE_SLUG,
             __('Debug Info', 'hide-dashboard-menu-items'),
             __('Debug Info', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config->debug_page_slug,
+            $this->config::DEBUG_PAGE_SLUG,
             [$this->debugger, 'render_debug_page']
         );
     }
@@ -146,7 +146,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             $this->config->plugin_name . '_settings_section',
             '',
             '__return_false',
-            $this->config->settings_page_slug
+            $this->config::SETTINGS_PAGE_SLUG
         );
     }
 
@@ -162,16 +162,16 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         return array(
             'scan_done' => $this->storage_manager->get_scan_status(),
 
-            'bypass_enabled_key' => $this->config->bypass_enabled_key,
-            'bypass_param_key' => $this->config->bypass_param_key,
+            'bypass_enabled_key' => $this->config::BYPASS_STATUS_KEY,
+            'bypass_param_key' => $this->config::BYPASS_PASSCODE,
 
-            'hidden_db_menu_key' => $this->config->hidden_db_menu_key,
-            'hidden_tb_menu_key' => $this->config->hidden_tb_menu_key,
+            'hidden_db_menu_key' => $this->config::HIDDEN_DASHBOARD_MENU_KEY,
+            'hidden_tb_menu_key' => $this->config::HIDDEN_ADMIN_BAR_MENU_KEY,
 
-            'settings_option' => $this->config->settings_option,
-            'option_group' => $this->config->option_group,
+            'settings_option' => $this->config::SETTINGS_OPTION,
+            'option_group' => $this->config::OPTION_GROUP,
 
-            'settings_page_slug' => $this->config->settings_page_slug,
+            'settings_page_slug' => $this->config::SETTINGS_PAGE_SLUG,
 
             'cached_db_menu' => $this->storage_manager->get_dashboard_menu_cache(),
             'cached_tb_menu' => $this->storage_manager->get_toolbar_menu_cache(),
@@ -253,12 +253,12 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
         // load styles in plugin admin settings & debug page
         if ($hook_suffix === $this->settings_page_hook_suffix || $hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config->settings_page_slug, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
+            wp_enqueue_style($this->config::SETTINGS_PAGE_SLUG, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
         }
 
         // load styles only in plugin debug page
         if ($hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config->debug_page_slug, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
+            wp_enqueue_style($this->config::DEBUG_PAGE_SLUG, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
         }
     }
 

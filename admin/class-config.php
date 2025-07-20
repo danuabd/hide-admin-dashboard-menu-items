@@ -121,7 +121,7 @@ class Hide_Dashboard_Menu_Items_Config
      * @since   1.0.0
      * @var     string  HIDDEN_ADMIN_BAR_MENU     Key for hidden admin bar menu.
      */
-    public const HIDDEN_ADMIN_BAR_MENU = 'hidden_admin_bar_menu';
+    public const HIDDEN_ADMIN_BAR_MENU_KEY = 'hidden_admin_bar_menu';
 
     /**
      * Key for bypass enabled value.
