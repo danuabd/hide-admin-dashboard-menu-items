@@ -15,14 +15,6 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Debugger
 {
-    /**
-     * Config data of plugin.
-     * 
-     * @since   1.0.0
-     * @access  private
-     * @var     Hide_Dashboard_Menu_Items_Config    $config
-     */
-    private $config;
 
     /**
      * Storage manager of plugin.
@@ -52,7 +44,6 @@ class Hide_Dashboard_Menu_Items_Debugger
         Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager
     ) {
-        $this->config = $config;
         $this->storage_manager = $storage_manager;
         $this->accepted_event_types = ['info', 'error'];
     }
