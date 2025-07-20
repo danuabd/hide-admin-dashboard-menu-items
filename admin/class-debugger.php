@@ -109,9 +109,6 @@ class Hide_Dashboard_Menu_Items_Debugger
         $stored_info_data = !empty($stored_debug_data) && isset($stored_debug_data['info']) ? $stored_debug_data['info'] : [];
         $stored_error_data = !empty($stored_debug_data) && isset($stored_debug_data['error']) ? $stored_debug_data['error'] : [];
 
-        error_log(print_r($hidden_db_menu, true));
-        error_log(print_r($hidden_tb_menu, true));
-
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';
     }
 }

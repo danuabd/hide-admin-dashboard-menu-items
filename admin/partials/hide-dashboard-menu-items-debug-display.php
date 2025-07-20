@@ -155,7 +155,7 @@ if (!defined('ABSPATH')) {
                     <?php $i = 1;
                     foreach ($stored_error_data as $key => $cvalue) {
                         $i_print =  strval($i) . '. '; ?>
-                        <li><strong><?php echo $i_print, esc_html($key);  ?>: </strong><?php echo esc_html($value); ?></li>
+                        <li><strong><?php echo esc_html($i_print), esc_html($key);  ?>: </strong><?php echo esc_html($value); ?></li>
                     <?php $i += 1;
                     } ?>
                 </ul>
