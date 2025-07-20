@@ -38,105 +38,106 @@ class Hide_Dashboard_Menu_Items_Config
      * Plugin option prefix.
      * 
      * @since   1.0.0
-     * @var     string  $option_name    Plugin option prefix.
+     * @var     string  OPTION_NAME    Plugin option prefix.
+     * 
      */
-    public $option_name;
+    public const OPTION_NAME = 'hdmi';
 
     /**
      * Option for settings group.
      * 
      * @since   1.0.0
-     * @var     string  $option_group   Option for settings group.
+     * @var     string  OPTION_GROUP   Option for settings group.
      */
-    public $option_group;
+    public const OPTION_GROUP = self::OPTION_NAME . '_group';
 
     /**
      * Option for settings.
      * 
      * @since   1.0.0
-     * @var     string  $settings_option    Option for settings.
+     * @var     string  SETTINGS_OPTION    Option for settings.
      */
-    public $settings_option;
+    public const SETTINGS_OPTION = self::OPTION_NAME . '_settings';
 
     /**
      * Option for admin menu.
      * 
      * @since   1.0.0
-     * @var     string  $db_menu_option Option for admin menu.
+     * @var     string  DASHBOARD_MENU_OPTION Option for admin menu.
      */
-    public $db_menu_option;
+    public const DASHBOARD_MENU_OPTION = self::OPTION_NAME . '_dashboard_menu';
 
     /**
      * Option for admin toolbar menu.
      * 
      * @since   1.0.0
-     * @var     string $tb_menu_option  Option for admin toolbar menu.
+     * @var     string ADMIN_BAR_MENU_OPTION  Option for admin toolbar menu.
      */
-    public $tb_menu_option;
+    public const ADMIN_BAR_MENU_OPTION = self::OPTION_NAME . '_admin_bar_menu';
 
     /**
      * Option for debug data.
      * 
      * @since   1.0.0
-     * @var     string  $debug_option   Option for debug data.
+     * @var     string  DEBUG_LOG_OPTION   Option for debug data.
      */
-    public $debug_option;
+    public const DEBUG_LOG_OPTION = self::OPTION_NAME . '_debug_log';
 
     /**
      * Option to check if the previous scan was success.
      * 
      * @since   1.0.0
-     * @var     string  $scan_success_option    Option to check if the previous scan was success.
+     * @var     string  SCAN_SUCCESS_OPTION    Option to check if the previous scan was success.
      */
-    public $scan_success_option;
+    public const SCAN_SUCCESS_OPTION = self::OPTION_NAME . '_scan_success';
 
     /**
      * Slug for the settings page.
      * 
      * @since   1.0.0
-     * @var     string  $settings_page_slug     Slug for the settings page.
+     * @var     string  SETTINGS_PAGE_SLUG     Slug for the settings page.
      */
-    public $settings_page_slug;
+    public const SETTINGS_PAGE_SLUG = $this->plugin_name . '-settings';
 
     /**
      * Slug for the debug page.
      * 
      * @since   1.0.0
-     * @var     string  $debug_page_slug    Slug for the debug page.
+     * @var     string  DEBUG_PAGE_SLUG    Slug for the debug page.
      */
-    public $debug_page_slug;
+    public const DEBUG_PAGE_SLUG = $this->plugin_name . '-debug';
 
     /**
      * Key for hidden dashboard menu.
      * 
      * @since   1.0.0
-     * @var     string  $hidden_db_menu_key     Key for hidden dashboard menu.
+     * @var     string  HIDDEN_DASHBOARD_MENU_KEY     Key for hidden dashboard menu.
      */
-    public $hidden_db_menu_key = 'hidden_db_menu';
+    public const HIDDEN_DASHBOARD_MENU_KEY = 'hidden_dashboard_menu';
 
     /**
      * Key for hidden admin bar menu.
      * 
      * @since   1.0.0
-     * @var     string  $hidden_tb_menu_key     Key for hidden admin bar menu.
+     * @var     string  HIDDEN_ADMIN_BAR_MENU     Key for hidden admin bar menu.
      */
-    public $hidden_tb_menu_key = 'hidden_tb_menu';
+    public const HIDDEN_ADMIN_BAR_MENU = 'hidden_admin_bar_menu';
 
     /**
      * Key for bypass enabled value.
      * 
      * @since   1.0.0
-     * @var     string  $bypass_enabled_key     Key for bypass enabled value.
+     * @var     string  BYPASS_STATUS_KEY     Key for bypass enabled value.
      */
-    public $bypass_enabled_key = 'bypass_enabled';
+    public const BYPASS_STATUS_KEY = 'bypass_status';
 
     /**
      * Bypass query parameter
      * 
      * @since   1.0.0
-     * @var     string  bypass_param_key    Bypass query parameter
+     * @var     string  BYPASS_PASSCODE    Bypass query parameter
      */
-    public $bypass_param_key = 'bypass_param';
+    public const BYPASS_PASSCODE = 'bypass_passcode';
 
     /**
      * Build plugin constants
@@ -149,15 +150,5 @@ class Hide_Dashboard_Menu_Items_Config
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
-        $this->option_name = 'hdmi';
-        $this->option_group = $this->option_name . '_group';
-        $this->scan_success_option = $this->option_name . '_scan_completed';
-        $this->settings_option = $this->option_name . '_settings';
-        $this->db_menu_option = $this->option_name . '_db_cached';
-        $this->tb_menu_option = $this->option_name . '_tb_cached';
-        $this->debug_option = $this->option_name . '_debug';
-
-        $this->settings_page_slug = $plugin_name . '-settings';
-        $this->debug_page_slug = $plugin_name . '-debug';
     }
 }
