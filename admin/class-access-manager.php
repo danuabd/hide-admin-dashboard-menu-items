@@ -15,14 +15,6 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
-    /**
-     * Holds config class instance.
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Config    $config
-     */
-    private $config;
 
     /**
      * Holds storage manager class instance.
@@ -63,32 +55,18 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      * Initialize the class and set its properties.
      * 
      * @since   1.0.0
-     * @param   Hide_Dashboard_Menu_Items_Config    $config
      * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
      * @param   Hide_Dashboard_Menu_Items_Debugger  $debugger
      * @param   Hide_Dashboard_Menu_Items_Notices   $notice_manager
      */
     public function __construct(
-        Hide_Dashboard_Menu_Items_Config $config,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
         Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
-        $this->config = $config;
         $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
         $this->notice_manager = $notice_manager;
-    }
-
-    /**
-     * Get bypass passcode from storage.
-     * 
-     * @since   1.0.0
-     * @return  string|null   Return bypass parameter from storage. Otherwise null.
-     */
-    private function bypass_param()
-    {
-        return  $this->storage_manager->get_bypass_param();
     }
 
     /**

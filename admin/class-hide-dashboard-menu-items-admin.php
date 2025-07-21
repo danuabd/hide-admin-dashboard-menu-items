@@ -141,7 +141,6 @@ class Hide_Dashboard_Menu_Items_Admin
 		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->config, $this->storage_manager, $this->debugger, $this->notice_manager);
 
 		$this->access_manager   = new Hide_Dashboard_Menu_Items_Access_Manager(
-			$this->config,
 			$this->storage_manager,
 			$this->debugger,
 			$this->notice_manager
