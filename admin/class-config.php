@@ -84,6 +84,14 @@ class Hide_Dashboard_Menu_Items_Config
     public const DEBUG_LOG_OPTION = self::OPTION_NAME . '_debug_log';
 
     /**
+     * Option for debug data.
+     * 
+     * @since   1.0.0
+     * @var     string  DEBUG_LOG_OPTION   Option for debug data.
+     */
+    public const ERROR_LOG_OPTION = self::OPTION_NAME . '_errorlog';
+
+    /**
      * Option to check if the previous scan was success.
      * 
      * @since   1.0.0
@@ -97,7 +105,7 @@ class Hide_Dashboard_Menu_Items_Config
      * @since   1.0.0
      * @var     string  SETTINGS_PAGE_SLUG     Slug for the settings page.
      */
-    public const SETTINGS_PAGE_SLUG = $this->plugin_name . '-settings';
+    public $settings_page_slug;
 
     /**
      * Slug for the debug page.
@@ -105,7 +113,7 @@ class Hide_Dashboard_Menu_Items_Config
      * @since   1.0.0
      * @var     string  DEBUG_PAGE_SLUG    Slug for the debug page.
      */
-    public const DEBUG_PAGE_SLUG = $this->plugin_name . '-debug';
+    public $debug_page_slug;
 
     /**
      * Key for hidden dashboard menu.
@@ -150,5 +158,8 @@ class Hide_Dashboard_Menu_Items_Config
     {
         $this->plugin_name = $plugin_name;
         $this->version = $version;
+
+        $this->settings_page_slug = $plugin_name . '-settings';
+        $this->debug_page_slug = $plugin_name . '-debug';
     }
 }
