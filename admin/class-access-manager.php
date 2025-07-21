@@ -80,7 +80,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         $this->config = $config;
         $this->debugger = $debugger;
         $this->notice_manager = $notice_manager;
-        $this->bypass_param_key = $this->config->bypass_param_key;
+        $this->bypass_param_key = $this->config::BYPASS_PASSCODE_KEY;
         self::$storage_manager = $storage_manager;
     }
 
@@ -239,9 +239,9 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             if (in_array($menu_item[2], $hidden_db, true)) {
                 if (strpos($menu[$index][2], $bypass_key) === false) {
                     if (strpos($menu[$index][2], '?') !== false) {
-                        $menu[$index][2] .= '&' . $this->config->option_name . '=' . $bypass_key . '&_wpnonce=' . $nonce;
+                        $menu[$index][2] .= '&' . $this->config::OPTION_NAME . '=' . $bypass_key . '&_wpnonce=' . $nonce;
                     } else {
-                        $menu[$index][2] .= '?' . $this->config->option_name . '=' . $bypass_key . '&_wpnonce=' . $nonce;
+                        $menu[$index][2] .= '?' . $this->config::OPTION_NAME . '=' . $bypass_key . '&_wpnonce=' . $nonce;
                     }
                 }
             }
@@ -269,7 +269,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
             if ($node && isset($node->href)) {
                 if (strpos($node->href, $bypass_key) === false) {
-                    $updated_href = add_query_arg($this->config->option_name, $bypass_key, $nonce, $node->href);
+                    $updated_href = add_query_arg($this->config::OPTION_NAME, $bypass_key, $nonce, $node->href);
                     $node->href = $updated_href;
                     $wp_admin_bar->add_menu($node);
                 }

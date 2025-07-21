@@ -135,9 +135,9 @@ class Hide_Dashboard_Menu_Items_Config
      * Bypass query parameter
      * 
      * @since   1.0.0
-     * @var     string  BYPASS_PASSCODE    Bypass query parameter
+     * @var     string  BYPASS_PASSCODE_KEY    Bypass query parameter
      */
-    public const BYPASS_PASSCODE = 'bypass_passcode';
+    public const BYPASS_PASSCODE_KEY = 'bypass_passcode';
 
     /**
      * Build plugin constants

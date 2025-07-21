@@ -163,7 +163,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             'scan_done' => $this->storage_manager->get_scan_status(),
 
             'bypass_enabled_key' => $this->config::BYPASS_STATUS_KEY,
-            'bypass_param_key' => $this->config::BYPASS_PASSCODE,
+            'bypass_param_key' => $this->config::BYPASS_PASSCODE_KEY,
 
             'hidden_db_menu_key' => $this->config::HIDDEN_DASHBOARD_MENU_KEY,
             'hidden_tb_menu_key' => $this->config::HIDDEN_ADMIN_BAR_MENU_KEY,

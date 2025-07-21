@@ -46,7 +46,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_plugin_option($key, $default = false)
     {
-        $options = get_option($this->config->settings_option, array());
+        $options = get_option($this->config::SETTINGS_OPTION, array());
         return $options[$key] ?? $default;
     }
 
@@ -75,7 +75,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function is_bypass_active()
     {
-        return $this->get_plugin_option($this->config->bypass_enabled_key);
+        return $this->get_plugin_option($this->config::BYPASS_STATUS_KEY);
     }
 
     /**
@@ -87,7 +87,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     public function get_bypass_param()
     {
         if ($this->is_bypass_active())
-            return $this->get_plugin_option($this->config->bypass_param_key);
+            return $this->get_plugin_option($this->config::BYPASS_PASSCODE_KEY);
         else return '';
     }
 
@@ -99,7 +99,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_hidden_db_menu()
     {
-        return $this->get_plugin_option($this->config->hidden_db_menu_key, array());
+        return $this->get_plugin_option($this->config::HIDDEN_DASHBOARD_MENU_KEY, array());
     }
 
     /**
@@ -110,7 +110,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_hidden_tb_menu()
     {
-        return $this->get_plugin_option($this->config->hidden_tb_menu_key, array());
+        return $this->get_plugin_option($this->config::HIDDEN_ADMIN_BAR_MENU_KEY, array());
     }
 
     // --------------------------------------------------
@@ -125,7 +125,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_dashboard_menu_cache()
     {
-        return $this->get_other_option($this->config->db_menu_option);
+        return $this->get_other_option($this->config::DASHBOARD_MENU_OPTION);
     }
 
     /**
@@ -136,7 +136,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_toolbar_menu_cache()
     {
-        return $this->get_other_option($this->config->tb_menu_option);
+        return $this->get_other_option($this->config::ADMIN_BAR_MENU_OPTION);
     }
 
     /**
@@ -147,7 +147,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_debug_data()
     {
-        return $this->get_other_option($this->config->debug_option);
+        return $this->get_other_option($this->config::DEBUG_LOG_OPTION);
     }
 
     /**
@@ -158,7 +158,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      */
     public function get_scan_status()
     {
-        return $this->get_other_option($this->config->scan_success_option, false);
+        return $this->get_other_option($this->config::SCAN_SUCCESS_OPTION, false);
     }
 
 
@@ -175,7 +175,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     public function update_dashboard_menu($dashboard_menu)
     {
         if (is_array($dashboard_menu) && !empty($dashboard_menu))
-            update_option($this->config->db_menu_option, $dashboard_menu);
+            update_option($this->config::DASHBOARD_MENU_OPTION, $dashboard_menu);
     }
 
     /**
@@ -187,7 +187,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     public function update_toolbar_menu($toolbar_menu)
     {
         if (is_array($toolbar_menu) && !empty($toolbar_menu))
-            update_option($this->config->tb_menu_option, $toolbar_menu);
+            update_option($this->config::ADMIN_BAR_MENU_OPTION, $toolbar_menu);
     }
 
     /**
@@ -203,7 +203,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
         if ($key && $message) {
             $debug_data = $this->get_debug_data();
             $debug_data[$type][$key] = $message;
-            update_option($this->config->debug_option, $debug_data);
+            update_option($this->config::DEBUG_LOG_OPTION, $debug_data);
         }
     }
 }
