@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
     /**
-     * Config data
+     * Holds config class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -25,16 +25,16 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private $config;
 
     /**
-     * Storage manager
+     * Holds storage manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
      * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
      */
-    private static $storage_manager;
+    private $storage_manager;
 
     /**
-     * Storage manager
+     * Holds debugger class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -43,7 +43,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private $debugger;
 
     /**
-     * Admin notices manager
+     * Holds notices manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -52,14 +52,11 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     private $notice_manager;
 
     /**
-     * Bypass query parameter
+     * Holds permission to hidden menu items
      * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     string  $bypass_param_key
+     * @since 1.0.0
+     * @var boolean 
      */
-    private $bypass_param_key;
-
     private static $allow_access = false;
 
     /**
@@ -78,32 +75,24 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
         $this->config = $config;
+        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
         $this->notice_manager = $notice_manager;
-        $this->bypass_param_key = $this->config::BYPASS_PASSCODE_KEY;
-        self::$storage_manager = $storage_manager;
     }
 
     /**
-     * Check if bypass feature is in active.
+     * Get bypass passcode from storage.
      * 
      * @since   1.0.0
-     * @return  boolean   Returns True if bypass feature is in active. Otherwise False.
+     * @return  string|null   Return bypass parameter from storage. Otherwise null.
      */
-    private static function is_bypass_active()
+    private function bypass_param()
     {
-        return self::$storage_manager->is_bypass_active() ?? false;
-    }
+        if (!self::$allow_access) {
+            self::$allow_access = $this->storage_manager->get_bypass_param();
+        }
 
-    /**
-     * Get bypass parameter from storage.
-     * 
-     * @since   1.0.0
-     * @return  string|null   Return bypass parameter from storage. If there is no parameter, return null.
-     */
-    private static function bypass_param()
-    {
-        return self::$storage_manager->get_bypass_param()  ?? null;
+        return self::$allow_access;
     }
 
     /**
@@ -131,12 +120,11 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      * 
      * 4 - require data is not missing (menu items).
      */
-    private static function has_required()
+    private function has_required()
     {
         return
-            self::is_bypass_active() &&
-            self::bypass_param() &&
-            !self::is_scanning();
+            $this->storage_manager->is_bypass_active() &&
+            $this->storage_manager->get_bypass_param();
     }
 
     /**
@@ -148,7 +136,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
     public function set_bypass_access()
     {
         // Step 1: Check if required parameters exist
-        if (!isset($_GET[$this->bypass_param_key], $_GET['_wpnonce'])) return false;
+        if (!isset($_GET[Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY], $_GET['_wpnonce'])) return false;
 
         // Step 2: Sanitize the nonce value
         $nonce = sanitize_text_field(wp_unslash($_GET['_wpnonce']));
@@ -158,7 +146,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
 
         if ($nonce_verify_result) {
 
-            $bypass_input_param = sanitize_text_field(wp_unslash($_GET[$this->bypass_param_key]));
+            $bypass_input_param = sanitize_text_field(wp_unslash($_GET[Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY]));
 
             if ($bypass_input_param === self::bypass_param())
                 self::$allow_access = true;
@@ -175,22 +163,22 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     public function hide_dashboard_menu()
     {
-        $db_hidden = self::$storage_manager->get_hidden_db_menu();
+        $hidden_dashboard_menu = $this->storage_manager->get_hidden_dashboard_menu();
 
-        if (!self::has_required() || empty($db_hidden)) return;
+        if (!self::has_required() || empty($hidden_dashboard_menu)) return;
 
         // has access - allow
         if (self::$allow_access) {
 
             // allow further access by modifying URLs
-            $this->update_dashboard_menu($db_hidden, self::bypass_param());
+            $this->update_dashboard_menu($hidden_dashboard_menu, self::bypass_param());
 
             // don't hide
             return;
         }
 
         // hide the menu items
-        foreach ($db_hidden as $slug) {
+        foreach ($hidden_dashboard_menu as $slug) {
             remove_menu_page($slug);
         }
     }
@@ -202,7 +190,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     public function hide_toolbar_menu()
     {
-        $tb_hidden = self::$storage_manager->get_hidden_tb_menu();
+        $tb_hidden = $this->storage_manager->get_hidden_admin_bar_menu();
 
         if (!self::has_required() || empty($tb_hidden)) return;
 
@@ -210,7 +198,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
         if (self::$allow_access) {
 
             // allow further access by modifying URLs
-            $this->update_toolbar_menu($tb_hidden, self::bypass_param());
+            $this->update_admin_bar_menu($tb_hidden, self::bypass_param());
 
             // don't hide
             return;
@@ -247,19 +235,19 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             }
         }
 
-        $this->debugger->log_event('Dashboard menu updated?', 'Yes');
-        $this->debugger->log_event('Dashboard menu was updated at');
+        $this->debugger->log_debug('Dashboard menu updated?', 'Yes');
+        $this->debugger->log_debug('Dashboard menu was updated at', current_time('sql'));
     }
 
 
     /**
-     * Append the bypass query parameter to admin toolbar menu item URLs.
+     * Append the bypass query parameter to admin bar menu item URLs.
      *
      * @since   1.0.0
      * @param   array   $hidden_tb      Hidden admin bat menu items.
      * @param   string  $bypass_key     User-set bypass parameter.
      */
-    public function update_toolbar_menu($hidden_tb, $bypass_key)
+    public function update_admin_bar_menu($hidden_tb, $bypass_key)
     {
         global $wp_admin_bar;
 
@@ -276,8 +264,8 @@ class Hide_Dashboard_Menu_Items_Access_Manager
             }
         }
 
-        $this->debugger->log_event('Admin bar menu updated?', 'Yes');
-        $this->debugger->log_event('Admin bar menu was updated at');
+        $this->debugger->log_debug('Admin bar menu updated?', 'Yes');
+        $this->debugger->log_debug('Admin bar menu was updated at', current_time('sql'));
     }
 
     /**
@@ -288,12 +276,12 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      */
     public function restrict_menu_access()
     {
-        $hidden_db_menu = self::$storage_manager->get_hidden_db_menu();
-        $hidden_tb_menu = self::$storage_manager->get_hidden_tb_menu();
+        $hidden_dashboard_menu = $this->storage_manager->get_hidden_dashboard_menu();
+        $hidden_tb_menu = $this->storage_manager->get_hidden_admin_bar_menu();
 
-        if (!self::has_required() || !(empty($hidden_db_menu) && empty($hidden_tb_menu))) return;
+        if (!self::has_required() || !(empty($hidden_dashboard_menu) && empty($hidden_tb_menu))) return;
 
-        $hidden_all = array_merge($hidden_db_menu, $hidden_tb_menu);
+        $hidden_all = array_merge($hidden_dashboard_menu, $hidden_tb_menu);
 
         $current_screen = get_current_screen();
 
