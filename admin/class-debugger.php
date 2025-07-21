@@ -15,9 +15,17 @@ if (!defined('ABSPATH')) {
 }
 class Hide_Dashboard_Menu_Items_Debugger
 {
+    /**
+     * Plugin version.
+     * 
+     * @since   1.0.0
+     * @access  private
+     * @var     string   $version
+     */
+    private $version;
 
     /**
-     * Storage manager of plugin.
+     * Storage manager class instance.
      * 
      * @since   1.0.0
      * @access  private
@@ -26,53 +34,51 @@ class Hide_Dashboard_Menu_Items_Debugger
     private $storage_manager;
 
     /**
-     * Event types that are accepted.
+     * Initialize class with required instances
      * 
      * @since   1.0.0
-     * @access  private
-     * @var     array   $accepted_event_types
-     */
-    private $accepted_event_types;
-
-    /**
-     * 
-     * @since   1.0.0
-     * @param   Hide_Dashboard_Menu_Items_Config            $config
      * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
      */
     public function __construct(
-        Hide_Dashboard_Menu_Items_Config $config,
+        $version,
         Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager
     ) {
+
+        $this->version = $version;
         $this->storage_manager = $storage_manager;
-        $this->accepted_event_types = ['info', 'error'];
     }
 
     /**
-     * Add event to debug data.
+     * Add new entry to debug log.
      * 
      * @since   1.0.0
      * @param   string  $key
      * @param   string  $message
-     * @param   string  $type (info or error)
      */
-    public function log_event($key = '', $message = '', $type = 'info')
+    public function log_debug($key, $message)
     {
-        if (!in_array($type, $this->accepted_event_types) || !($message || $key)) {
+        if (!($key && $message)) {
+            return;
+        }
+
+        $this->storage_manager->update_debug_log($key, $message);
+    }
+
+    /**
+     * Add new entry to error log.
+     * 
+     * @since   1.0.0
+     * @param   string  $message
+     */
+    public function log_error($message)
+    {
+        if (!$message) {
             return;
         }
 
         $current_time = current_time('mysql');
 
-        if (!$message) {
-            $message = $current_time;
-        }
-
-        if (!$key) {
-            $key = $current_time;
-        }
-
-        $this->storage_manager->update_debug_data($key, $message, $type);
+        $this->storage_manager->update_error_log($current_time, $message);
     }
 
     /**
@@ -86,19 +92,20 @@ class Hide_Dashboard_Menu_Items_Debugger
             return;
         }
 
-        $stored_debug_data = $this->storage_manager->get_debug_data();
-
-        $curr_user_id = get_current_user_id();
-        $user = get_user_by('id', $curr_user_id);
-        $scan_status = $this->storage_manager->get_scan_status();
-        $db_menu_cache = $this->storage_manager->get_dashboard_menu_cache();
-        $tb_menu_cache = $this->storage_manager->get_toolbar_menu_cache();
-        $hidden_db_menu = $this->storage_manager->get_hidden_db_menu();
-        $hidden_tb_menu = $this->storage_manager->get_hidden_tb_menu();
+        $version = $this->version;
+        $current_user_id = get_current_user_id();
+        $current_user = get_user_by('id', $current_user_id);
+        $user_name = $current_user->display_name;
+        $user_roles = implode($current_user->roles);
+        $scan_status = $this->storage_manager->get_scan_status_cache();
+        $dashboard_menu_cache = $this->storage_manager->get_dashboard_menu_cache();
+        $admin_bar_menu_cache = $this->storage_manager->get_admin_bar_menu_cache();
+        $hidden_dashboard_menu = $this->storage_manager->get_hidden_dashboard_menu();
+        $hidden_admin_bar_menu = $this->storage_manager->get_hidden_admin_bar_menu();
         $bypass_enabled = $this->storage_manager->is_bypass_active();
         $bypass_key = $this->storage_manager->get_bypass_param();
-        $stored_info_data = !empty($stored_debug_data) && isset($stored_debug_data['info']) ? $stored_debug_data['info'] : [];
-        $stored_error_data = !empty($stored_debug_data) && isset($stored_debug_data['error']) ? $stored_debug_data['error'] : [];
+        $error_log = $this->storage_manager->get_error_log_cache();
+        $debug_log = $this->storage_manager->get_debug_log_cache();
 
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-debug-display.php';
     }
