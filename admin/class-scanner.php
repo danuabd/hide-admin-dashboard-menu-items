@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Scanner
 {
     /**
-     * Instance of plugin config.
+     * Holds config class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -25,7 +25,7 @@ class Hide_Dashboard_Menu_Items_Scanner
     private $config;
 
     /**
-     * Instance of plugin storage manager class.
+     * Holds storage manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -34,7 +34,7 @@ class Hide_Dashboard_Menu_Items_Scanner
     private $storage_manager;
 
     /**
-     * Instance of plugin debugger class.
+     * Holds debugger class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -43,7 +43,7 @@ class Hide_Dashboard_Menu_Items_Scanner
     private $debugger;
 
     /**
-     * Instance of plugin notice manager class.
+     * Holds notice manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -91,13 +91,13 @@ class Hide_Dashboard_Menu_Items_Scanner
             do_action('admin_bar_menu', $GLOBALS['wp_admin_bar']);
 
             update_option($this->config::SCAN_SUCCESS_OPTION, 1);
-            $this->debugger->log_event('Last Scan Time');
+            $this->debugger->log_debug('Last Scan Time', current_time('sql'));
 
             // Redirect back with success transient
             $this->notice_manager->add_notice('scan_completed', __('Menu scan completed successfully.', 'hide-dashboard-menu-items'), 'success');
 
             set_transient('scan_is_completed', 30);
-            wp_redirect(admin_url('admin.php?page=' . $this->config::SETTINGS_PAGE_SLUG));
+            wp_redirect(admin_url('admin.php?page=' . $this->config->settings_page_slug));
             exit;
         }
     }
@@ -112,12 +112,12 @@ class Hide_Dashboard_Menu_Items_Scanner
     {
 
         if (empty($menu) || !is_array($menu)) {
-            $this->debugger->log_event('', 'Menu is not initialized or empty.', 'error');
+            $this->debugger->log_error('Menu is not initialized or empty.');
             return;
         }
 
         $menu_items = array();
-        $hidden_menu_items = $this->storage_manager->get_hidden_db_menu();
+        $hidden_menu_items = $this->storage_manager->get_hidden_dashboard_menu();
 
         $menu_combined = array_merge($menu, $hidden_menu_items);
 
@@ -138,7 +138,7 @@ class Hide_Dashboard_Menu_Items_Scanner
             $slug       = isset($item[2]) ? $item[2] : '';
             $icon       = isset($item[6]) ? $item[6] : '';
 
-            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->config::SETTINGS_PAGE_SLUG) {
+            if (empty($slug) || empty($title) || empty($icon) || $slug === $this->config->settings_page_slug) {
                 // Skip items with missing data
                 continue;
             }
@@ -153,7 +153,7 @@ class Hide_Dashboard_Menu_Items_Scanner
         }
 
         if (empty($menu_items)) {
-            $this->debugger->log_event('', 'No top-level menu items found.' . 'error');
+            $this->debugger->log_error('No top-level menu items found.');
             return;
         }
 
@@ -170,14 +170,14 @@ class Hide_Dashboard_Menu_Items_Scanner
     {
 
         if (!($wp_admin_bar instanceof WP_Admin_Bar)) {
-            $this->debugger->log_event('', 'WP Admin Bar is not initialized.', 'error');
+            $this->debugger->log_error('WP Admin Bar is not initialized.');
             return;
         }
 
         $nodes = $wp_admin_bar->get_nodes();
 
         if (empty($nodes)) {
-            $this->debugger->log_event('', 'No admin bar nodes found.', 'error');
+            $this->debugger->log_error('No admin bar nodes found.');
             return;
         }
 
@@ -201,10 +201,10 @@ class Hide_Dashboard_Menu_Items_Scanner
         }
 
         if (empty($menu_items)) {
-            $this->debugger->log_event('', 'No top-level admin bar menu items found.', 'error');
+            $this->debugger->log_error('No top-level admin bar menu items found.');
             return;
         }
 
-        $this->storage_manager->update_toolbar_menu($menu_items);
+        $this->storage_manager->update_admin_bar_menu($menu_items);
     }
 }

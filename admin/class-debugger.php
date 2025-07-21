@@ -25,7 +25,7 @@ class Hide_Dashboard_Menu_Items_Debugger
     private $version;
 
     /**
-     * Storage manager class instance.
+     * Holds storage manager class instance.
      * 
      * @since   1.0.0
      * @access  private
