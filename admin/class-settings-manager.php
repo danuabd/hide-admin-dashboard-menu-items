@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Admin_Settings
 {
     /**
-     * Instance of config class of this plugin.
+     * Holds configuration class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -25,7 +25,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     private $config;
 
     /**
-     * Instance of storage manager class of this plugin.
+     * Holds storage manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -34,7 +34,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     private $storage_manager;
 
     /**
-     * Instance of debugger class of this plugin.
+     * Holds debugger class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -43,7 +43,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     private $debugger;
 
     /**
-     * Instance of notice manager class of this plugin.
+     * Holds notice manager class instance.
      * 
      * @since   1.0.0
      * @access  protected
@@ -113,22 +113,22 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     public function add_admin_menu()
     {
         // Add a new top-level menu item.
-        $this->settings_page_hook_suffix =    add_menu_page(
+        $this->settings_page_hook_suffix =  add_menu_page(
             'Configure Hide Menu Items',
             __('Hide Menu Items', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config::SETTINGS_PAGE_SLUG,
+            $this->config->settings_page_slug,
             array($this, 'render_settings_page'),
             'dashicons-hidden',
             99
         );
 
         $this->debug_page_hook_suffix = add_submenu_page(
-            $this->config::SETTINGS_PAGE_SLUG,
+            $this->config->settings_page_slug,
             __('Debug Info', 'hide-dashboard-menu-items'),
             __('Debug Info', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config::DEBUG_PAGE_SLUG,
+            $this->config->debug_page_slug,
             [$this->debugger, 'render_debug_page']
         );
     }
@@ -146,45 +146,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             $this->config->plugin_name . '_settings_section',
             '',
             '__return_false',
-            $this->config::SETTINGS_PAGE_SLUG
-        );
-    }
-
-    /**
-     * Build content of the settings page.
-     *
-     * @since   1.0.0
-     * @access  private
-     * @return  array   Array of items needs to render settings page.
-     */
-    private function build_settings_page_data()
-    {
-        return array(
-            'scan_done' => $this->storage_manager->get_scan_status(),
-
-            'bypass_enabled_key' => $this->config::BYPASS_STATUS_KEY,
-            'bypass_param_key' => $this->config::BYPASS_PASSCODE_KEY,
-
-            'hidden_db_menu_key' => $this->config::HIDDEN_DASHBOARD_MENU_KEY,
-            'hidden_tb_menu_key' => $this->config::HIDDEN_ADMIN_BAR_MENU_KEY,
-
-            'settings_option' => $this->config::SETTINGS_OPTION,
-            'option_group' => $this->config::OPTION_GROUP,
-
-            'settings_page_slug' => $this->config::SETTINGS_PAGE_SLUG,
-
-            'cached_db_menu' => $this->storage_manager->get_dashboard_menu_cache(),
-            'cached_tb_menu' => $this->storage_manager->get_toolbar_menu_cache(),
-
-            'hidden_db_menu' =>
-            $this->storage_manager->get_hidden_db_menu(),
-            'hidden_tb_menu' =>
-            $this->storage_manager->get_hidden_tb_menu(),
-
-            'bypass_enabled' =>
-            $this->storage_manager->is_bypass_active()  ? 'checked' : '',
-            'bypass_value' =>
-            esc_attr($this->storage_manager->get_bypass_param()) ?? '',
+            $this->config->settings_page_slug
         );
     }
 
@@ -199,7 +161,14 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             return;
         }
 
-        extract($this->build_settings_page_data());
+        $settings_page_slug = $this->config->settings_page_slug;
+        $scan_completed = $this->storage_manager->get_scan_status_cache();
+        $dashboard_menu = $this->storage_manager->get_dashboard_menu_cache();
+        $admin_bar_menu = $this->storage_manager->get_admin_bar_menu_cache();
+        $hidden_dashboard_menu = $this->storage_manager->get_hidden_dashboard_menu();
+        $hidden_admin_bar_menu = $this->storage_manager->get_hidden_admin_bar_menu();
+        $is_bypass_enabled = $this->storage_manager->is_bypass_active();
+        $bypass_parameter = $this->storage_manager->get_bypass_param();
 
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
     }
@@ -211,11 +180,11 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      * @param   array   $input User     inputs received via admin form
      * @return  array   Sanitized array of options
      */
-    public function sanitize_settings($input)
+    public function sanitize_settings($user_input)
     {
         $this->debugger->log_event('Settings form last submitted');
 
-        if (!is_array($input)) {
+        if (!is_array($user_input)) {
             return [];
         }
 
@@ -230,7 +199,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             return '';
         };
 
-        $sanitized = array_map($sanitize_recursive, $input);
+        $sanitized = array_map($sanitize_recursive, $user_input);
 
         if (!empty($sanitized)) {
             $this->debugger->log_event('Settings last updated');
@@ -253,12 +222,12 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
         // load styles in plugin admin settings & debug page
         if ($hook_suffix === $this->settings_page_hook_suffix || $hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config::SETTINGS_PAGE_SLUG, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
+            wp_enqueue_style($this->config->settings_page_slug, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
         }
 
         // load styles only in plugin debug page
         if ($hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config::DEBUG_PAGE_SLUG, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
+            wp_enqueue_style($this->config->debug_page_slug, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
         }
     }
 

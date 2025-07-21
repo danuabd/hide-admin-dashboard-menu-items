@@ -13,16 +13,16 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
-if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$cached_tb_menu)) {
+if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || (!$dashboard_menu && !$admin_bar_menu)) {
 
     $title = $description = '';
 
-    if (!$scan_done && !isset($_GET['hdmi_scan_success']) || !$cached_db_menu && !$cached_tb_menu) {
-        // If initial scan is not done
+    if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || !$dashboard_menu && !$admin_bar_menu) {
+        // If initial scan is not completed
         $title = 'Welcome to Hide Admin Menu Items Plugin!';
         $description = 'Before using this plugin, you need to scan the admin menu items. Click on the button below to start the scan. This will cache the dashboard menu and toolbar menu items and allow you to hide them later.';
     } else {
-        // If scan is done but no items found
+        // If scan is completed but no items found
         $title = 'Admin Menu Items Scan';
         $description = 'The admin menu items have not been scanned yet or corrupted. Please start the scan.';
     }
@@ -40,7 +40,7 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
 
         <form method="post" action="options.php" id="hdmi__form">
             <?php
-            settings_fields($option_group);
+            settings_fields(Hide_Dashboard_Menu_Items_Config::OPTION_GROUP);
             do_settings_sections($settings_page_slug);
             wp_nonce_field('hdmi_scan_nonce_action', 'hdmi_scan_nonce_field');
 
@@ -52,18 +52,18 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
             /* ---------------------------------------------------
                 ADMIN Dashboard ITEMS
             --------------------------------------------------- */
-            if (!empty($cached_db_menu)) {
+            if (!empty($dashboard_menu)) {
                 echo '<h2 class="hdmi__subheading">Dashboard Menu Items</h2>';
                 echo '<div class="hdmi__menu" id="hdmi__menu--db">';
                 echo '<div class="hdmi__grid">';
 
-                foreach ($cached_db_menu as $item) {
+                foreach ($dashboard_menu as $item) {
                     $slug     = $item['slug'];
                     $title    = $item['title'];
                     $dashicon = $item['dashicon'];
-                    $checked  = in_array($item['slug'], $hidden_db_menu) ? 'checked' : '';
-                    $status   = in_array($item['slug'], $hidden_db_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = $settings_option . "[$hidden_db_menu_key][]";
+                    $checked  = in_array($item['slug'], $hidden_dashboard_menu) ? 'checked' : '';
+                    $status   = in_array($item['slug'], $hidden_dashboard_menu) ? 'Hidden' : 'Visible';
+                    $name_attr = $settings_option . "[" . Hide_Dashboard_Menu_Items_Config::HIDDEN_DASHBOARD_MENU_KEY . "][]";
 
             ?>
                     <div class="hdmi__grid-item">
@@ -91,17 +91,17 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
             /* ---------------------------------------------------
                 ADMIN TOOLBAR ITEMS
             --------------------------------------------------- */
-            if (isset($cached_tb_menu) && !empty($cached_tb_menu)) {
+            if (isset($admin_bar_menu) && !empty($admin_bar_menu)) {
                 echo '<h2 class="hdmi__subheading">Toolbar Menu Items</h2>';
                 echo '<div id="hdmi__menu--tb">';
                 echo '<div class="hdmi__list">';
 
-                foreach ($cached_tb_menu as $item) {
+                foreach ($admin_bar_menu as $item) {
                     $id     = $item['id'];
                     $title    = $item['title'];
-                    $checked  = in_array($id, $hidden_tb_menu) ? 'checked' : '';
-                    $status   = in_array($id, $hidden_tb_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = $settings_option . "[$hidden_tb_menu_key][]";
+                    $checked  = in_array($id, $hidden_admin_bar_menu) ? 'checked' : '';
+                    $status   = in_array($id, $hidden_admin_bar_menu) ? 'Hidden' : 'Visible';
+                    $name_attr = $settings_option . "[" . Hide_Dashboard_Menu_Items_Config::HIDDEN_ADMIN_BAR_MENU_KEY . "][]";
 
                 ?>
 
@@ -133,15 +133,15 @@ if (!$scan_done && !isset($_GET['hdmi_scan_success']) || (!$cached_db_menu && !$
                 <div id="hdmi__bypass-controls">
                     <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
                         <input type="checkbox" id="hdmi__bypass-toggle" class="hdmi-toggle-input"
-                            name="<?php echo esc_attr($settings_option . "[{$bypass_enabled_key}]") ?>" value="1"
-                            <?php echo esc_attr($bypass_enabled) ?> />
+                            name="<?php echo esc_attr(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION . "[" . Hide_Dashboard_Menu_Items_Config::BYPASS_STATUS_KEY . "]") ?>" value="1"
+                            <?php echo sanitize_text_field($is_bypass_enabled)  ? 'checked' : '' ?> />
                         <span id="hdmi__bypass-slider" class="hdmi-toggle-slider"></span>
                         Enable bypass feature
                     </label>
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr($settings_option . "[{$bypass_param_key}]") ?>" value="<?php echo esc_attr($bypass_value) ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION . "[" . Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY . "]") ?>" value="<?php echo esc_attr($bypass_parameter) ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
