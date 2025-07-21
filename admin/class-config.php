@@ -35,6 +35,30 @@ class Hide_Dashboard_Menu_Items_Config
     public $version;
 
     /**
+     * Slug for the settings page.
+     * 
+     * @since   1.0.0
+     * @var     string  $settings_page_slug     Slug for the settings page.
+     */
+    public $settings_page_slug;
+
+    /**
+     * Slug for the debug page.
+     * 
+     * @since   1.0.0
+     * @var     string  $debug_page_slug    Slug for the debug page.
+     */
+    public $debug_page_slug;
+
+    /**
+     * Slug for the restricted page.
+     * 
+     * @since   1.0.0
+     * @var     string  $restricted_page_slug    Slug for the restricted page.
+     */
+    public $restricted_page_slug;
+
+    /**
      * Plugin option prefix.
      * 
      * @since   1.0.0
@@ -100,22 +124,6 @@ class Hide_Dashboard_Menu_Items_Config
     public const SCAN_SUCCESS_OPTION = self::OPTION_NAME . '_scan_success';
 
     /**
-     * Slug for the settings page.
-     * 
-     * @since   1.0.0
-     * @var     string  SETTINGS_PAGE_SLUG     Slug for the settings page.
-     */
-    public $settings_page_slug;
-
-    /**
-     * Slug for the debug page.
-     * 
-     * @since   1.0.0
-     * @var     string  DEBUG_PAGE_SLUG    Slug for the debug page.
-     */
-    public $debug_page_slug;
-
-    /**
      * Key for hidden dashboard menu.
      * 
      * @since   1.0.0
@@ -161,5 +169,6 @@ class Hide_Dashboard_Menu_Items_Config
 
         $this->settings_page_slug = $plugin_name . '-settings';
         $this->debug_page_slug = $plugin_name . '-debug';
+        $this->restricted_page_slug = $plugin_name . '-restricted';
     }
 }
