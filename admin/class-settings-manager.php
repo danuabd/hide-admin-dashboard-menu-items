@@ -182,7 +182,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      */
     public function sanitize_settings($user_input)
     {
-        $this->debugger->log_event('Settings form last submitted');
+        $this->debugger->log_debug('Settings form last submitted', current_time('sql'));
 
         if (!is_array($user_input)) {
             return [];
@@ -202,7 +202,7 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         $sanitized = array_map($sanitize_recursive, $user_input);
 
         if (!empty($sanitized)) {
-            $this->debugger->log_event('Settings last updated');
+            $this->debugger->log_debug('Settings last updated', current_time('sql'));
         }
 
         $this->notice_manager->add_notice('settings_updated', __('Settings have been updated.', 'hide-dashboard-menu-items'), 'success');
