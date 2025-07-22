@@ -19,6 +19,7 @@ class Hide_Dashboard_Menu_Items_Deactivator
 	 */
 	public static function deactivate()
 	{
+		require_once plugin_dir_path(__FILE__) . '../admin/class-config.php';
 		$plugin_option_name = 'hdmi';
 
 		// Delete the options set by the plugin

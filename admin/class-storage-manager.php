@@ -101,7 +101,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * 
      * 3 - Bypass enabled status (true|false)
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @param   string  $setting_key
      * @param   mixed   $default_value
      * @return  mixed   Returns if the option exists in database. Otherwise the $default value.
@@ -125,7 +125,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Check if bypass feature is set as active.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  boolean     Returns true if bypass is enabled. Otherwise false.
      */
     public function is_bypass_active()
@@ -136,7 +136,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get bypass parameter from storage.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  string|null      Returns Bypass key if Bypass query parameter exists on database. Otherwise null.
      */
     public function get_bypass_param()
@@ -147,7 +147,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get hidden dashboard menu from storage.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns Hidden dashboard menu if exists. Otherwise empty array.
      */
     public function get_hidden_dashboard_menu()
@@ -158,7 +158,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get hidden admin bar menu from storage.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns Hidden admin bar menu if exists. Otherwise empty array.
      */
     public function get_hidden_admin_bar_menu()
@@ -173,7 +173,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get dashboard menu.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns dashboard menu if exists in either storage or cache. Otherwise empty array.
      */
     public function get_dashboard_menu_cache()
@@ -189,7 +189,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get admin bar menu.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns Admin bar menu if exists in either storage or cache. Otherwise an empty array.
      */
     public function get_admin_bar_menu_cache()
@@ -205,7 +205,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get debug log.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns debug log if exists in either storage or cache. Otherwise an empty array.
      */
     public function get_debug_log_cache()
@@ -221,7 +221,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get error log.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  array   Returns error log if exists in either storage or cache. Otherwise an empty array.
      */
     public function get_error_log_cache()
@@ -238,7 +238,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Get menu scan status.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @return  boolean     Returns true if exists. Otherwise false.
      */
     public function get_scan_status_cache()
@@ -259,7 +259,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Update dashboard menu.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @param   array   $dashboard_menu     Dashboard menu to update.
      * @return boolean                      Returns true if updated. Otherwise false.
      */
@@ -276,7 +276,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Update admin bar menu.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @param   array   $admin_bar_menu     Admin bar menu to update.
      * @return  boolean                     Returns true if updated. Otherwise false.
      */
@@ -293,7 +293,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Update debug log entry.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @param   array   $key        Key to find the correct entry to update.
      * @param   array   $message    New value.
      * @return  boolean             Returns true if updated. Otherwise false.
@@ -314,7 +314,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     /**
      * Update error log entry.
      * 
-     * @since   1.0.0
+     * @since   1.0.1
      * @param   array   $key        Key to find the correct entry to update.
      * @param   array   $message    New value.
      * @return  boolean             Returns true if updated. Otherwise false.
@@ -333,5 +333,23 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
         $updated =  update_option(Hide_Dashboard_Menu_Items_Config::ERROR_LOG_OPTION, $error_log);
 
         return $updated;
+    }
+
+    /**
+     * Delete all plugin data.
+     * 
+     * @since   1.0.1
+     * @param   string  $plugin_name    Plugin name to avoid accidental method calling.
+     */
+    public function delete_plugin_data($plugin_name)
+    {
+        if ($plugin_name !== $this->config->plugin_name) return;
+
+        delete_option(Hide_Dashboard_Menu_Items_Config::DASHBOARD_MENU_OPTION);
+        delete_option(Hide_Dashboard_Menu_Items_Config::ADMIN_BAR_MENU_OPTION);
+        delete_option(Hide_Dashboard_Menu_Items_Config::DEBUG_LOG_OPTION);
+        delete_option(Hide_Dashboard_Menu_Items_Config::ERROR_LOG_OPTION);
+        delete_option(Hide_Dashboard_Menu_Items_Config::SCAN_SUCCESS_OPTION);
+        delete_option(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION);
     }
 }
