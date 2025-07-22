@@ -102,7 +102,7 @@ class Hide_Dashboard_Menu_Items_Access_Manager
      * @since 1.0.0
      * @return void
      */
-    public function handle_bypass_form_handler()
+    public function bypass_form_handler()
     {
         if (
             !isset($_POST['hdmi_bypass_submit']) ||

@@ -113,16 +113,10 @@ class Hide_Dashboard_Menu_Items
 		// Fires as an admin screen or script is being initialized.
 		$this->loader->add_action('admin_init', $plugin_admin->settings_manager, 'register_settings', 10);
 		$this->loader->add_action('admin_init', $plugin_admin->scanner, 'scan', 999);
-
-		// $this->loader->add_action('current_screen', $plugin_admin->access_manager, 'set_bypass_access', 999);
-
+		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'bypass_form_handler');
 
 		// Fires before the administration menu loads in the admin.
 		$this->loader->add_action('admin_menu', $plugin_admin->settings_manager, 'add_admin_menu');
-		// $this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu', 999);
-
-		// Loads all necessary admin bar items.
-		// $this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'hide_toolbar_menu', 999);
 
 		// Prints admin screen notices.
 		$this->loader->add_action('admin_notices', $plugin_admin->notice_manager, 'render_notices');
@@ -130,6 +124,13 @@ class Hide_Dashboard_Menu_Items
 		// Runs in the HTML header so a plugin or theme can enqueue JavaScript and CSS to all admin pages.
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_styles');
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_scripts');
+
+
+		// $this->loader->add_action('current_screen', $plugin_admin->access_manager, 'set_bypass_access', 999);
+
+		// $this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu', 999);
+
+		// $this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'hide_toolbar_menu', 999);
 	}
 
 	/**
