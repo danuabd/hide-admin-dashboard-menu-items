@@ -15,7 +15,7 @@ class Hide_Dashboard_Menu_Items_Deactivator
 {
 
 	/**
-	 * @since    1.0.0
+	 * @since    1.0.1
 	 */
 	public static function deactivate()
 	{
