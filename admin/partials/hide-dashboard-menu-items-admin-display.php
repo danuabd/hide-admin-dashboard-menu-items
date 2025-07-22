@@ -13,6 +13,13 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
+$settings_option = esc_attr(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION);
+$bypass_passcode_key = esc_attr(Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY);
+$bypass_status_key = esc_attr(Hide_Dashboard_Menu_Items_Config::BYPASS_STATUS_KEY);
+$admin_bar_menu_key = esc_attr(Hide_Dashboard_Menu_Items_Config::HIDDEN_ADMIN_BAR_MENU_KEY);
+$dashboard_menu_key = esc_attr(Hide_Dashboard_Menu_Items_Config::HIDDEN_DASHBOARD_MENU_KEY);
+
 if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || (!$dashboard_menu && !$admin_bar_menu)) {
 
     $title = $description = '';
@@ -63,7 +70,7 @@ if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || (!$dashboard_menu 
                     $dashicon = $item['dashicon'];
                     $checked  = in_array($item['slug'], $hidden_dashboard_menu) ? 'checked' : '';
                     $status   = in_array($item['slug'], $hidden_dashboard_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = $settings_option . "[" . Hide_Dashboard_Menu_Items_Config::HIDDEN_DASHBOARD_MENU_KEY . "][]";
+                    $name_attr = "{$settings_option}[{$dashboard_menu_key}][]";
 
             ?>
                     <div class="hdmi__grid-item">
@@ -101,7 +108,7 @@ if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || (!$dashboard_menu 
                     $title    = $item['title'];
                     $checked  = in_array($id, $hidden_admin_bar_menu) ? 'checked' : '';
                     $status   = in_array($id, $hidden_admin_bar_menu) ? 'Hidden' : 'Visible';
-                    $name_attr = $settings_option . "[" . Hide_Dashboard_Menu_Items_Config::HIDDEN_ADMIN_BAR_MENU_KEY . "][]";
+                    $name_attr = "{$settings_option}[{$admin_bar_menu_key}][]";
 
                 ?>
 
@@ -133,15 +140,15 @@ if (!$scan_completed && !isset($_GET['hdmi_scan_success']) || (!$dashboard_menu 
                 <div id="hdmi__bypass-controls">
                     <label id="hdmi__bypass-toggle-wrapper" class="hdmi-toggle-wrapper">
                         <input type="checkbox" id="hdmi__bypass-toggle" class="hdmi-toggle-input"
-                            name="<?php echo esc_attr(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION . "[" . Hide_Dashboard_Menu_Items_Config::BYPASS_STATUS_KEY . "]") ?>" value="1"
-                            <?php echo sanitize_text_field($is_bypass_enabled)  ? 'checked' : '' ?> />
+                            name="<?php echo esc_attr("{$settings_option}[{$bypass_status_key}]") ?>" value="1"
+                            <?php echo esc_attr($is_bypass_enabled)  ? 'checked' : '' ?> />
                         <span id="hdmi__bypass-slider" class="hdmi-toggle-slider"></span>
                         Enable bypass feature
                     </label>
 
                     <div id="hdmi__bypass-settings">
                         <label id="hdmi__bypass-label" for="hdmi__bypass-key"><strong>Custom Query Parameter</strong></label>
-                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION . "[" . Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY . "]") ?>" value="<?php echo esc_attr($bypass_parameter) ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
+                        <input type="text" id="hdmi__bypass-key" name="<?php echo esc_attr("{$settings_option}[{$bypass_passcode_key}]") ?>" value="<?php echo esc_attr($bypass_parameter) ?>" placeholder="e.g. bypass_access" class="regular-text" minlength="4" maxlength="12" disabled />
 
                         <p id="description hdmi__bypass-warning">
                             ⚠️ Do not use spaces, symbols like `?`, `&`, `=`, or `%`. Only letters, numbers, underscores, and hyphens are allowed.
