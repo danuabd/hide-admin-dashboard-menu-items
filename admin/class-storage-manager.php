@@ -26,6 +26,15 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     private $config;
 
     /**
+     * Plugin name.
+     * 
+     * @since   1.0.1
+     * @access  protected
+     * @var     string    $plugin_name
+     */
+    private static $plugin_name;
+
+    /**
      * Stores cache of plugin settings.
      * 
      * @since   1.0.0
@@ -88,6 +97,7 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
     public function __construct(Hide_Dashboard_Menu_Items_Config $config)
     {
         $this->config = $config;
+        self::$plugin_name = $this->config->plugin_name;
     }
 
     /**
@@ -341,9 +351,9 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @param   string  $plugin_name    Plugin name to avoid accidental method calling.
      */
-    public function delete_plugin_data($plugin_name)
+    public static function delete_plugin_data($plugin_name)
     {
-        if ($plugin_name !== $this->config->plugin_name) return;
+        if ($plugin_name !== self::$plugin_name) return;
 
         delete_option(Hide_Dashboard_Menu_Items_Config::DASHBOARD_MENU_OPTION);
         delete_option(Hide_Dashboard_Menu_Items_Config::ADMIN_BAR_MENU_OPTION);

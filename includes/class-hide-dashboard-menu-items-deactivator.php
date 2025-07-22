@@ -19,13 +19,8 @@ class Hide_Dashboard_Menu_Items_Deactivator
 	 */
 	public static function deactivate()
 	{
-		require_once plugin_dir_path(__FILE__) . '../admin/class-config.php';
-		$plugin_option_name = 'hdmi';
+		require_once plugin_dir_path(__FILE__) . '../admin/class-storage-manager.php';
 
-		// Delete the options set by the plugin
-		delete_option($plugin_option_name . '_tb_cached');
-		delete_option($plugin_option_name . '_db_cached');
-		delete_option($plugin_option_name . '_scan_completed');
-		delete_option($plugin_option_name . '_debug');
+		Hide_Dashboard_Menu_Items_Storage_Manager::delete_plugin_data('hide-admin-dashboard-menu-items');
 	}
 }

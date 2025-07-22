@@ -14,16 +14,6 @@ if (! defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
 
-function hide_dashboard_menu_items_uninstall()
-{
-	$plugin_option_name = 'hdmi';
+require_once plugin_dir_path(__FILE__) . './admin/class-storage-manager.php';
 
-	// Delete the options set by the plugin
-	delete_option($plugin_option_name . '_scan_completed');
-	delete_option($plugin_option_name . '_settings');
-	delete_option($plugin_option_name . '_tb_cached');
-	delete_option($plugin_option_name . '_db_cached');
-	delete_option($plugin_option_name . '_debug');
-}
-
-hide_dashboard_menu_items_uninstall();
+Hide_Dashboard_Menu_Items_Storage_Manager::delete_plugin_data('hide-admin-dashboard-menu-items');
