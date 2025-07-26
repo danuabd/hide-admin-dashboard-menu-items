@@ -4,14 +4,14 @@
  * The plugin bootstrap file
  *
  * @link              https://danukaprasad.com
- * @since             1.0.0
+ * @since             1.0.1
  * @package           Hide_Dashboard_Menu_Items
  *
  * @wordpress-plugin
  * Plugin Name:       Hide Dashboard Menu Items
  * Plugin URI:        https://danukaprasad.com/wordpress-plugins/hide-dashboard-menu-items
  * Description:       A simple & lightweight plugin that lets you hide unwanted admin menu items from the WordPress dashboard and block direct access to the associated pages — keeping your backend clean, focused, and secure.
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            ABD Prasad
  * Author URI:        https://danukaprasad.com/
  * License:           GPL-2.0+
