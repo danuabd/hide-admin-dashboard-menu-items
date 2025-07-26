@@ -74,3 +74,9 @@ Only administrators can configure visibility and restriction settings.
 
 = 1.0.0 =
 First stable release. Hide unnecessary admin menu items and keep your backend clean and secure.
+
+= 1.0.1 =
+-Fix various bugs found in first release.
+-Add new restriction feature.
+-Optimize plugin for memory usage.
+-Add new entries for the debug log.
