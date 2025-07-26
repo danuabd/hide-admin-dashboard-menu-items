@@ -21,13 +21,34 @@
 
 // If this file is called directly, abort.
 if (! defined('WPINC')) {
+	echo 'Hi there!  I\'m just a plugin, not much I can do when called directly :).';
 	die;
 }
 
 /**
- * Currently plugin version.
+ * Configuration class.
  */
-define('HIDE_DASHBOARD_MENU_ITEMS_VERSION', '1.0.0');
+require_once plugin_dir_path(__FILE__) . 'includes/class-hide-dashboard-menu-items-config.php';
+
+/**
+ * Plugin name.
+ */
+define('HDMI_PLUGIN_NAME', 'hide-dashboard-menu-items');
+
+/**
+ * Current plugin version.
+ */
+define('HDMI_VERSION', '1.0.0');
+
+/**
+ * Plugin root path.
+ */
+define('HDMI_PLUGIN_DIR', plugin_dir_path(__FILE__));
+
+/**
+ * Plugin option prefix.
+ */
+define('HDMI_PREFIX', 'hdmi_by_abd');
 
 /**
  * The code that runs during plugin activation.
@@ -68,7 +89,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-hide-dashboard-menu-items.ph
 function run_hide_dashboard_menu_items()
 {
 
-	$plugin = new Hide_Dashboard_Menu_Items();
+	$plugin = new Hide_Dashboard_Menu_Items(Hide_Dashboard_Menu_Items_Config::settings_option());
 	$plugin->run();
 }
 run_hide_dashboard_menu_items();
