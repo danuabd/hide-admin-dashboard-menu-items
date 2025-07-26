@@ -16,49 +16,62 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Notice_Manager
 {
 
+    private static $notices = [];
+
     /**
      * Set a custom admin notice using transient.
      *
      * @since   1.0.0
-     * @param   string  $key        Unique key for this notice.
      * @param   string  $message    Message to display.
      * @param   string  $type       Notice type: success, error, warning, info.
-     * @param   int     $duration   Duration in seconds (default: 30s).
+     * @param   int     $duration   Duration in seconds (default: 60s).
      */
-    public function add_notice($key, $message, $type = 'info', $duration = 30)
+    public function add_plugin_notice($message, $type = 'info', $dismissible = true)
     {
         $notice = array(
             'message' => $message,
             'type'    => $type,
+            'dismissible' => $dismissible
         );
 
-        set_transient("hdmi_notice_{$key}", $notice, $duration);
+        self::$notices[] = $notice;
+    }
+
+    /**
+     * Render notice using a transient.
+     * 
+     * @since 1.0.1
+     */
+    public function render_transient_notice()
+    {
+        $transient_notice = get_transient('hdmi_admin_notice_transient');
+
+        if (!$transient_notice || empty($transient_notice)) return;
+
+        wp_admin_notice(__($transient_notice['message'], 'hide-admin-dashboard-items'), array(
+            'type' => $transient_notice['type'],
+            'dismissible' => $transient_notice['dismissible']
+        ));
+
+        delete_transient('hdmi_admin_notice_transient');
     }
 
 
     /**
-     * Display admin notices (one per key).
+     * Display admin notices (one per notice).
      * 
      * @since   1.0.0
      */
-    public function render_notices()
+    public function render_plugin_notices()
     {
-        $notice_keys = array('scan_completed', 'settings_updated', 'bypass_enabled');
+        if (sizeof(self::$notices) < 1) return;
 
-        foreach ($notice_keys as $key) {
-            $transient_key = "hdmi_notice_{$key}";
-            $notice = get_transient($transient_key);
+        foreach (self::$notices as $i => $notice) {
 
-            $dismissible_attr = $key !== 'bypass_enabled' ? 'is-dismissible' : '';
-
-            if ($notice && !empty($notice['message'])) {
-                $type = esc_attr($notice['type'] ?? 'info');
-                $message = esc_html($notice['message']);
-
-                echo "<div class='notice notice-{$type} {$dismissible_attr}'><p>{$message}</p></div>";
-
-                delete_transient($transient_key);
-            }
+            wp_admin_notice(__($notice['message'], 'hide-admin-dashboard-items'), array(
+                'type' => $notice['type'],
+                'dismissible' => $notice['dismissible']
+            ));
         }
     }
 }

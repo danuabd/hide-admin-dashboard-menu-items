@@ -1,6 +1,6 @@
 "use strict";
 document.addEventListener("DOMContentLoaded", function () {
-  const hdmiForm = document.getElementById("hdmi__form");
+  const hdmiForm = document.getElementById("hdmi__setting-form");
   const hdmiBypassToggle = document.getElementById("hdmi__bypass-toggle");
   const hdmiBypassSettingsView = document.getElementById(
     "hdmi__bypass-settings"

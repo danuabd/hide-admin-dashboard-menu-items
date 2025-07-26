@@ -3,255 +3,221 @@
 /**
  * Access manager class for the plugin
  *
- *
  * @link       https://danukaprasad.com
  * @since      1.0.0
- *
  * @package    Hide_Dashboard_Menu_Items
  * @subpackage Hide_Dashboard_Menu_Items/admin
  */
+
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
 class Hide_Dashboard_Menu_Items_Access_Manager
 {
-    /**
-     * Config data
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Config    $config
-     */
-    private $config;
 
     /**
-     * Storage manager
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
-     */
-    private $storage_manager;
-
-    /**
-     * Storage manager
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Debugger  $debugger
+     * @var Hide_Dashboard_Menu_Items_Debugger
      */
     private $debugger;
 
     /**
-     * Admin notices manager
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Notice_Manager    $notice_manager
-     */
-    private $notice_manager;
-
-    /**
-     * Bypass query parameter
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     string  $bypass_param_query
-     */
-    private $bypass_param_query;
-
-    /**
-     * Initialize the class and set its properties.
-     * 
-     * @since   1.0.0
-     * @param   Hide_Dashboard_Menu_Items_Config    $config
-     * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
-     * @param   Hide_Dashboard_Menu_Items_Debugger  $debugger
-     * @param   Hide_Dashboard_Menu_Items_Notices   $notice_manager
+     * Constructor
      */
     public function __construct(
-        Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
-        Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
-        $this->config = $config;
-        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
-        $this->notice_manager = $notice_manager;
-        $this->bypass_param_query = $this->config->option_name;
     }
 
     /**
-     * Hide Dashboard Menu items.
-     *
-     * @since   1.0.0
+     * Whether bypass is verified via nonce
      */
-    public function hide_dashboard_menu()
+    protected function is_bypass_verified(): bool
     {
-        $scan_running = get_transient('hdmi_scan_running');
+        return isset($_GET['_bypass_url_nonce']) && wp_verify_nonce(
+            sanitize_text_field(wp_unslash($_GET['_bypass_url_nonce'])),
+            'bypass_enabled_action'
+        );
+    }
 
-        if ($scan_running) return;
+    /**
+     * Remove hidden menu items
+     */
+    public function remove_hidden_dashboard_items(): void
+    {
+        static $has_run = false;
+        if ($has_run || Hide_Dashboard_Menu_Items_Storage_Manager::has_scan_started()) return;
+        $has_run = true;
 
-        $db_hidden = $this->storage_manager->get_hidden_db_menu();
+        global $menu;
+        $hidden_items = Hide_Dashboard_Menu_Items_Storage_Manager::get_hidden_dashboard();
 
-        $bypass_active = $this->storage_manager->is_bypass_active();
+        if (!is_array($menu) || empty($hidden_items)) return;
 
-        $bypass_param = $this->storage_manager->get_bypass_param();
+        error_log(__METHOD__ . ' executing');
 
-        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
-
-        if (!is_array($db_hidden) || empty($db_hidden)) {
-            return;
-        }
-
-        if ($bypass_active && $bypass_param_in_uri) {
-            $this->debugger->log_event('Bypass Active', 'Yes');
-            $this->notice_manager->add_notice('bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
-            $this->update_dashboard_menu($db_hidden, $bypass_param);
-            return;
-        }
-
-        // No access — remove the menu items
-        foreach ($db_hidden as $slug) {
+        foreach ($hidden_items as $slug) {
             remove_menu_page($slug);
         }
     }
 
     /**
-     * Hide Admin Toolbar items.
-     * 
-     * @since   1.0.0
+     * Remove hidden admin bar items
      */
-    public function hide_toolbar_menu()
+    public function remove_hidden_admin_bar_items(): void
     {
-        $scan_running = get_transient('hdmi_scan_running');
-
-        if ($scan_running) return;
+        static $has_run = false;
+        if ($has_run || Hide_Dashboard_Menu_Items_Storage_Manager::has_scan_started()) return;
+        $has_run = true;
 
         global $wp_admin_bar;
+        $hidden_items = Hide_Dashboard_Menu_Items_Storage_Manager::get_hidden_admin_bar();
 
-        $tb_hidden = $this->storage_manager->get_hidden_tb_menu();
+        if (!($wp_admin_bar instanceof WP_Admin_Bar) || empty($hidden_items)) return;
 
-        $bypass_active =
-            $this->storage_manager->is_bypass_active();
-        $bypass_param =
-            $this->storage_manager->get_bypass_param();
+        error_log(__METHOD__ . ' executing');
 
-        $bypass_param_in_uri = isset($_GET[$this->bypass_param_query]) && sanitize_text_field($_GET[$this->bypass_param_query])  === $bypass_param;
-
-        if (!is_array($tb_hidden) || empty($tb_hidden)) {
-            return;
-        }
-
-        if ($bypass_active && $bypass_param_in_uri) {
-            $this->debugger->log_event('Bypass Active', 'Yes');
-            $this->notice_manager->add_notice('bypass_enabled', __('Bypass is active and has been accessed', 'hide-dashboard-menu-items'), 'info');
-            $this->update_toolbar_menu($tb_hidden, $bypass_param);
-            return;
-        }
-
-        // No access — remove the menu items
-        foreach ($tb_hidden as $id) {
+        foreach ($hidden_items as $id) {
             $wp_admin_bar->remove_menu($id);
         }
     }
 
     /**
-     * Append the bypass query parameter to dashboard menu item URLs.
-     *
-     * @since   1.0.0
-     * @param   array   $hidden The hidden menu slugs.
-     * @param   string  $bypass_key The bypass query key.
+     * Check if the current screen matches a hidden menu slug
      */
-    public function update_dashboard_menu($hidden, $bypass_key)
+    private function accessing_same_menu(string $slug, WP_Screen $screen): bool
     {
-        global $menu;
+        $needles = array_filter([
+            $screen->id ?? '',
+            $screen->base ?? '',
+            $screen->parent_base ?? '',
+            $screen->parent_file ?? '',
+        ]);
 
-        foreach ($menu as $index => $menu_item) {
-            if (in_array($menu_item[2], $hidden, true)) {
-                if (strpos($menu[$index][2], $bypass_key) === false) {
-                    if (strpos($menu[$index][2], '?') !== false) {
-                        $menu[$index][2] .= '&' . $this->config->option_name . '=' . $bypass_key;
-                    } else {
-                        $menu[$index][2] .= '?' . $this->config->option_name . '=' . $bypass_key;
-                    }
-                }
+        foreach ($needles as $needle) {
+            if (str_contains($slug, $needle)) {
+                return true;
             }
         }
 
-        $this->debugger->log_event('Dashboard menu updated?', 'Yes');
-        $this->debugger->log_event('Dashboard menu was updated at');
-    }
-
-
-    /**
-     * Append the bypass query parameter to admin toolbar menu item URLs.
-     *
-     * @since   1.0.0
-     * @param   array   $hidden_slugs
-     * @param   string  $bypass_key
-     */
-    public function update_toolbar_menu($hidden_slugs, $bypass_key)
-    {
-        global $wp_admin_bar;
-
-        foreach ($hidden_slugs as $slug) {
-            $node = $wp_admin_bar->get_node($slug);
-
-            if ($node && isset($node->href)) {
-                if (strpos($node->href, $bypass_key) === false) {
-                    $updated_href = add_query_arg($this->config->option_name, $bypass_key, $node->href);
-                    $node->href = $updated_href;
-                    $wp_admin_bar->add_menu($node);
-                }
-            }
-        }
-
-        $this->debugger->log_event('Admin bar menu updated?', 'Yes');
-        $this->debugger->log_event('Admin bar menu was updated at');
+        return false;
     }
 
     /**
-     * Function to restrict access to hidden menu items.
-     *
-     * @since   1.0.0
+     * Set a transient admin notice
      */
-    public function restrict_menu_access()
+    private function set_bypass_notice(): void
     {
+        set_transient('hdmi_admin_notice_transient', [
+            'message'     => 'You are on bypass mode!',
+            'type'        => 'warning',
+            'dismissible' => false,
+        ]);
+    }
 
-        $hidden_db_menu = $this->storage_manager->get_hidden_db_menu();
-        $hidden_tb_menu = $this->storage_manager->get_hidden_tb_menu();
+    /**
+     * Handle bypass form submission
+     */
+    public function bypass_form_handler(): void
+    {
+        static $has_run = false;
+        if ($has_run) return;
+        $has_run = true;
 
-        if (empty($hidden_db_menu) && empty($hidden_tb_menu)) {
+        $key = Hide_Dashboard_Menu_Items_Config::bypass_passcode_key();
+
+        if (
+            !isset($_POST['_bypass_gateway_nonce'], $_POST[$key], $_POST['_wp_http_referer']) ||
+            !check_admin_referer('_bypass_gateway_action', '_bypass_gateway_nonce')
+        ) {
             return;
         }
 
-        $bypass_active = $this->storage_manager->is_bypass_active();
-        $bypass_param = $this->storage_manager->get_bypass_param();
-        $bypass_param_key = $this->config->option_name;
+        error_log(__METHOD__ . ' executing');
 
-        $has_access = $bypass_active && isset($_GET[$bypass_param_key]) && sanitize_text_field($_GET[$bypass_param_key]) === $bypass_param;
+        $input_code    = sanitize_text_field(wp_unslash($_POST[$key]));
+        $referer_url   = sanitize_url(wp_unslash($_POST['_wp_http_referer']));
+        $stored_code   = Hide_Dashboard_Menu_Items_Storage_Manager::get_bypass_code();
 
-        $hidden_all = array_merge($hidden_db_menu, $hidden_tb_menu);
+        if ($input_code === $stored_code) {
+            $this->debugger->log_debug('Bypass Granted?', 'Bypass access granted on' . current_time('Y-m-d H:i:s'));
 
-        $current_screen = isset($_GET['page']) ? sanitize_text_field($_GET['page']) : basename($_SERVER['PHP_SELF']);
+            $url = wp_nonce_url($referer_url, 'bypass_enabled_action', '_bypass_url_nonce');
 
-        foreach ($hidden_all as $slug) {
-            if (
-                strpos($_SERVER['REQUEST_URI'], $slug) !== false
-                || $current_screen === $slug
-            ) {
-                // allow access
-                if ($has_access) {
-                    return;
-                }
+            $this->set_bypass_notice();
+            wp_safe_redirect($url);
+            exit;
+        }
+    }
 
-                // Restrict access
-                status_header(403);
-                nocache_headers();
-                exit;
-            }
+    /**
+     * Decide whether to show the gateway
+     */
+    private function maybe_render_gateway(bool $is_restricted): void
+    {
+        if (!$is_restricted) return;
+
+        if (!$this->is_bypass_verified()) {
+            status_header(403);
+            $this->access_gateway_markup();
+            exit;
+        }
+
+        $this->set_bypass_notice();
+    }
+
+    /**
+     * Output access gateway markup
+     */
+    public function access_gateway_markup(): void
+    {
+        $bypass_active = Hide_Dashboard_Menu_Items_Storage_Manager::is_bypass_active();
+        $bypass_key    = Hide_Dashboard_Menu_Items_Config::bypass_passcode_key();
+        $form_action   = admin_url("admin-post.php");
+
+        echo "<div class='wrap'>";
+        echo "<h1>🔒 Access Restricted</h1>";
+
+        if ($bypass_active) {
+            echo '<p>This page is hidden. If you have setup a passcode, enter it below:</p>';
+            echo "<form method='post' action='" . esc_attr($form_action) . "'>";
+            wp_nonce_field('_bypass_gateway_action', '_bypass_gateway_nonce');
+            echo "<input type='text' name='" . esc_attr($bypass_key) . "' class='regular-text' placeholder='Enter passcode' autocomplete='off' required />";
+            submit_button('Unlock Access');
+            echo "</form>";
+        } else {
+            echo "<p>This page is hidden and direct access is not allowed by admin.</p>";
+        }
+
+        echo "</div>";
+    }
+
+    /**
+     * Restrict access to hidden items
+     */
+    public function menu_access_gateway(WP_Screen $screen): void
+    {
+        static $has_run = false;
+        if ($has_run) return;
+        $has_run = true;
+
+        if (
+            !is_admin() ||
+            Hide_Dashboard_Menu_Items_Storage_Manager::has_scan_started() ||
+            !Hide_Dashboard_Menu_Items_Storage_Manager::is_restrict_active()
+        ) {
+            return;
+        }
+
+        error_log(__METHOD__ . ' executing');
+
+        $dashboard_items = Hide_Dashboard_Menu_Items_Storage_Manager::get_restricted_dashboard();
+        $admin_bar_items = Hide_Dashboard_Menu_Items_Storage_Manager::get_restricted_admin_bar();
+
+        foreach (array_merge($dashboard_items, $admin_bar_items) as $slug) {
+            $restricted = $this->accessing_same_menu($slug, $screen);
+            $this->maybe_render_gateway($restricted);
         }
     }
 }

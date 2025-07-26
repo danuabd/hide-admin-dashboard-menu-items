@@ -64,27 +64,103 @@
   background-color: var(--hdmi-light-gray);
   border: 1px solid var(--hdmi-border);
   border-radius: 6px;
-  padding: 1rem;
+  padding: 2em 1.5em;
   font-size: 0.875rem;
   overflow-x: auto;
-  white-space: pre-wrap;
   word-break: break-word;
 }
 
-#hdmi__debug .hdmi__copy-button {
+#hdmi__copy-debug,
+#hdmi__copy-error {
   margin-bottom: 1rem;
 }
 
-.hdmi__debug-section.hdmi__debug-help {
+/* ---------------------------------------------------
+   DEBUG SECTION
+--------------------------------------------------- */
+.hdmi__log-box li {
+  font-size: 1rem;
+  color: #202020;
+  line-height: 1;
   margin-bottom: 0;
 }
 
+.hdmi__log-box li strong {
+  display: inline-block;
+  color: #004a7c;
+}
+
+.hdmi__log-box > ul {
+  display: flex;
+  flex-direction: column;
+  list-style-position: inside;
+  list-style-type: square;
+  gap: 2rem;
+  color: var(--hdmi-muted-text);
+  padding: 0;
+  margin: 0 0 0.5rem 0;
+}
+
+.hdmi__log-box ul > li > strong {
+  margin-right: 0.5rem;
+}
+
+/* List inside a list item */
+.hdmi__has-list-inside {
+  white-space-collapse: collapse;
+}
+
+.hdmi__has-list-inside > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  list-style-position: inside;
+  list-style-type: none;
+  color: var(--hdmi-muted-text);
+  padding: 0;
+  margin-left: 2rem;
+}
+
+.hdmi__list-after,
+.hdmi__inside-list {
+  margin-bottom: 1.5rem;
+}
+
+.hdmi__list-after:last-child,
+.hdmi__inside-list:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------
+   ERROR SECTION
+--------------------------------------------------- */
+#hdmi__error-box {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+#hdmi__error-box li {
+  list-style-type: none;
+}
+
+#hdmi__error-box strong {
+  color: var(--hdmi-red);
+}
+
+#hdmi__error-box li:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------
+   HELP SECTION
+--------------------------------------------------- */
 .hdmi__debug-help {
-  font-size: 0.9rem;
+  font-size: 1rem;
   background: var(--hdmi-light-gray);
   border: 1px solid var(--hdmi-border);
   padding: 1rem;
   border-radius: 6px;
+  margin-bottom: 0;
 }
 
 .hdmi__debug-help a {
@@ -94,90 +170,4 @@
 
 .hdmi__debug-help a:hover {
   text-decoration: underline;
-}
-
-/* ---------------------------------------------------
-   DEBUG LIST FORMATTING (NESTED UL)
---------------------------------------------------- */
-#hdmi__debug strong {
-  display: inline-block;
-}
-
-.hdmi__error-box {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.hdmi__log-box > ul {
-  margin: 0 0 0.5rem 1rem;
-  padding: 0;
-  list-style-type: disc;
-  color: var(--hdmi-muted-text);
-  font-family: monospace;
-  font-size: 0.875rem;
-}
-
-.hdmi__log-box > ul > li {
-  color: #202020;
-  margin-bottom: 0;
-}
-
-.hdmi__debug-box > ul > li > strong {
-  color: #004a7c;
-  margin-bottom: 1rem;
-}
-
-.hdmi__error-box > ul > li > strong {
-  color: var(--hdmi-red);
-  margin-bottom: 1rem;
-}
-
-.hdmi__log-box > ul > li > ul {
-  color: #202020;
-  font-weight: 400;
-}
-
-.hdmi__log-box > ul > li > ul > li {
-  color: #2c3338;
-  font-weight: 400;
-}
-
-.hdmi__log-box > ul > li > ul > li:last-child {
-  margin-bottom: 1rem;
-}
-
-.hdmi__log-box > ul > li > ul > li > strong {
-  color: #202020;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-.hdmi__log-box > ul > li > ul > li > ul {
-  color: #202020;
-  font-weight: 400;
-}
-
-.hdmi__log-box > ul > li > ul > li > ul > li {
-  color: #2c3338;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-.hdmi__log-box > ul > li > ul > li > ul > li > strong {
-  color: #202020;
-  font-weight: 400;
-  margin-bottom: 0.5rem;
-}
-
-.hdmi__log-box > ul > li > ul > li > ul > li:last-child {
-  margin-bottom: 1rem;
-}
-
-.hdmi__log-box li {
-  line-height: 1.4;
-}
-
-.hdmi__log-box ul > li > ul > li > ul > li > ul > li > strong {
-  color: #2c3338;
-  font-weight: 400;
 }

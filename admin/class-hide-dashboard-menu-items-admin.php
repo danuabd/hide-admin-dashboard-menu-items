@@ -23,7 +23,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @access   private
 	 * @var      string    $plugin_name    ID of this plugin.
 	 */
-	private $plugin_name;
+	private $plugin_name = HDMI_PLUGIN_NAME;
 
 	/**
 	 * Version of this plugin.
@@ -32,25 +32,7 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @access   private
 	 * @var      string    $version    current version of this plugin.
 	 */
-	private $version;
-
-	/**
-	 * Instance of Config class.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      Hide_Dashboard_Menu_Items_Config    $config    Instance of Config class.
-	 */
-	private $config;
-
-	/**
-	 * Instance of storage manager of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      Hide_Dashboard_Menu_Items_Storage_Manager    $storage_manager    Instance of storage manager of this plugin.
-	 */
-	private $storage_manager;
+	private $version = HDMI_VERSION;
 
 	/**
 	 * Instance of admin settings class of this plugin.
@@ -104,10 +86,8 @@ class Hide_Dashboard_Menu_Items_Admin
 	 * @param	string	$plugin_name	The name of this plugin.
 	 * @param	string	$version		The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version)
+	public function __construct()
 	{
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
 		$this->load_dependencies();
 	}
 
@@ -120,7 +100,6 @@ class Hide_Dashboard_Menu_Items_Admin
 	private function load_dependencies()
 	{
 		$file_path = plugin_dir_path(__FILE__);
-		require_once $file_path . 'class-config.php';
 		require_once $file_path . 'class-settings-manager.php';
 		require_once $file_path . 'class-debugger.php';
 		require_once $file_path . 'class-scanner.php';
@@ -128,23 +107,16 @@ class Hide_Dashboard_Menu_Items_Admin
 		require_once $file_path . 'class-access-manager.php';
 		require_once $file_path . 'class-storage-manager.php';
 
-		$this->config = new Hide_Dashboard_Menu_Items_Config($this->plugin_name, $this->version);
+		$this->debugger = new Hide_Dashboard_Menu_Items_Debugger();
 
-		$this->storage_manager = new Hide_Dashboard_Menu_Items_Storage_Manager($this->config);
+		$this->notice_manager = new Hide_Dashboard_Menu_Items_Notice_Manager();
 
-		$this->debugger = new Hide_Dashboard_Menu_Items_Debugger($this->config, $this->storage_manager);
+		$this->settings_manager = new Hide_Dashboard_Menu_Items_Admin_Settings($this->debugger, $this->notice_manager);
 
-		$this->notice_manager  = new Hide_Dashboard_Menu_Items_Notice_Manager();
-
-		$this->settings_manager = new Hide_Dashboard_Menu_Items_Admin_Settings($this->config, $this->storage_manager, $this->debugger, $this->notice_manager);
-
-		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->config, $this->storage_manager, $this->debugger, $this->notice_manager);
+		$this->scanner = new Hide_Dashboard_Menu_Items_Scanner($this->debugger, $this->notice_manager);
 
 		$this->access_manager   = new Hide_Dashboard_Menu_Items_Access_Manager(
-			$this->config,
-			$this->storage_manager,
 			$this->debugger,
-			$this->notice_manager
 		);
 	}
 }

@@ -18,7 +18,6 @@ class Hide_Dashboard_Menu_Items_Activator
 	 */
 	public static function activate()
 	{
-		$domain = 'hide-dashboard-menu-items';
 		$hasError = false;
 		$error_message = '';
 
@@ -36,8 +35,8 @@ class Hide_Dashboard_Menu_Items_Activator
 		if ($hasError) {
 			deactivate_plugins(plugin_basename(dirname(__DIR__) . '/hide-dashboard-menu-items.php'));
 			wp_die(
-				esc_html__('Plugin activation failed: ', $domain) . $error_message,
-				esc_html__('Plugin Activation Error', $domain),
+				esc_html__('Plugin activation failed: ', 'hide-dashboard-menu-items') . esc_html($error_message),
+				esc_html__('Plugin Activation Error', 'hide-dashboard-menu-items'),
 				array('back_link' => true)
 			);
 		}

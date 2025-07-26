@@ -56,8 +56,8 @@ class Hide_Dashboard_Menu_Items
 	 */
 	public function __construct()
 	{
-		if (defined('HIDE_DASHBOARD_MENU_ITEMS_VERSION')) {
-			$this->version = HIDE_DASHBOARD_MENU_ITEMS_VERSION;
+		if (constant('HDMI_VERSION')) {
+			$this->version = constant('HDMI_VERSION');
 		} else {
 			$this->version = '1.0.0';
 		}
@@ -65,8 +65,6 @@ class Hide_Dashboard_Menu_Items
 
 		$this->load_dependencies();
 		$this->define_admin_hooks();
-
-		date_default_timezone_set('Asia/Colombo');
 	}
 
 	/**
@@ -112,25 +110,83 @@ class Hide_Dashboard_Menu_Items
 
 		$plugin_admin = new Hide_Dashboard_Menu_Items_Admin($this->get_plugin_name(), $this->get_version());
 
-		// Fires as an admin screen or script is being initialized.
-		$this->loader->add_action('admin_init', $plugin_admin->settings_manager, 'register_settings', 10);
-		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'restrict_menu_access');
-		$this->loader->add_action('admin_init', $plugin_admin->scanner, 'scan', 999);
+		/*---------------------------------------------------------
+			Fires before the administration menu loads in the admin.
+		-----------------------------------------------------------
+		*/
 
-
-		// Fires before the administration menu loads in the admin.
 		$this->loader->add_action('admin_menu', $plugin_admin->settings_manager, 'add_admin_menu');
-		$this->loader->add_action('admin_menu', $plugin_admin->access_manager, 'hide_dashboard_menu');
 
-		// Loads all necessary admin bar items.
-		$this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'hide_toolbar_menu');
+		/*---------------------------------------------------------
+			Fires as an admin screen or script is being initialized.
+		-----------------------------------------------------------
+		*/
 
-		// Prints admin screen notices.
-		$this->loader->add_action('admin_notices', $plugin_admin->notice_manager, 'render_notices');
+		$this->loader->add_action('admin_init', $plugin_admin->settings_manager, 'register_settings', 10);
 
-		// Runs in the HTML header so a plugin or theme can enqueue JavaScript and CSS to all admin pages.
+		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'bypass_form_handler', 12);
+
+		$this->loader->add_action('admin_init', $plugin_admin->scanner, 'init_scan_handler', 14);
+
+		$this->loader->add_action('admin_init', $plugin_admin->scanner, 're_scan_handler', 16);
+
+		$this->loader->add_action('admin_init', $plugin_admin->scanner, 'scan_dashboard', 18);
+
+		$this->loader->add_action('admin_init', $plugin_admin->access_manager, 'remove_hidden_dashboard_items', 999);
+
+		/*---------------------------------------------------------
+			Prints admin screen notices.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action('admin_notices', $plugin_admin->notice_manager, 'render_plugin_notices');
+
+		$this->loader->add_action('admin_notices', $plugin_admin->notice_manager, 'render_transient_notice');
+
+		/*---------------------------------------------------------
+			Fires after the current screen has been set.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action('current_screen', $plugin_admin->access_manager, 'menu_access_gateway');
+
+		/*---------------------------------------------------------
+			Enqueue JavaScript and CSS to all admin pages.
+		-----------------------------------------------------------
+		*/
+
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_styles');
+
 		$this->loader->add_action('admin_enqueue_scripts', $plugin_admin->settings_manager, 'enqueue_scripts');
+
+		/*---------------------------------------------------------
+			Fires before the admin bar is rendered.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action('wp_before_admin_bar_render', $plugin_admin->access_manager, 'remove_hidden_admin_bar_items');
+
+		/*---------------------------------------------------------
+			Fires after the admin bar is ready.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action('admin_bar_menu', $plugin_admin->scanner, 'scan_admin_bar', 999999);
+
+		/*---------------------------------------------------------
+			Fires after the value of a specific option
+			has been successfully updated.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action("update_option_" . Hide_Dashboard_Menu_Items_Config::settings_option(), $plugin_admin->settings_manager, 'collect_hidden_menu_children', 10, 3);
+
+		/*---------------------------------------------------------
+			Fires just before PHP shuts down execution.
+		-----------------------------------------------------------
+		*/
+
+		$this->loader->add_action('admin_footer', $plugin_admin->scanner, 'finish_scan');
 	}
 
 	/**
