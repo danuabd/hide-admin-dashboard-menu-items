@@ -14,6 +14,10 @@ if (! defined('WP_UNINSTALL_PLUGIN')) {
 	exit;
 }
 
-require_once plugin_dir_path(__FILE__) . './admin/class-storage-manager.php';
 
-Hide_Dashboard_Menu_Items_Storage_Manager::delete_plugin_data('hide-admin-dashboard-menu-items');
+delete_option(Hide_Dashboard_Menu_Items_Config::settings_option());
+delete_option(Hide_Dashboard_Menu_Items_Config::dashboard_option());
+delete_option(Hide_Dashboard_Menu_Items_Config::admin_bar_option());
+delete_option(Hide_Dashboard_Menu_Items_Config::debug_option());
+delete_option(Hide_Dashboard_Menu_Items_Config::error_option());
+delete_option(Hide_Dashboard_Menu_Items_Config::scan_success_option());

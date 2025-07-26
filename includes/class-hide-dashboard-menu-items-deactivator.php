@@ -15,12 +15,16 @@ class Hide_Dashboard_Menu_Items_Deactivator
 {
 
 	/**
+	 * Deactivate plugin
+	 * 
 	 * @since    1.0.1
 	 */
 	public static function deactivate()
 	{
-		require_once plugin_dir_path(__FILE__) . '../admin/class-storage-manager.php';
 
-		Hide_Dashboard_Menu_Items_Storage_Manager::delete_plugin_data('hide-admin-dashboard-menu-items');
+		delete_option(Hide_Dashboard_Menu_Items_Config::dashboard_option());
+		delete_option(Hide_Dashboard_Menu_Items_Config::admin_bar_option());
+		delete_option(Hide_Dashboard_Menu_Items_Config::debug_option());
+		delete_option(Hide_Dashboard_Menu_Items_Config::scan_success_option());
 	}
 }
