@@ -51,12 +51,12 @@
   font-size: 1.25rem;
 }
 
-#hdmi__rescan-button,
+#hdmi__scan-inner-button,
 #hdmi__save-button {
   font-size: 0.875rem;
 }
 
-#hdmi__rescan-button {
+#hdmi__scan-inner-button {
   margin-bottom: 6px;
 }
 
@@ -230,7 +230,7 @@
   overflow: hidden;
 }
 
-#hdmi-scan svg {
+#hdmi-scan__background {
   position: absolute;
   top: 0;
   left: 0;
@@ -247,19 +247,6 @@
 #hdmi-scan form {
   position: relative;
   z-index: 1;
-}
-
-#hdmi-scan__background {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-#hdmi-scan__background-icons {
-  stroke: none;
-  fill-rule: evenodd;
-  fill: #000;
-  fill-opacity: 0.06;
 }
 
 #hdmi-scan__figure {
@@ -339,31 +326,43 @@
 /* ---------------------------------------------------
    RE-SCAN
 --------------------------------------------------- */
-#hdmi__rescan {
+#hdmi__scan-wrapper {
   margin-bottom: 4rem;
 }
 
-#hdmi__rescan-description {
+#hdmi__scan-inner-description {
   display: block;
   font-style: italic;
 }
 
+#hdmi__rescan-button {
+  margin-bottom: 0.4rem;
+}
+
 /* ---------------------------------------------------
-   BYPASS
+   RESTRICT & restrict
 --------------------------------------------------- */
+#hdmi__restrict-settings {
+  display: block;
+  margin-bottom: 4rem;
+}
+
 #hdmi__bypass-settings {
   display: none;
 }
 
+#hdmi__restrict-description,
 #hdmi__bypass-description {
   font-size: 0.9rem;
   margin: 0 0 2rem 0;
 }
 
+#hdmi__restrict-toggle-wrapper,
 #hdmi__bypass-toggle-wrapper {
   margin-bottom: 1rem;
 }
 
+#hdmi__restrict-label,
 #hdmi__bypass-label {
   display: block;
   margin-bottom: 8px;

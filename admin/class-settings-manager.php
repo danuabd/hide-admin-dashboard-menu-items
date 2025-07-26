@@ -16,24 +16,6 @@ if (!defined('ABSPATH')) {
 class Hide_Dashboard_Menu_Items_Admin_Settings
 {
     /**
-     * Holds configuration class instance.
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Config    $config
-     */
-    private $config;
-
-    /**
-     * Holds storage manager class instance.
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
-     */
-    private $storage_manager;
-
-    /**
      * Holds debugger class instance.
      * 
      * @since   1.0.0
@@ -73,19 +55,13 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      * Initialize class with required instances
      * 
      * @since   1.0.0
-     * @param   Hide_Dashboard_Menu_Items_Config            $config
-     * @param   Hide_Dashboard_Menu_Items_Storage_Manager   $storage_manager
      * @param   Hide_Dashboard_Menu_Items_Debugger          $debugger
      * @param   Hide_Dashboard_Menu_Items_Notice_Manager    $notice_manager
      */
     public function __construct(
-        Hide_Dashboard_Menu_Items_Config $config,
-        Hide_Dashboard_Menu_Items_Storage_Manager $storage_manager,
         Hide_Dashboard_Menu_Items_Debugger $debugger,
         Hide_Dashboard_Menu_Items_Notice_Manager $notice_manager
     ) {
-        $this->config = $config;
-        $this->storage_manager = $storage_manager;
         $this->debugger = $debugger;
         $this->notice_manager = $notice_manager;
     }
@@ -97,10 +73,14 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      */
     public function register_settings()
     {
+        static $has_run = false;
+
+        if ($has_run) return;
+        $has_run = true;
 
         register_setting(
-            $this->config::OPTION_GROUP,
-            $this->config::SETTINGS_OPTION,
+            Hide_Dashboard_Menu_Items_Config::option_group(),
+            Hide_Dashboard_Menu_Items_Config::settings_option(),
             array($this, 'sanitize_submissions')
         );
     }
@@ -112,23 +92,28 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      */
     public function add_admin_menu()
     {
+        static $has_run = false;
+
+        if ($has_run) return;
+        $has_run = true;
+
         // Add a new top-level menu item.
         $this->settings_page_hook_suffix =  add_menu_page(
             'Configure Hide Menu Items',
             __('Hide Menu Items', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config->settings_page_slug,
+            Hide_Dashboard_Menu_Items_Config::settings_slug(),
             array($this, 'render_settings_page'),
             'dashicons-hidden',
             99
         );
 
         $this->debug_page_hook_suffix = add_submenu_page(
-            $this->config->settings_page_slug,
+            Hide_Dashboard_Menu_Items_Config::settings_slug(),
             __('Debug Info', 'hide-dashboard-menu-items'),
             __('Debug Info', 'hide-dashboard-menu-items'),
             'manage_options',
-            $this->config->debug_page_slug,
+            Hide_Dashboard_Menu_Items_Config::debug_slug(),
             [$this->debugger, 'render_debug_page']
         );
     }
@@ -143,10 +128,10 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
     public function register_fields_and_sections()
     {
         add_settings_section(
-            $this->config->plugin_name . '_settings_section',
+            constant('HDMI_PLUGIN_NAME') . '_settings_section',
             '',
             '__return_false',
-            $this->config->settings_page_slug
+            Hide_Dashboard_Menu_Items_Config::settings_slug()
         );
     }
 
@@ -161,14 +146,15 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             return;
         }
 
-        $settings_page_slug = $this->config->settings_page_slug;
-        $scan_completed = $this->storage_manager->get_scan_status_cache();
-        $dashboard_menu = $this->storage_manager->get_dashboard_menu_cache();
-        $admin_bar_menu = $this->storage_manager->get_admin_bar_menu_cache();
-        $hidden_dashboard_menu = $this->storage_manager->get_hidden_dashboard_menu();
-        $hidden_admin_bar_menu = $this->storage_manager->get_hidden_admin_bar_menu();
-        $is_bypass_enabled = $this->storage_manager->is_bypass_active();
-        $bypass_parameter = $this->storage_manager->get_bypass_param();
+        $settings_page_slug = Hide_Dashboard_Menu_Items_Config::settings_slug();
+        $scan_completed = Hide_Dashboard_Menu_Items_Storage_Manager::get_scan_status_cache();
+        $hidden_dashboard = Hide_Dashboard_Menu_Items_Storage_Manager::get_hidden_dashboard();
+        $hidden_admin_bar = Hide_Dashboard_Menu_Items_Storage_Manager::get_hidden_admin_bar();
+        $dashboard = Hide_Dashboard_Menu_Items_Storage_Manager::get_dashboard_cache();
+        $admin_bar = Hide_Dashboard_Menu_Items_Storage_Manager::get_admin_bar_cache();
+        $is_restrict_enabled = Hide_Dashboard_Menu_Items_Storage_Manager::is_restrict_active();
+        $is_bypass_enabled = Hide_Dashboard_Menu_Items_Storage_Manager::is_bypass_active();
+        $bypass_code = Hide_Dashboard_Menu_Items_Storage_Manager::get_bypass_code();
 
         require_once plugin_dir_path(__FILE__) . 'partials/hide-dashboard-menu-items-admin-display.php';
     }
@@ -182,9 +168,9 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
      */
     public function sanitize_settings($user_input)
     {
-        $this->debugger->log_debug('Settings form last submitted', current_time('sql'));
+        $this->debugger->log_debug('Settings form last submitted', current_time('Y-M-D H:i'));
 
-        if (!is_array($user_input)) {
+        if (!is_array($user_input || empty($user_input))) {
             return [];
         }
 
@@ -202,12 +188,96 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
         $sanitized = array_map($sanitize_recursive, $user_input);
 
         if (!empty($sanitized)) {
-            $this->debugger->log_debug('Settings last updated', current_time('sql'));
+            $this->debugger->log_debug('Settings last updated', current_time('Y-M-D H:i'));
         }
 
-        $this->notice_manager->add_notice('settings_updated', __('Settings have been updated.', 'hide-dashboard-menu-items'), 'success');
+        $this->notice_manager->add_plugin_notice(__('Settings have been updated.', 'hide-dashboard-menu-items'), 'success');
+
         return $sanitized;
     }
+
+    /**
+     * Store hidden menu children in storage
+     *
+     * @since   1.0.1
+     * @param   array $old_value Old value
+     * @param   array $new_value New value
+     */
+    public function collect_hidden_menu_children($old_value, $new_value)
+    {
+        static $has_run = false;
+
+        if ($has_run) return;
+        $has_run = true;
+
+        $dashboard_key = Hide_Dashboard_Menu_Items_Config::hidden_dashboard_key();
+        $admin_bar_key = Hide_Dashboard_Menu_Items_Config::hidden_admin_bar_key();
+
+        // Extract menu values
+        $old_dashboard = $old_value[$dashboard_key] ?? [];
+        $old_admin_bar = $old_value[$admin_bar_key] ?? [];
+
+        $new_dashboard = $new_value[$dashboard_key] ?? [];
+        $new_admin_bar = $new_value[$admin_bar_key] ?? [];
+
+        $dashboard_changed = $old_dashboard === $new_dashboard;
+        $admin_bar_changed = $old_admin_bar === $new_admin_bar;
+
+        if (!$dashboard_changed && !$admin_bar_changed) {
+            return;
+        }
+
+        error_log('collect_hidden_menu_children executing');
+
+        // Handle dashboard menu
+        if (!empty($new_dashboard) && isset($GLOBALS['menu'])) {
+            global $submenu;
+
+            $restricted_dashboard_links = [];
+
+            foreach ($new_dashboard as $parent_slug) {
+                $restricted_dashboard_links[] = $parent_slug;
+
+                if (!empty($submenu[$parent_slug])) {
+                    foreach ($submenu[$parent_slug] as $item) {
+                        if (isset($item[2])) {
+                            $restricted_dashboard_links[] = $item[2];
+                        }
+                    }
+                }
+            }
+
+            Hide_Dashboard_Menu_Items_Storage_Manager::update_restricted_dashboard($restricted_dashboard_links);
+        }
+
+        // Handle admin bar menu
+        if (!empty($new_admin_bar) && isset($GLOBALS['wp_admin_bar'])) {
+            global $wp_admin_bar;
+
+            $children_cache = Hide_Dashboard_Menu_Items_Storage_Manager::get_admin_bar_children_cache();
+            if (empty($children_cache)) return;
+
+            $restricted_admin_links = [];
+
+            foreach ($new_admin_bar as $id) {
+                $node = $wp_admin_bar->get_node($id);
+                if (!empty($node->href)) {
+                    $restricted_admin_links[] = $node->id;
+                }
+
+                if (!empty($children_cache[$id])) {
+                    foreach ($children_cache[$id] as $child) {
+                        if (isset($child['id'])) {
+                            $restricted_admin_links[] = $child['id'];
+                        }
+                    }
+                }
+            }
+
+            Hide_Dashboard_Menu_Items_Storage_Manager::update_restricted_admin_bar($restricted_admin_links);
+        }
+    }
+
 
     /**
      * Register the stylesheets for the admin area.
@@ -222,12 +292,12 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
 
         // load styles in plugin admin settings & debug page
         if ($hook_suffix === $this->settings_page_hook_suffix || $hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config->settings_page_slug, $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
+            wp_enqueue_style(Hide_Dashboard_Menu_Items_Config::settings_slug(), $css_base_url . 'admin.css', array(), filemtime($css_base_path . 'admin.css'), 'all');
         }
 
         // load styles only in plugin debug page
         if ($hook_suffix === $this->debug_page_hook_suffix) {
-            wp_enqueue_style($this->config->debug_page_slug, $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
+            wp_enqueue_style(Hide_Dashboard_Menu_Items_Config::debug_slug(), $css_base_url . 'debug.css', array(), filemtime($css_base_path . 'debug.css'), 'all');
         }
     }
 
@@ -244,6 +314,6 @@ class Hide_Dashboard_Menu_Items_Admin_Settings
             return;
         }
 
-        wp_enqueue_script($this->config->plugin_name, plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', false);
+        wp_enqueue_script(constant('HDMI_PLUGIN_NAME'), plugin_dir_url(__FILE__) . 'js/hide-dashboard-menu-items-admin.js', array(), filemtime(plugin_dir_path(__FILE__) . 'js/hide-dashboard-menu-items-admin.js'), false);
     }
 }
