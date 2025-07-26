@@ -13,71 +13,72 @@
 if (!defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
+
 class Hide_Dashboard_Menu_Items_Storage_Manager
 {
-
-    /**
-     * Instance of config class of this plugin.
-     * 
-     * @since   1.0.0
-     * @access  protected
-     * @var     Hide_Dashboard_Menu_Items_Config    $config
-     */
-    private $config;
-
-    /**
-     * Plugin name.
-     * 
-     * @since   1.0.1
-     * @access  protected
-     * @var     string    $plugin_name
-     */
-    private static $plugin_name;
 
     /**
      * Stores cache of plugin settings.
      * 
      * @since   1.0.0
      * @access  protected
-     * @var     array[]    $plugin_settings_cache   Holds plugin settings as a cache.
+     * @var     array[]    $settings_cache   Holds plugin settings as a cache.
      */
-    private $plugin_settings_cache = null;
+    private static $settings_cache = null;
 
     /**
      * Holds cache of dashboard menu.
      * 
      * @since   1.0.0
      * @access  protected
-     * @var     array[]    $dashboard_menu_cache   Holds dashboard menu as a cache.
+     * @var     array[]    $dashboard_cache   Holds dashboard menu as a cache.
      */
-    private $dashboard_menu_cache = array();
+    private static $dashboard_cache = array();
+
+    /**
+     * Holds cache of dashboard menu children.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     array[]    $dashboard_children_cache   Holds dashboard menu children as a cache.
+     */
+    private static $dashboard_children_cache = array();
 
     /**
      * Holds cache of admin bar menu.
      * 
      * @since   1.0.0
      * @access  protected
-     * @var     array[]    $admin_bar_menu_cache   Holds admin bar menu as a cache.
+     * @var     array[]    $admin_bar_cache   Holds admin bar menu as a cache.
      */
-    private $admin_bar_menu_cache = array();
+    private static $admin_bar_cache = array();
+
+    /**
+     * Holds cache of admin bar menu children.
+     * 
+     * @since   1.0.0
+     * @access  protected
+     * @var     array[]    $admin_bar_children_cache   Holds admin bar menu children as a cache.
+     */
+    private static $admin_bar_children_cache = array();
 
     /**
      * Holds cache of debug log.
      * 
      * @since   1.0.0
      * @access  protected
-     * @var     array[]    $debug_log_cache   Holds debug log as a cache.
+     * @var     array[]    $debug_log   Holds debug log as a cache.
      */
-    private $debug_log_cache = array();
+    private static $debug_log = array();
 
     /**
      * Holds cache of error log.
      * 
      * @since   1.0.0
      * @access  protected
-     * @var     array[]    $error_log_cache   Holds error log as a cache.
+     * @var     array[]    $error_log   Holds error log as a cache.
      */
-    private $error_log_cache = array();
+    private static $error_log = array();
 
     /**
      * Holds cache of scan status.
@@ -86,51 +87,85 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @access  protected
      * @var     array[]    $scan_status   Holds scan status as a cache.
      */
-    private $scan_status = false;
+    private static $scan_status = false;
 
     /**
-     * Initialize class with required instances.
-     * 
-     * @since   1.0.0
-     * @param   Hide_Dashboard_Menu_Items_Config    $config
+     * Retrieve an option.
+     *
+     * @since 1.0.1
+     * @param string    $option_name    The option to retrieve.
+     * @param mixed     $default        Default value.
+     * @return mixed
      */
-    public function __construct(Hide_Dashboard_Menu_Items_Config $config)
+    private static function get_array_option($option_name, $default = [])
     {
-        $this->config = $config;
-        self::$plugin_name = $this->config->plugin_name;
+        return get_option($option_name, $default);
     }
 
     /**
-     * Get a saved settings from storage.
-     * 
-     * These are the settings can be obtained:
-     * 
-     * 1 - Hidden dashboard (array[]) / admin bar menu items (string[])
-     * 
-     * 2 - Bypass parameter (?hdmi=[parameter])
-     * 
-     * 3 - Bypass enabled status (true|false)
-     * 
-     * @since   1.0.1
-     * @param   string  $setting_key
-     * @param   mixed   $default_value
-     * @return  mixed   Returns if the option exists in database. Otherwise the $default value.
+     * Update an entry in option.
+     *
+     * @since 1.0.1
+     * @param string    $option_name    The key to retrieve from plugin settings.
+     * @param string    $key            Key to find the entry.
+     * @param mixed     $value          Value to update.
+     * @return mixed
      */
-    private function get_plugin_setting($setting_key, $default_value = array())
+    private static function update_array_option($option_name, $key, $value)
     {
-        if ($this->plugin_settings_cache === null) {
+        $data = self::get_array_option($option_name, []);
+        $data[$key] = $value;
+        return update_option($option_name, $data);
+    }
 
-            $this->plugin_settings_cache = get_option(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION, []);
+    /**
+     * Retrieve a specific key from a multidimensional option array (with lazy cache).
+     *
+     * @since 1.0.1
+     * @param string $key           The key to retrieve from plugin settings.
+     * @param mixed  $default       Default value if not found.
+     * @return mixed
+     */
+    private static function get_plugin_setting($key, $default = null)
+    {
+        if (self::$settings_cache === null) {
+            self::$settings_cache = self::get_array_option(Hide_Dashboard_Menu_Items_Config::settings_option());
         }
 
-        if (empty($this->plugin_settings_cache) || !isset($this->plugin_settings_cache[$setting_key])) return $default_value;
-
-        return $this->plugin_settings_cache;
+        return isset(self::$settings_cache[$key]) ? self::$settings_cache[$key] : $default;
     }
 
-    // --------------------------------------------------
-    // get values using keys
-    // --------------------------------------------------
+    /**
+     * Update a specific key inside plugin settings array.
+     *
+     * @since 1.0.1
+     * @param string $key
+     * @param mixed  $value
+     * @return bool
+     */
+    private static function update_plugin_setting($key, $value)
+    {
+        if ($value === null) return false;
+
+        self::update_array_option(Hide_Dashboard_Menu_Items_Config::settings_option(), $key, $value);
+    }
+
+
+
+    /* --------------------------------------------------
+        get values using keys
+    ----------------------------------------------------- */
+
+    /**
+     * Check if submenu restriction is enabled.
+     * 
+     * @since   1.0.1
+     * @return  boolean     Returns true if submenu restrict is enabled. Otherwise false.
+     */
+    public static function is_restrict_active()
+    {
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::restrict_status_key(), false);
+    }
 
     /**
      * Check if bypass feature is set as active.
@@ -138,20 +173,20 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  boolean     Returns true if bypass is enabled. Otherwise false.
      */
-    public function is_bypass_active()
+    public static function is_bypass_active()
     {
-        return $this->get_plugin_setting(Hide_Dashboard_Menu_Items_Config::BYPASS_STATUS_KEY, false);
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::bypass_status_key(), false);
     }
 
     /**
      * Get bypass parameter from storage.
      * 
      * @since   1.0.1
-     * @return  string|null      Returns Bypass key if Bypass query parameter exists on database. Otherwise null.
+     * @return  string|null      Returns Bypass key if Bypass parameter exists on database. Otherwise null.
      */
-    public function get_bypass_param()
+    public static function get_bypass_code()
     {
-        return $this->get_plugin_setting(Hide_Dashboard_Menu_Items_Config::BYPASS_PASSCODE_KEY, null);
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::bypass_passcode_key(), null);
     }
 
     /**
@@ -160,9 +195,20 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns Hidden dashboard menu if exists. Otherwise empty array.
      */
-    public function get_hidden_dashboard_menu()
+    public static function get_hidden_dashboard()
     {
-        return $this->get_plugin_setting(Hide_Dashboard_Menu_Items_Config::HIDDEN_DASHBOARD_MENU_KEY, array());
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::hidden_dashboard_key(), array());
+    }
+
+    /**
+     * Get restricted dashboard menu from storage.
+     * 
+     * @since   1.0.1
+     * @return  array   Returns Restricted dashboard menu if exists. Otherwise empty array.
+     */
+    public static function get_restricted_dashboard()
+    {
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::restricted_dashboard_key(), array());
     }
 
     /**
@@ -171,14 +217,36 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns Hidden admin bar menu if exists. Otherwise empty array.
      */
-    public function get_hidden_admin_bar_menu()
+    public static function get_hidden_admin_bar()
     {
-        return $this->get_plugin_setting(Hide_Dashboard_Menu_Items_Config::HIDDEN_ADMIN_BAR_MENU_KEY, array());
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::hidden_admin_bar_key(), array());
     }
 
-    // --------------------------------------------------
-    // get data using option names
-    // --------------------------------------------------
+    /**
+     * Get restricted admin bar menu from storage.
+     * 
+     * @since   1.0.1
+     * @return  array   Returns Restricted admin bar menu if exists. Otherwise empty array.
+     */
+    public static function get_restricted_admin_bar()
+    {
+        return self::get_plugin_setting(Hide_Dashboard_Menu_Items_Config::restricted_admin_bar_key(), array());
+    }
+
+    /**
+     * Get scan status.
+     * 
+     * @since   1.0.1
+     * @return  boolean   Returns true if scan has started. Otherwise false.
+     */
+    public static function has_scan_started()
+    {
+        return get_transient('hdmi_scan_has_started');
+    }
+
+    /* --------------------------------------------------
+        get data using option names
+    ----------------------------------------------------- */
 
     /**
      * Get dashboard menu.
@@ -186,14 +254,30 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns dashboard menu if exists in either storage or cache. Otherwise empty array.
      */
-    public function get_dashboard_menu_cache()
+    public static function get_dashboard_cache()
     {
-        if (empty($this->dashboard_menu_cache)) {
+        if (empty(self::$dashboard_cache)) {
 
-            $this->dashboard_menu_cache =  get_option(Hide_Dashboard_Menu_Items_Config::DASHBOARD_MENU_OPTION, array());
+            self::$dashboard_cache =  self::get_array_option(Hide_Dashboard_Menu_Items_Config::dashboard_option());
         }
 
-        return $this->dashboard_menu_cache;
+        return self::$dashboard_cache;
+    }
+
+    /**
+     * Get dashboard menu children cache.
+     * 
+     * @since   1.0.1
+     * @return  array   Returns dashboard menu children if exists in either storage or cache. Otherwise empty array.
+     */
+    public static function get_dashboard_children_cache()
+    {
+        if (empty(self::$dashboard_children_cache)) {
+
+            self::$dashboard_children_cache =  self::get_array_option(Hide_Dashboard_Menu_Items_Config::dashboard_children_option());
+        }
+
+        return self::$dashboard_children_cache;
     }
 
     /**
@@ -202,14 +286,30 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns Admin bar menu if exists in either storage or cache. Otherwise an empty array.
      */
-    public function get_admin_bar_menu_cache()
+    public static function get_admin_bar_cache()
     {
-        if (empty($this->admin_bar_menu_cache)) {
+        if (empty(self::$admin_bar_cache)) {
 
-            $this->admin_bar_menu_cache = get_option(Hide_Dashboard_Menu_Items_Config::ADMIN_BAR_MENU_OPTION, array());
+            self::$admin_bar_cache = self::get_array_option(Hide_Dashboard_Menu_Items_Config::admin_bar_option());
         }
 
-        return $this->admin_bar_menu_cache;
+        return self::$admin_bar_cache;
+    }
+
+    /**
+     * Get admin bar menu children.
+     * 
+     * @since   1.0.1
+     * @return  array   Returns Admin bar menu children if exists in either storage or cache. Otherwise an empty array.
+     */
+    public static function get_admin_bar_children_cache()
+    {
+        if (empty(self::$admin_bar_children_cache)) {
+
+            self::$admin_bar_children_cache = self::get_array_option(Hide_Dashboard_Menu_Items_Config::admin_bar_children_option());
+        }
+
+        return self::$admin_bar_children_cache;
     }
 
     /**
@@ -218,14 +318,11 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns debug log if exists in either storage or cache. Otherwise an empty array.
      */
-    public function get_debug_log_cache()
+    public static function get_debug_log()
     {
+        self::$debug_log =  self::get_array_option(Hide_Dashboard_Menu_Items_Config::debug_option());
 
-        if (empty($this->debug_log_cache)) {
-            $this->debug_log_cache =  get_option(Hide_Dashboard_Menu_Items_Config::DEBUG_LOG_OPTION, array());
-        }
-
-        return $this->debug_log_cache;
+        return self::$debug_log;
     }
 
     /**
@@ -234,15 +331,11 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  array   Returns error log if exists in either storage or cache. Otherwise an empty array.
      */
-    public function get_error_log_cache()
+    public static function get_error_log()
     {
+        self::$error_log =  self::get_array_option(Hide_Dashboard_Menu_Items_Config::error_option());
 
-        if (empty($this->error_log_cache)) {
-
-            $this->error_log_cache =  get_option(Hide_Dashboard_Menu_Items_Config::ERROR_LOG_OPTION, array());
-        }
-
-        return $this->error_log_cache;
+        return self::$error_log;
     }
 
     /**
@@ -251,36 +344,64 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @since   1.0.1
      * @return  boolean     Returns true if exists. Otherwise false.
      */
-    public function get_scan_status_cache()
+    public static function get_scan_status_cache()
     {
-        if (!$this->scan_status) {
+        if (!self::$scan_status) {
 
-            $this->scan_status =  get_option(Hide_Dashboard_Menu_Items_Config::SCAN_SUCCESS_OPTION, false);
+            self::$scan_status =  self::get_array_option(Hide_Dashboard_Menu_Items_Config::scan_success_option(), false);
         }
 
-        return $this->scan_status;
+        return self::$scan_status;
     }
 
-
-    // --------------------------------------------------
-    // update data using option name
-    // --------------------------------------------------
+    /* --------------------------------------------------
+        update data using options
+    ----------------------------------------------------- */
 
     /**
      * Update dashboard menu.
      * 
      * @since   1.0.1
-     * @param   array   $dashboard_menu     Dashboard menu to update.
+     * @param   array   $dashboard     Dashboard menu to update.
      * @return boolean                      Returns true if updated. Otherwise false.
      */
-    public function update_dashboard_menu($dashboard_menu)
+    public static function update_dashboard($dashboard)
     {
         $updated = false;
 
-        if (is_array($dashboard_menu) && !empty($dashboard_menu))
-            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::DASHBOARD_MENU_OPTION, $dashboard_menu);
+        if (is_array($dashboard) && !empty($dashboard))
+            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::dashboard_option(), $dashboard);
 
         return $updated;
+    }
+
+    /**
+     * Update dashboard menu children.
+     * 
+     * @since   1.0.1
+     * @param   array   $dashboard_children           Children items to update.
+     * @return  boolean                     Returns true if updated. Otherwise false.
+     */
+    public static function update_dashboard_children($dashboard_children)
+    {
+        $updated = false;
+
+        if (is_array($dashboard_children) && !empty($dashboard_children))
+            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::dashboard_children_option(), $dashboard_children);
+
+        return $updated;
+    }
+
+    /**
+     * Update restricted dashboard menu.
+     * 
+     * @since   1.0.1
+     * @param   array   $restricted_dashboard       updated menu.
+     * @return  boolean                             Returns true if updated. Otherwise false.
+     */
+    public static function update_restricted_dashboard($restricted_dashboard)
+    {
+        return self::update_plugin_setting(Hide_Dashboard_Menu_Items_Config::restricted_dashboard_key(), $restricted_dashboard);
     }
 
     /**
@@ -290,14 +411,43 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @param   array   $admin_bar_menu     Admin bar menu to update.
      * @return  boolean                     Returns true if updated. Otherwise false.
      */
-    public function update_admin_bar_menu($admin_bar_menu)
+    public static function update_admin_bar($admin_bar)
     {
         $updated = false;
 
-        if (is_array($admin_bar_menu) && !empty($admin_bar_menu))
-            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::ADMIN_BAR_MENU_OPTION, $admin_bar_menu);
+        if (is_array($admin_bar) && !empty($admin_bar))
+            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::admin_bar_option(), $admin_bar);
 
         return $updated;
+    }
+
+    /**
+     * Update admin bar menu children.
+     * 
+     * @since   1.0.1
+     * @param   array   $admin_bar_children  Children items to update.
+     * @return  boolean                      Returns true if updated. Otherwise false.
+     */
+    public static function update_admin_bar_children($admin_bar_children)
+    {
+        $updated = false;
+
+        if (is_array($admin_bar_children) && !empty($admin_bar_children))
+            $updated =  update_option(Hide_Dashboard_Menu_Items_Config::admin_bar_children_option(), $admin_bar_children);
+
+        return $updated;
+    }
+
+    /**
+     * Update restricted admin bar menu.
+     * 
+     * @since   1.0.1
+     * @param   array   $restricted_admin_bar  updated menu.
+     * @return  boolean                             Returns true if updated. Otherwise false.
+     */
+    public static function update_restricted_admin_bar($restricted_admin_bar)
+    {
+        return self::update_plugin_setting(Hide_Dashboard_Menu_Items_Config::restricted_admin_bar_key(), $restricted_admin_bar);
     }
 
     /**
@@ -308,15 +458,15 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @param   array   $message    New value.
      * @return  boolean             Returns true if updated. Otherwise false.
      */
-    public function update_debug_log($key, $message)
+    public static function update_debug_log($key, $message)
     {
         $updated = false;
 
         if (!($key && $message)) return $updated;
 
-        $debug_data = $this->get_debug_log_cache();
+        $debug_data = self::get_debug_log();
         $debug_data[$key] = $message;
-        $updated =  update_option(Hide_Dashboard_Menu_Items_Config::DEBUG_LOG_OPTION, $debug_data);
+        $updated =  update_option(Hide_Dashboard_Menu_Items_Config::debug_option(), $debug_data);
 
         return $updated;
     }
@@ -329,37 +479,47 @@ class Hide_Dashboard_Menu_Items_Storage_Manager
      * @param   array   $message    New value.
      * @return  boolean             Returns true if updated. Otherwise false.
      */
-    public function update_error_log($message)
+    public static function update_error_log($message)
     {
         $updated = false;
 
         if (!$message) return $updated;
 
         // current data
-        $key = current_time('mysql');
+        $key = current_time("Y-m-d H:i");
 
-        $error_log = $this->get_error_log_cache();
+        $error_log = self::get_error_log();
         $error_log[$key] = $message;
-        $updated =  update_option(Hide_Dashboard_Menu_Items_Config::ERROR_LOG_OPTION, $error_log);
+
+        $updated =  update_option(Hide_Dashboard_Menu_Items_Config::error_option(), $error_log);
 
         return $updated;
     }
 
+    /* --------------------------------------------------
+        Add data using keys
+    ----------------------------------------------------- */
     /**
-     * Delete all plugin data.
-     * 
+     * Set scan start transient.
+     *
      * @since   1.0.1
-     * @param   string  $plugin_name    Plugin name to avoid accidental method calling.
      */
-    public static function delete_plugin_data($plugin_name)
+    public static function add_scan_started_transient()
     {
-        if ($plugin_name !== self::$plugin_name) return;
+        set_transient('hdmi_scan_has_started', true, 60);
+    }
 
-        delete_option(Hide_Dashboard_Menu_Items_Config::DASHBOARD_MENU_OPTION);
-        delete_option(Hide_Dashboard_Menu_Items_Config::ADMIN_BAR_MENU_OPTION);
-        delete_option(Hide_Dashboard_Menu_Items_Config::DEBUG_LOG_OPTION);
-        delete_option(Hide_Dashboard_Menu_Items_Config::ERROR_LOG_OPTION);
-        delete_option(Hide_Dashboard_Menu_Items_Config::SCAN_SUCCESS_OPTION);
-        delete_option(Hide_Dashboard_Menu_Items_Config::SETTINGS_OPTION);
+    /* --------------------------------------------------
+        Remove data using keys
+    ----------------------------------------------------- */
+
+    /**
+     * Removes scan start transient.
+     *
+     * @since   1.0.1
+     */
+    public static function remove_scan_started_transient()
+    {
+        delete_transient('hdmi_scan_has_started');
     }
 }
