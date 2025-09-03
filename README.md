@@ -1,4 +1,4 @@
-=== Hide Dashboard Menu Items ===
+# Hide Dashboard Menu Items
 Contributors: danukaprasad
 Donate link: https://danukaprasad.com/
 Tags: hide menu, hide dashboard menu, hide toolbar menu, restrict admin menu, restrict toolbar menu
@@ -11,7 +11,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 Hide unwanted dashboard and toolbar menu items in WordPress and prevent unauthorized access to their pages.
 
-== Description ==
+## escription
 
 **Hide Dashboard Menu Items** is a simple yet powerful plugin that gives administrators full control over the visibility of dashboard and toolbar menus in the WordPress admin area.
 
@@ -28,13 +28,13 @@ This plugin is ideal for developers, agencies, and anyone managing multi-user Wo
 * Reset all settings at any time.
 * Lightweight and easy to use.
 
-== Installation ==
+## Installation
 
 1. Upload the `hide-dashboard-menu-items` folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the ‘Plugins’ menu in WordPress.
 3. Go to **Settings → Hide Menu Items** to configure the plugin.
 
-== Frequently Asked Questions ==
+## Frequently Asked Questions
 
 = Will this plugin affect the front-end of my site? =
 
